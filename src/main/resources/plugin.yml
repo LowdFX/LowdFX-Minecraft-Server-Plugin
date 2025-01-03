@@ -1,0 +1,88 @@
+name: lowdfx
+version: '1.0'
+main: at.lowdfx.lowdfx.lowdfx
+api-version: '1.21'
+softdepend: ['ProtocolLib']
+
+commands:
+  spawn:
+    description: Teleportiert dich zum Spawn
+    usage: /spawn
+    permission: lowdfx.spawn
+  home:
+    description: Teleportiert dich zu deinem Home
+    usage: /home
+    permission: lowdfx.home
+  warp:
+    description: Teleportiert dich zu dem angegebenem Warp
+    usage: /warp
+    permission: lowdfx.warp
+  gm:
+    description: Ändert deinen Gamemode
+    usage: /gm
+    permission: lowdfx.gm
+  fly:
+    description: Ändert deinen Fly Modus
+    usage: /fly
+    permission: lowdfx.fly
+  heal:
+    description: Heilt dich voll
+    usage: /heal
+    permission: lowdfx.heal
+  feed:
+    description: Stillt deinen Hunger
+    usage: /feed
+    permission: lowdfx.feed
+  vanish:
+    description: Macht dich unsichtbar
+    aliases: ['v']
+    usage: /vanish
+    permission: lowdfx.vanish
+  trash:
+    description: Öffne einen Mülleimer
+    usage: /trash
+    permission: lowdfx.trash
+  invsee:
+    description: Öffne das Inventar eines Spielers
+    usage: /invsee
+    permission: lowdfx.invsee
+  endersee:
+    description: Öffne die Enderchest eines Spielers
+    usage: /endersee
+    permission: lowdfx.endersee
+  anvil:
+    description: Öffne einen Amboss
+    usage: /anvil
+    permission: lowdfx.anvil
+  workbench:
+    description: Öffne eine Werkbank
+    usage: /workbench
+    permission: lowdfx.workbench
+  lock:
+    description: Mit diesem Befehl werden Kisten gesperrt
+    usage: /lock
+    permission: lowdfx.lock
+  warn:
+    description: Mit diesem Befehl greifst du auf das Verwarn System zu
+    usage: /warn
+    permission: lowdfx.warn
+  low:
+    description: Hauptbefehl des Plugins
+    usage: /low
+    permission: lowdfx.low
+  low help:
+    description: Zeigt Hilfe über das Plugin
+    usage: /low help
+    permission: lowdfx.low.help
+  low info:
+    description: Zeigt Informationen über das Plugin
+    usage: /low info
+    permission: lowdfx.low.info
+  low starterkit:
+    description: Gibt ein Starterkit
+    usage: /low starterkit
+    permission: lowdfx.low.starterkit
+  low opkit:
+    description: Gibt das OP Kit
+    usage: /low opkit
+    permission: lowdfx.low.opkit
