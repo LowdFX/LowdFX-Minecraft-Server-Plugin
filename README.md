@@ -6,7 +6,7 @@
 **ACHTUNG**: Soft Dependency ist nicht notwendig, da diese nur für Zukünftige Projekt eingebunden ist!
 
 ## Beschreibung
-Das LowdFX Plugin erweitert deinen Minecraft-Server um zahlreiche, hilfreiche Befehle und Funktionen.
+Das LowdFX Plugin erweitert deinen Minecraft-Server um zahlreiche wie auch hilfreiche Befehle und Funktionen.
 Von Spielerinteraktionen über Home, Warp oder Spawn bis hin zu Invsee und Kistensperr-Befehlen bietet es ein umfangreiches Funktionsspektrum.
 Des weitern wurden Standard Commands wie Gamemode und der gleichen vereinfacht um einen besseren Umgang zu haben.
 Personalisierte Wilkommensnachricht wie auch Serverleave Nachricht, es wurde auch mit einem einfachen Vanish Befehl erweitert.
