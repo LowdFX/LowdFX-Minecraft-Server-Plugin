@@ -2,7 +2,7 @@
 
 **Version**: 1.0  
 **Minecraft API-Version**: 1.21  
-**Soft Dependency**: [ProtocolLib](https://github.com/dmulloy2/ProtocolLib)
+**Soft Dependency**: [ProtocolLib](https://github.com/dmulloy2/ProtocolLib)  
 **ACHTUNG**: Soft Dependency ist nicht notwendig, da diese nur für Zukünftige Projekt eingebunden ist!
 
 ## Beschreibung
