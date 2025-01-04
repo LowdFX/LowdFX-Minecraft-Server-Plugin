@@ -10,6 +10,8 @@ Das LowdFX Plugin erweitert deinen Minecraft-Server um zahlreiche wie auch hilfr
 Von Spielerinteraktionen über Home, Warp oder Spawn bis hin zu Invsee und Kistensperr-Befehlen bietet es ein umfangreiches Funktionsspektrum.
 Des weitern wurden Standard Commands wie Gamemode und der gleichen vereinfacht um einen besseren Umgang zu haben.
 Personalisierte Wilkommensnachricht wie auch Serverleave Nachricht, es wurde auch mit einem einfachen Vanish Befehl erweitert.
+Ein eigenes Verwarnsystem mit 3 Verwarnungen mit gespeicherter Info wie auch temp- und perma Ban.
+Bei den Bans wird der Name, UUID und IP gebannt!
 
 ---
 
