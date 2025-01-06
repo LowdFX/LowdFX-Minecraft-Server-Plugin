@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx;
 
 import at.lowdfx.lowdfx.commands.*;
+import at.lowdfx.lowdfx.commands.ChestShop.*;
 import at.lowdfx.lowdfx.commands.basicCommands.*;
 import at.lowdfx.lowdfx.commands.basicCommands.TrashCommand;
 import at.lowdfx.lowdfx.commands.basicCommands.inventoryCommands.*;
@@ -18,11 +19,6 @@ import at.lowdfx.lowdfx.commands.teleport.managers.*;
 import at.lowdfx.lowdfx.items.opkit.*;
 import at.lowdfx.lowdfx.quit.*;
 import at.lowdfx.lowdfx.welcome.*;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
@@ -38,6 +34,7 @@ public final class lowdfx extends JavaPlugin {
     private static SpawnManager spawnManager;
     private ChestData chestData;
     private InvisiblePlayerHandler invisibleHandler;
+    private ChestShopManager shopManager;
 
     @Override
     public void onEnable() {
@@ -62,8 +59,26 @@ public final class lowdfx extends JavaPlugin {
         // Spawn Events - Manager
         spawnManager = new SpawnManager(this);
         getServer().getPluginManager().registerEvents(spawnManager, this);
-        // Vanish Events - invisible Handler
 
+        // ChestShop Manager
+        File shopFolder = new File(getDataFolder(), "ChestShops");
+        if (!shopFolder.exists() && shopFolder.mkdirs()) {
+            getLogger().info("ChestShops-Ordner wurde erstellt.");
+        }
+
+        // Initialisiere den ShopManager
+        shopManager = new ChestShopManager(shopFolder, plugin);
+
+        // Lade alle Shops aus den Spielerdateien
+        shopManager.loadAllShops();
+
+        // Command registrieren
+        ChestShopCommand chestShopCommand = new ChestShopCommand(shopManager);
+        getCommand("shop").setExecutor(chestShopCommand);
+        //getCommand("shop").setTabCompleter(chestShopCommand);
+
+        // Listener registrieren
+        getServer().getPluginManager().registerEvents(new ChestShopListener(shopManager), this);
         // ------------------------------------------------------------------------------------------------
 
 /*ChestData Datei*/
@@ -84,12 +99,12 @@ public final class lowdfx extends JavaPlugin {
         this.getCommand("spawn").setExecutor(new SpawnCommand(this));
         this.getCommand("gm").setExecutor(new GamemodeCommand(this));
         this.getCommand("fly").setExecutor(new FlyCommand(this));
-            invisibleHandler = new InvisiblePlayerHandler(this);
-
-                this.getCommand("vanish").setExecutor(new VanishCommand(this, invisibleHandler));
-                this.getCommand("vanish").setTabCompleter(new VanishTabCompleter());
-                getServer().getPluginManager().registerEvents(invisibleHandler, this);
-                invisibleHandler.loadVanishedPlayers();// Registriere den TabCompleter
+        //Vanish
+        invisibleHandler = new InvisiblePlayerHandler(this);
+        this.getCommand("vanish").setExecutor(new VanishCommand(this, invisibleHandler));
+        this.getCommand("vanish").setTabCompleter(new VanishTabCompleter());
+        getServer().getPluginManager().registerEvents(invisibleHandler, this);
+        invisibleHandler.loadVanishedPlayers();// Registriere den TabCompleter
 
         this.getCommand("heal").setExecutor(new HealCommand(this));
         this.getCommand("feed").setExecutor(new FeedCommand(this));
@@ -153,6 +168,11 @@ public final class lowdfx extends JavaPlugin {
             getLogger().warning("Config ist null während onDisable().");
         }
 
+        // Speichere alle Shops in die Spielerdateien
+        shopManager.saveAllShops();
+
+
+
         //------------------------------------------
         if (!this.getServer().isPrimaryThread()) {
             // Hier asynchrone Aufgaben starten oder Operationen durchführen, die nicht während dem Shutdown laufen
@@ -169,6 +189,7 @@ public final class lowdfx extends JavaPlugin {
                 chestData.save();
             }
         }
+        saveConfig();
     }
 
 
@@ -214,5 +235,9 @@ public final class lowdfx extends JavaPlugin {
 
     public InvisiblePlayerHandler getInvisibleHandler() {
         return invisibleHandler;
+    }
+
+    public ChestShopManager getShopManager() {
+        return shopManager;
     }
 }

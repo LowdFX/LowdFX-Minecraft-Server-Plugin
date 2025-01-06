@@ -1,0 +1,12 @@
+join:
+  welcome: Guten Tag # Willkommensnachricht
+  quit: Bis bald # Verabschiedungsnachricht
+
+basic:
+  servername: HiyarCraft # Servername steht vor jeder Befehlsnachricht wie auch Willkommens und Verabschiedungsnachricht
+  noPermission: Du hast keine Berechtigung für diesen Befehl! # Berechtigungsnachricht
+  maxhomes: 5 # Maximale Homes pro Spieler
+  vanish: true # Vanish Command ein = (true) aus = (false)
+warnsystem:
+  tempban-duration: 86400 # Dauer des temporären Bans in Sekunden (Standard: 24 Stunden)
+

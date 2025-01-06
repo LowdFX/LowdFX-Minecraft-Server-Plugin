@@ -1,0 +1,61 @@
+chests:
+  551_112_-3232:
+    locked: true
+    owner: martin
+    whitelist:
+    - martin
+  558_112_-3225:
+    locked: false
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  557_112_-3244:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  558_112_-3244:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  559_112_-3243:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  558_112_-3242:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  557_112_-3243:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  559_112_-3254:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  557_112_-3254:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  558_112_-3253:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  558_112_-3255:
+    locked: true
+    owner: LowdFX
+    whitelist:
+    - LowdFX
+  667_72_-3270:
+    locked: false
+    owner: LowdFX
+    whitelist:
+    - LowdFX

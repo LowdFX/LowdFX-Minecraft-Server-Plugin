@@ -1,0 +1,20 @@
+[
+  {
+    "uuid": "00000000-0000-0000-0009-01f8ae07d864",
+    "name": ".denise1256",
+    "level": 4,
+    "bypassesPlayerLimit": true
+  },
+  {
+    "uuid": "0cff1804-b811-4cb6-bb22-d106d0737268",
+    "name": "LowdFX",
+    "level": 4,
+    "bypassesPlayerLimit": true
+  },
+  {
+    "uuid": "c0b82bb2-a30f-317c-969e-03778815d41f",
+    "name": "martin",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  }
+]

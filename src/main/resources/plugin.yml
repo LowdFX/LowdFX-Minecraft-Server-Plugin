@@ -38,6 +38,10 @@ commands:
     aliases: ['v']
     usage: /vanish
     permission: lowdfx.vanish
+  shop:
+    description: Erstelle einen Kisten Shop
+    usage: /shop
+    permission: lowdfx.chestshop
   trash:
     description: Öffne einen Mülleimer
     usage: /trash
