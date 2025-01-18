@@ -1,7 +1,6 @@
-package at.lowdfx.lowdfx.commands.tab_completion;
+package at.lowdfx.lowdfx.commands.tab_completion.completion.inventoryTabCompleters;
 
-import at.lowdfx.lowdfx.Utilities;
-import at.lowdfx.lowdfx.commands.chest.lock.ChestLockCommand;
+import at.lowdfx.lowdfx.commands.basic.inventory.AnvilCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -12,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChestLockTabCompleter implements TabCompleter {
-    private static final List<String> COMMANDS = List.of("help", "unlock", "add", "remove");
+public class AnvilTabCompleter implements TabCompleter {
+    private static final List<String> COMMANDS = List.of("help");
     // Eine statische Liste der Befehle
 
     @Override
@@ -24,17 +23,15 @@ public class ChestLockTabCompleter implements TabCompleter {
         StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
         // Die gefilterten Vervollständigungen zurückgeben
 
-        if (sender.hasPermission(ChestLockCommand.PLAYER_PERMISSION)) {
+        if (sender.hasPermission(AnvilCommand.ADMIN_PERMISSION)) {
             if (args.length == 1) {
                 if (!(sender instanceof Player)) {
                     return List.of();
                 }
                 return completions;
             }
-            if (args.length == 2 && args[0].equalsIgnoreCase("unlock") || args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
-                return Utilities.getOnlinePlayers();
-            }
         }
         return List.of();
     }
+
 }

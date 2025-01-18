@@ -1,8 +1,8 @@
 package at.lowdfx.lowdfx.commands.tab_completion;
 
 import at.lowdfx.lowdfx.Lowdfx;
+import at.lowdfx.lowdfx.Utilities;
 import at.lowdfx.lowdfx.commands.WarnCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -12,11 +12,12 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WarnTabCompleter implements TabCompleter {
-    private static final String[] ADMIN_COMMANDS = { "help", "info", "remove", "removeall" };
-    private static final String[] PLAYER_COMMANDS = { "help", "info" };
+    private static final List<String> ADMIN_COMMANDS = List.of("help", "info", "remove", "removeall");
+    private static final List<String> PLAYER_COMMANDS = List.of("help", "info");
     // Eine statische Liste der Befehle
 
     @Override
@@ -25,8 +26,8 @@ public class WarnTabCompleter implements TabCompleter {
         final List<String> adminCompletions = new ArrayList<>();
         final List<String> playerCompletions = new ArrayList<>();
         // Konvertieren des Arrays COMMANDS in eine Liste, um copyPartialMatches zu verwenden
-        StringUtil.copyPartialMatches(args[0], Arrays.asList(ADMIN_COMMANDS), adminCompletions);
-        StringUtil.copyPartialMatches(args[0], Arrays.asList(PLAYER_COMMANDS), playerCompletions);
+        StringUtil.copyPartialMatches(args[0], ADMIN_COMMANDS, adminCompletions);
+        StringUtil.copyPartialMatches(args[0], PLAYER_COMMANDS, playerCompletions);
 
         // Die gefilterten Vervollständigungen zurückgeben
 
@@ -59,14 +60,6 @@ public class WarnTabCompleter implements TabCompleter {
         return List.of();
     }
 
-    public ArrayList<String> getOnlinePlayers() {
-        ArrayList<String> list = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            list.add(player.getName());
-        }
-        return list;
-    }
-
     public ArrayList<String> getWarnedPlayers() {
         ArrayList<String> warnedList = new ArrayList<>();
         File warnFolder = Lowdfx.DATA_DIR.resolve("WarnSystem").toFile();  // Hier den Pfad zum Ordner der Warn-Daten anpassen
@@ -96,19 +89,9 @@ public class WarnTabCompleter implements TabCompleter {
     }
 
     public ArrayList<String> getCombinedPlayers() {
-        // Hole die Online-Spieler-Liste
-        ArrayList<String> onlinePlayers = getOnlinePlayers();
-        // Hole die Liste der verwarnten Spieler
-        ArrayList<String> warnedPlayers = getWarnedPlayers();
-
-        // Nutze ein Set, um Duplikate zu vermeiden
-        Set<String> combinedSet = new HashSet<>();
-
-        // Füge sowohl online Spieler als auch verwarnten Spieler zum Set hinzu
-        combinedSet.addAll(onlinePlayers);
-        combinedSet.addAll(warnedPlayers);
-
-        // Wandeln das Set zurück in eine ArrayList
-        return new ArrayList<>(combinedSet);
+        List<String> all = new ArrayList<>();
+        all.addAll(Utilities.getOnlinePlayers());
+        all.addAll(getWarnedPlayers());
+        return new ArrayList<>(all);
     }
 }

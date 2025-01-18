@@ -1,29 +1,29 @@
 package at.lowdfx.lowdfx.items.starterkit;
 
-import org.bukkit.ChatColor;
+import at.lowdfx.lowdfx.Lowdfx;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 
 public class StarterStoneAxe {
-    public static ItemStack get() {
-        ItemStack item = new ItemStack(Material.STONE_AXE, 1);
-        ItemMeta meta = item.getItemMeta();
+    public static final ItemStack ITEM = new ItemStack(Material.STONE_AXE);
 
-        meta.setDisplayName(ChatColor.RED + "Starter Steinaxt");
-        meta.addEnchant(Enchantment.EFFICIENCY, 1, false);
-        meta.addEnchant(Enchantment.UNBREAKING, 1, false);
-        meta.addEnchant(Enchantment.FORTUNE, 1, false);
+    static {
+        ITEM.editMeta(meta -> {
+            meta.displayName(Component.text("Starter Steinaxt", NamedTextColor.RED));
+            meta.lore(Lowdfx.STARTER_LORE);
+            meta.setUnbreakable(true);
 
+            meta.addEnchant(Enchantment.EFFICIENCY, 1, false);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, false);
+            meta.addEnchant(Enchantment.FORTUNE, 1, false);
+        });
+    }
 
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.DARK_PURPLE + "Starter Kit");
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-        return item;
+    public static @NotNull ItemStack get() {
+        return new ItemStack(ITEM);
     }
 }

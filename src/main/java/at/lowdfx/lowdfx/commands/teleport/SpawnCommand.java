@@ -2,8 +2,10 @@ package at.lowdfx.lowdfx.commands.teleport;
 
 import at.lowdfx.lowdfx.Lowdfx;
 import at.lowdfx.lowdfx.commands.teleport.managers.SpawnManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +22,7 @@ public class SpawnCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         Bukkit.getScheduler().runTaskAsynchronously(Lowdfx.PLUGIN, () -> {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "Das darf nur ein Spieler tun!");
+                sender.sendMessage(Component.text("Das darf nur eine Spieler tun!", NamedTextColor.RED));
                 return;
             }
             if (sender.hasPermission(PLAYER_PERMISSION)) {
@@ -46,7 +48,7 @@ public class SpawnCommand implements CommandExecutor {
             if (sender.hasPermission(ADMIN_PERMISSION)) {
                 if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("set")) {
-                        setAdmin(sender, args[1], args);
+                        setAdmin(sender, args[1]);
                         return;
                     }
 
@@ -56,9 +58,7 @@ public class SpawnCommand implements CommandExecutor {
                     }
                 }
             }
-
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                    ChatColor.RED + "Fehler! Benutze /spawn help für eine hilfe!");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler! Benutze /spawn help für eine hilfe!", NamedTextColor.RED)));
         });
         return true;
     }
@@ -68,31 +68,27 @@ public class SpawnCommand implements CommandExecutor {
         if (SpawnManager.exists(name)) {
             // Prüfen, ob nur der aktuelle Spawn der einzige Spawn ist
             if (SpawnManager.getNames().size() == 1 && SpawnManager.getNames().contains(name)) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                        ChatColor.RED + "Es ist nicht möglich, den einzigen verfügbaren Spawn zu löschen.");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Es ist nicht möglich, den einzigen verfügbaren Spawn zu löschen.", NamedTextColor.RED)));
                 return;
             }
 
             // Entferne den Spawn, falls vorhanden
             SpawnManager.setSpawn(name, null);
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                    ChatColor.GREEN + "Der Spawn " + ChatColor.BOLD + name +  ChatColor.GREEN + " wurde gelöscht!");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spawn " + name + " wurde gelöscht!", NamedTextColor.GREEN)));
         } else {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                    ChatColor.RED + "Der Spawn " + ChatColor.BOLD + name +  ChatColor.RED + " existiert nicht!");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spawn " + name + " existiert nicht!", NamedTextColor.RED)));
         }
     }
 
-    private void setAdmin(CommandSender sender, String name, String[] args) {
+    private void setAdmin(CommandSender sender, String name) {
         // Setzen des Spawns
         SpawnManager.setSpawn(name, ((Player) sender).getLocation());
-        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                ChatColor.GREEN + "Der Spawn " + ChatColor.BOLD + name +  ChatColor.GREEN + " wurde gesetzt!");
+        sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spawn " + name + " wurde gesetzt!", NamedTextColor.GREEN)));
 
-        // Wenn nur ein Spawn existiert, den Standardspawn wiederherstellen
+        // Wenn nur ein Spawn existiert, den Standard-spawn wiederherstellen
         if (SpawnManager.getNames().size() == 1) {
             // Neue Version ohne ServerProperties
-            SpawnManager.setSpawn("default", Bukkit.getWorlds().get(0).getSpawnLocation());  // Hier wird die erste Welt im Server genutzt
+            SpawnManager.setSpawn("default", Bukkit.getWorlds().getFirst().getSpawnLocation());  // Hier wird die erste Welt im Server genutzt
 
         }
     }
@@ -100,34 +96,31 @@ public class SpawnCommand implements CommandExecutor {
     private void spawnAdmin(CommandSender sender, String name) {
         if (SpawnManager.exists(name)) {
             Objects.requireNonNull(SpawnManager.getSpawn(name)).teleport(((Player) sender), Lowdfx.PLUGIN);
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                    ChatColor.GREEN + "Du wurdest zum Spawn teleportiert!");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Du wurdest zum Spawn teleportiert!", NamedTextColor.GREEN)));
         } else {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                    ChatColor.RED + "Der eingegebene Spawn " + ChatColor.BOLD + name +  ChatColor.RED + " existiert nicht!");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Der eingegebene Spawn " + name + " existiert nicht!", NamedTextColor.RED)));
         }
     }
 
-    private void spawn(CommandSender sender) {
+    private void spawn(@NotNull CommandSender sender) {
         SpawnManager.getSpawn(((Player) sender)).teleport(((Player) sender), Lowdfx.PLUGIN);
-        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +
-                ChatColor.GREEN + "Du wurdest zum Spawn teleportiert!");
+        sender.sendMessage(Lowdfx.serverMessage(Component.text("Du wurdest zum Spawn teleportiert!", NamedTextColor.GREEN)));
     }
 
-    private void sendHelp(CommandSender sender) {
-        String title = ChatColor.GOLD.toString();
-        String color = ChatColor.GRAY.toString();
-        String commandColor = ChatColor.YELLOW.toString();
-        String arrow = ChatColor.WHITE + " → ";
-
-        sender.sendMessage(title + ChatColor.BOLD + "------- Help: Spawn -------");
-        sender.sendMessage(commandColor + "/spawn " +  arrow + color +" Teleportiert dich zum Spawn.");
-        sender.sendMessage(commandColor + "/spawn help " +  arrow + color +" Sendet dir eine Hilfestellung.");
+    private void sendHelp(@NotNull CommandSender sender) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("""
+                <gold><b>------- Help: Spawn -------</b>
+                <yellow>/spawn <white>→ <gray> Teleportiert dich zum Spawn.
+                <yellow>/spawn help <white>→ <gray> Sendet dir eine Hilfestellung.
+                """));
 
         if (sender.hasPermission(ADMIN_PERMISSION)) {
-            sender.sendMessage(commandColor + "/spawn set <name> " +  arrow + color +" Setzt einen Spawn mit dem Namen.");
-            sender.sendMessage(commandColor + "/spawn remove <name> " +  arrow + color +" Löscht einen Spawn mit den Namen.");
-            sender.sendMessage(commandColor + "/spawn tp <name> " +  arrow + color +" Teleportiert dich zum Spawn mit den eingegebenen Namen.");
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("""
+                    <gold><b>------- Help: Spawn -------</b>
+                    <yellow>/spawn set <name> <white>→ <gray> Setzt einen Spawn mit dem Namen.
+                    <yellow>/spawn remove <name> <white>→ <gray> Löscht einen Spawn mit den Namen.
+                    <yellow>/spawn tp <name> <white>→ <gray> Teleportiert dich zum Spawn mit den eingegebenen Namen.
+                    """));
         }
     }
 }

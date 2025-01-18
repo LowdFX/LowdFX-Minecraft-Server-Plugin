@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.commands.basic.inventoryCommands;
+package at.lowdfx.lowdfx.commands.basic.inventory;
 
 import at.lowdfx.lowdfx.Lowdfx;
 import net.kyori.adventure.text.Component;

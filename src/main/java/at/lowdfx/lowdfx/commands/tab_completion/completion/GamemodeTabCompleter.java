@@ -1,7 +1,7 @@
-package at.lowdfx.lowdfx.commands.tab_completion.basicTabCompleters;
+package at.lowdfx.lowdfx.commands.tab_completion.completion;
 
+import at.lowdfx.lowdfx.Utilities;
 import at.lowdfx.lowdfx.commands.basic.GamemodeCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -10,11 +10,10 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GamemodeTabCompleter implements TabCompleter {
-    private static final String[] COMMANDS = { "help", "0", "1", "2", "3", "survival", "creative", "adventure", "spectator" };
+    private static final List<String> COMMANDS = List.of("help", "0", "1", "2", "3", "survival", "creative", "adventure", "spectator");
     // Eine statische Liste der Befehle
 
     @Override
@@ -22,7 +21,7 @@ public class GamemodeTabCompleter implements TabCompleter {
         // Neues Array für die Vervollständigungen
         final List<String> completions = new ArrayList<>();
         // Konvertieren des Arrays COMMANDS in eine Liste, um copyPartialMatches zu verwenden
-        StringUtil.copyPartialMatches(args[0], Arrays.asList(COMMANDS), completions);
+        StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
         // Die gefilterten Vervollständigungen zurückgeben
 
         if (sender.hasPermission(GamemodeCommand.ADMIN_PERMISSION)) {
@@ -35,18 +34,9 @@ public class GamemodeTabCompleter implements TabCompleter {
             if (args.length == 2 && args[0].equalsIgnoreCase("0") || args[0].equalsIgnoreCase("1") || args[0].equalsIgnoreCase("2")
             || args[0].equalsIgnoreCase("3") || args[0].equalsIgnoreCase("survival") || args[0].equalsIgnoreCase("creative") ||
                     args[0].equalsIgnoreCase("adventure") || args[0].equalsIgnoreCase("spectator")) {
-                return getOnlinePlayers();
+                return Utilities.getOnlinePlayers();
             }
         }
         return List.of();
     }
-
-    public ArrayList<String> getOnlinePlayers() {
-        ArrayList<String> list = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            list.add(player.getName());
-        }
-        return list;
-    }
-
 }

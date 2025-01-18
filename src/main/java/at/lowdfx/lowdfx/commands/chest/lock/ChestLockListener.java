@@ -1,13 +1,12 @@
 package at.lowdfx.lowdfx.commands.chest.lock;
 
 import at.lowdfx.lowdfx.Lowdfx;
+import at.lowdfx.lowdfx.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Explosive;
@@ -23,21 +22,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ChestLockListener implements Listener {
     // Hilfsfunktion zur Abfrage der verbundenen Kisten
     private @NotNull Set<Location> getConnectedChests(Block chestBlock) {
-        Set<Location> connectedChests = new HashSet<>();
-        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
-            Block relativeBlock = chestBlock.getRelative(face);
-            if (relativeBlock.getType() == Material.CHEST) {
-                connectedChests.add(relativeBlock.getLocation());
-            }
-        }
-        return connectedChests;
+        return Utilities.connectedChests(chestBlock);
     }
 
     @EventHandler
@@ -109,10 +100,8 @@ public class ChestLockListener implements Listener {
                     }
 
                     // Abbrechen, falls die Kiste gesperrt ist und der Spieler keine Permission hat
-                    if (player == null || !player.hasPermission(ChestLockCommand.ADMIN_PERMISSION)) {
+                    if (player == null || !player.hasPermission(ChestLockCommand.ADMIN_PERMISSION))
                         event.setCancelled(true);
-                        return;
-                    }
                 }
             }
         }
@@ -136,11 +125,11 @@ public class ChestLockListener implements Listener {
                 if (!data.isPlayerInWhitelist(chestLocation, player.getName()) && !data.isOwner(player.getName(), chestLocation) && !player.hasPermission(ChestLockCommand.ADMIN_PERMISSION)) {
                     // Kiste ist gesperrt und der Spieler ist weder Besitzer noch auf der Whitelist
                     event.setCancelled(true);
-                    player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Diese Kiste ist gesperrt und du kannst sie nicht abbauen.");
+                    player.sendMessage(Lowdfx.serverMessage(Component.text("Diese Kiste ist gesperrt und du kannst sie nicht abbauen.", NamedTextColor.RED)));
                 } else {
                     // Spieler ist Besitzer oder auf der Whitelist, Kiste kann gelöscht werden
                     data.removeDestroyedChest(chestLocation);
-                    player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Diese Kiste wurde gelöscht.");
+                    player.sendMessage(Lowdfx.serverMessage(Component.text("Diese Kiste wurde gelöscht.", NamedTextColor.GREEN)));
                 }
             }
         }
@@ -169,7 +158,7 @@ public class ChestLockListener implements Listener {
                 if (!data.isPlayerInWhitelist(adjacentLocation, player.getName()) &&
                         !player.hasPermission(ChestLockCommand.ADMIN_PERMISSION)) {
                     event.setCancelled(true);
-                    player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Du kannst keine Doppelkiste mit einer gesperrten Kiste erstellen.");
+                    player.sendMessage(Lowdfx.serverMessage(Component.text("Du kannst keine Doppelkiste mit einer gesperrten Kiste erstellen.", NamedTextColor.RED)));
                     return;
                 }
             }
@@ -187,24 +176,8 @@ public class ChestLockListener implements Listener {
 
             // Überprüfe, ob es sich um eine Explosion handelt, die durch TNT, Creeper, etc. ausgelöst wurde
             if (event.getEntity() instanceof TNTPrimed || event.getEntity() instanceof Creeper || event.getEntity() instanceof Explosive || event.getEntity() instanceof ExplosiveMinecart) {
-                // Durch alle Blöcke in der Explosion iterieren
-                List<Block> blocksToRemove = new ArrayList<>();
-                for (Block block : event.blockList()) {
-                    // Wenn der Block eine Kiste oder Endertruhen ist
-                    if (block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX")) {
-                        Location chestLocation = block.getLocation();
-                        ChestData data = Lowdfx.PLUGIN.getChestData();
-
-                        // Wenn die Kiste gesperrt ist
-                        if (data.isChestLocked(chestLocation)) {
-                            // Block zur Liste der zu entfernenden Blöcke hinzufügen
-                            blocksToRemove.add(block);
-                        }
-                    }
-                }
-
                 // Alle gesperrten Kisten aus der Explosionsliste entfernen
-                event.blockList().removeAll(blocksToRemove);
+                event.blockList().removeAll(explosionBlocks(event.blockList()));
             }
         } catch (Exception e) {
             Lowdfx.LOG.error("Irgendwas funktioniert nicht.", e);
@@ -216,59 +189,50 @@ public class ChestLockListener implements Listener {
         try {
             // Überprüfen, ob ChestData geladen ist
             if (Lowdfx.PLUGIN.getChestData() == null) return;
-
-            // Liste von Blöcken, die von der Explosion betroffen sind
-            List<Block> blocksToRemove = new ArrayList<>();
-            for (Block block : event.blockList()) {
-                // Wenn es sich um eine Kiste handelt
-                if (block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX")) {
-                    Location chestLocation = block.getLocation();
-                    ChestData data = Lowdfx.PLUGIN.getChestData();
-
-                    // Wenn die Kiste gesperrt ist, verhindern wir die Zerstörung
-                    if (data.isChestLocked(chestLocation)) {
-                        // Block zur Liste der zu entfernenden Blöcke hinzufügen
-                        blocksToRemove.add(block);
-                    }
-                }
-            }
-
             // Alle gesperrten Kisten aus der Explosionsliste entfernen
-            event.blockList().removeAll(blocksToRemove);
+            event.blockList().removeAll(explosionBlocks(event.blockList()));
         } catch (Exception e) {
             Lowdfx.LOG.error("Irgendwas funktioniert nicht.", e);
         }
+    }
+
+    // Liste von Blöcken, die von der Explosion betroffen sind
+    public static @NotNull List<Block> explosionBlocks(@NotNull List<Block> blocks) {
+        List<Block> blocksToRemove = new ArrayList<>();
+        for (Block block : blocks) {
+            // Wenn es sich um eine Kiste handelt
+            if (block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX")) {
+                Location chestLocation = block.getLocation();
+                ChestData data = Lowdfx.PLUGIN.getChestData();
+
+                // Wenn die Kiste gesperrt ist, verhindern wir die Zerstörung
+                if (data.isChestLocked(chestLocation)) {
+                    // Block zur Liste der zu entfernenden Blöcke hinzufügen
+                    blocksToRemove.add(block);
+                }
+            }
+        }
+        return blocksToRemove;
     }
 
     @EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
-        try {
-            if (Lowdfx.PLUGIN.getChestData() == null) return;  // Frühes Abbrechen, falls `chestData` nicht verfügbar ist
-
-            // Überprüfe jeder Block in der Block-Liste der Piston-Erweiterung
-            for (Block block : event.getBlocks()) {
-                if (block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX")) {
-                    // Wenn die Kiste gesperrt ist, verhindere die Piston-Erweiterung
-                    if (Lowdfx.PLUGIN.getChestData().isChestLocked(block.getLocation())) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Lowdfx.LOG.error("Irgendwas funktioniert nicht.", e);
-        }
+        pistonStuff(event, event.getBlocks());
     }
 
     @EventHandler
     public void onPistonRetract(BlockPistonRetractEvent event) {
-        try {
-            if (Lowdfx.PLUGIN.getChestData() == null) return;  // Frühes Abbrechen, falls `chestData` nicht verfügbar ist
+        pistonStuff(event, event.getBlocks());
+    }
 
-            // Überprüfe, ob einer der Blöcke gesperrt ist, bevor der Block zurückgezogen wird
-            for (Block block : event.getBlocks()) {
+    public void pistonStuff(BlockPistonEvent event, List<Block> blocks) {
+        try {
+            if (Lowdfx.PLUGIN.getChestData() == null) return; // Frühes Abbrechen, falls `chestData` nicht verfügbar ist.
+
+            // Überprüfe, ob einer der Blöcke gesperrt ist, bevor der Block gezogen/gepusht wird.
+            for (Block block : blocks) {
                 if (block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX")) {
-                    // Wenn die Kiste gesperrt ist, verhindere das Zurückziehen
+                    // Wenn die Kiste gesperrt ist, verhindere das Ziehen/Pushen.
                     if (Lowdfx.PLUGIN.getChestData().isChestLocked(block.getLocation())) {
                         event.setCancelled(true);
                         return;

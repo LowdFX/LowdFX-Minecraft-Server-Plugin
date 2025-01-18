@@ -29,7 +29,7 @@ public class HealCommand implements CommandExecutor {
                         sender.sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
                         return;
                     }
-                    heal(sender, player);
+                    heal(player);
                     return;
                 }
 
@@ -46,7 +46,7 @@ public class HealCommand implements CommandExecutor {
                     }
 
                     if (args[0].equalsIgnoreCase(target.getName())) {
-                        healTarget(sender, target, args);
+                        healTarget(target, args);
                         return;
                     }
 
@@ -58,7 +58,7 @@ public class HealCommand implements CommandExecutor {
         return true;
     }
 
-    private void heal(CommandSender sender, @NotNull Player player) {
+    private void heal(@NotNull Player player) {
         double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue();
         double amount = maxHealth - player.getHealth();
 
@@ -76,7 +76,7 @@ public class HealCommand implements CommandExecutor {
         }
     }
 
-    private void healTarget(CommandSender sender, @NotNull Player player, String @NotNull [] args) {
+    private void healTarget(@NotNull Player player, String @NotNull [] args) {
         Player target = Bukkit.getPlayer(args[0]);
 
         double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getBaseValue();

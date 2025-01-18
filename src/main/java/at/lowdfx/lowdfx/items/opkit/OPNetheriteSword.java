@@ -29,13 +29,13 @@ public class OPNetheriteSword {
 
             meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.attackdamage"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.MAINHAND
             ));
             meta.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.attackspeed"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.MAINHAND));
         });

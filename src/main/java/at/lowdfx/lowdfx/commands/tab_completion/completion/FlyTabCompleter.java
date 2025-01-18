@@ -1,7 +1,7 @@
-package at.lowdfx.lowdfx.commands.tab_completion;
+package at.lowdfx.lowdfx.commands.tab_completion.completion;
 
 import at.lowdfx.lowdfx.Utilities;
-import at.lowdfx.lowdfx.commands.chest.lock.ChestLockCommand;
+import at.lowdfx.lowdfx.commands.basic.FlyCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -12,26 +12,26 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChestLockTabCompleter implements TabCompleter {
-    private static final List<String> COMMANDS = List.of("help", "unlock", "add", "remove");
+public class FlyTabCompleter implements TabCompleter {
+    private static final List<String> COMMANDS = List.of("help");
     // Eine statische Liste der Befehle
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String @NotNull [] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         // Neues Array für die Vervollständigungen
-        final List<String> completions = new ArrayList<>();
+         final List<String> completions = new ArrayList<>();
         // Konvertieren des Arrays COMMANDS in eine Liste, um copyPartialMatches zu verwenden
         StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
         // Die gefilterten Vervollständigungen zurückgeben
 
-        if (sender.hasPermission(ChestLockCommand.PLAYER_PERMISSION)) {
+        if (sender.hasPermission(FlyCommand.ADMIN_PERMISSION)) {
             if (args.length == 1) {
                 if (!(sender instanceof Player)) {
                     return List.of();
                 }
-                return completions;
+                return Utilities.allTabCompletions("help");
             }
-            if (args.length == 2 && args[0].equalsIgnoreCase("unlock") || args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
+            if (args.length == 2 && args[0].equalsIgnoreCase("fly")) {
                 return Utilities.getOnlinePlayers();
             }
         }

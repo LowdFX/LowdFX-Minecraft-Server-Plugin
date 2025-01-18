@@ -24,18 +24,18 @@ public class OPNetheriteLeggings {
 
             meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.armor"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.FEET
             ));
             meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.armortoughness"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.FEET));
             meta.addAttributeModifier(Attribute.EXPLOSION_KNOCKBACK_RESISTANCE, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.explosionknockbackresistance"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.FEET));
         });

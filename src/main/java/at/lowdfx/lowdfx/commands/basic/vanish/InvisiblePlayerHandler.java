@@ -1,11 +1,10 @@
-package at.lowdfx.lowdfx.commands.basic.vanishCommand;
+package at.lowdfx.lowdfx.commands.basic.vanish;
 
 import at.lowdfx.lowdfx.Lowdfx;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,19 +27,15 @@ public class InvisiblePlayerHandler implements Listener {
     private final JavaPlugin plugin;
     private final Map<Player, BossBar> playerBossBars = new HashMap<>();
     private final Set<UUID> vanishedPlayers = new HashSet<>();
-    private final File vanishedPlayersFile;
-    private FileConfiguration vanishedPlayersConfig;
 
     public InvisiblePlayerHandler(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
         // Erstellen oder Öffnen der Datei "VanishedPlayers.yml"
-        this.vanishedPlayersFile = new File(plugin.getDataFolder(), "VanishedPlayers.yml");
+        File vanishedPlayersFile = new File(plugin.getDataFolder(), "VanishedPlayers.yml");
         if (!vanishedPlayersFile.exists()) {
             plugin.saveResource("VanishedPlayers.yml", false); // Erstelle die Datei beim ersten Start
         }
 
-        // Laden der Konfiguration der neuen Datei
-        this.vanishedPlayersConfig = YamlConfiguration.loadConfiguration(vanishedPlayersFile);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -66,26 +61,6 @@ public class InvisiblePlayerHandler implements Listener {
 
         playerBossBars.put(player, bossBar);
         vanishedPlayers.add(player.getUniqueId());
-    }
-
-    // Spieler sichtbar machen und BossBar entfernen
-    public void makePlayerVisible(Player player) {
-        if (!playerBossBars.containsKey(player)) {
-            return;
-        }
-
-        BossBar bossBar = playerBossBars.remove(player);
-        if (bossBar != null)
-            bossBar.removeViewer(player);
-
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (!onlinePlayer.equals(player)) {
-                onlinePlayer.showPlayer(plugin, player);
-            }
-        }
-
-        player.removeMetadata("vanished", plugin);
-        vanishedPlayers.remove(player.getUniqueId());
     }
 
     @EventHandler

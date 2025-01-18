@@ -13,10 +13,8 @@ import java.util.List;
 
 public class WarpsTabCompleter implements TabCompleter {
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            return List.of();
-        }
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player)) return List.of();
 
         if (args.length == 1) {
             if (sender.hasPermission(WarpCommand.ADMIN_PERMISSION)) {
@@ -38,7 +36,6 @@ public class WarpsTabCompleter implements TabCompleter {
             }
 
         }
-
         return List.of();
     }
 

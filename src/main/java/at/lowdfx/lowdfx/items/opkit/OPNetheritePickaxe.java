@@ -29,7 +29,7 @@ public class OPNetheritePickaxe {
 
             meta.addAttributeModifier(Attribute.LUCK, new AttributeModifier(
                     new NamespacedKey("lowdfx", "generic.luck"),
-                    999999999,
+                    Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.MAINHAND));
 

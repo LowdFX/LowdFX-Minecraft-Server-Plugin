@@ -1,21 +1,20 @@
 package at.lowdfx.lowdfx.commands.chest.lock;
 
 import at.lowdfx.lowdfx.Lowdfx;
+import at.lowdfx.lowdfx.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -24,34 +23,24 @@ public class ChestLockCommand implements CommandExecutor {
     public static final String ADMIN_PERMISSION = "lowdfx.lock.admin";
 
     private @NotNull Set<Location> getConnectedChests(Block chestBlock) {
-        Set<Location> connectedChests = new HashSet<>();
-        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
-            Block relativeBlock = chestBlock.getRelative(face);
-            if (relativeBlock.getType() == Material.CHEST) {
-                connectedChests.add(relativeBlock.getLocation());
-            }
-        }
-        return connectedChests;
+        return Utilities.connectedChests(chestBlock);
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Nur Spieler können diesen Befehl ausführen.");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Nur Spieler können diesen Befehl ausführen!", NamedTextColor.RED)));
             return true;
         }
 
         if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
-            String title = ChatColor.GOLD.toString();
-            String color = ChatColor.GRAY.toString();
-            String commandColor = ChatColor.YELLOW.toString();
-            String arrow = ChatColor.WHITE + " → ";
-
-            sender.sendMessage(title + ChatColor.BOLD + "------- Help: Chest Lock -------");
-            sender.sendMessage(commandColor + "/lock" + arrow + color + " Sperrt die anvisierte Truhe");
-            sender.sendMessage(commandColor + "/lock add <Spieler>" + arrow + color + " Fügt zur anvisierter Kiste einene Spieler zur Whitelist");
-            sender.sendMessage(commandColor + "/lock remove" + arrow + color + " Entfernt von anvisierter Kiste einene Spieler von der Whitelist");
-            sender.sendMessage(commandColor + "/lock unlock" + arrow + color + " Entsperrt die anvisierte Truhe");
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("""
+                    <gold><b>------- Help: Chest Lock -------</b>
+                    <yellow>/lock <white>→ <gray> Sperrt die anvisierte Truhe.
+                    <yellow>/lock add <player> <player> <white>→ <gray> Fügt zur anvisierter Kiste einen Spieler zur Whitelist hinzu.
+                    <yellow>/lock remove <player> <player> <white>→ <gray> Entfernt von anvisierter Kiste einen Spieler von der Whitelist.
+                    <yellow>/lock unlock <player> <player> <white>→ <gray> Entsperrt die anvisierte Truhe.
+                    """));
             return true;
         }
 

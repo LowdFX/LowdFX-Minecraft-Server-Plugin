@@ -1,30 +1,29 @@
 package at.lowdfx.lowdfx.items.starterkit;
 
-import org.bukkit.ChatColor;
+import at.lowdfx.lowdfx.Lowdfx;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 
 public class StarterStoneSword {
-    public static ItemStack get() {
-        ItemStack item = new ItemStack(Material.STONE_SWORD, 1);
-        ItemMeta meta = item.getItemMeta();
+    public static final ItemStack ITEM = new ItemStack(Material.STONE_SWORD);
 
-        meta.setDisplayName(ChatColor.RED + "Starter Steinschwert");
-        meta.addEnchant(Enchantment.SHARPNESS, 1, false);
-        meta.addEnchant(Enchantment.UNBREAKING, 1, false);
+    static {
+        ITEM.editMeta(meta -> {
+            meta.displayName(Component.text("Starter Steinschwert", NamedTextColor.RED));
+            meta.lore(Lowdfx.STARTER_LORE);
+            meta.setUnbreakable(true);
 
-        // ändere Damage
-        //meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attackDamage", 3, AttributeModifier.Operation.ADD_NUMBER));
+            meta.addEnchant(Enchantment.EFFICIENCY, 1, false);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, false);
+            meta.addEnchant(Enchantment.FORTUNE, 1, false);
+        });
+    }
 
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.DARK_PURPLE + "Starter Kit");
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-        return item;
+    public static @NotNull ItemStack get() {
+        return new ItemStack(ITEM);
     }
 }

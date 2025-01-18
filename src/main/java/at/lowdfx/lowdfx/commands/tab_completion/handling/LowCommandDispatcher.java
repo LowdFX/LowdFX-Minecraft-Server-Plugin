@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.commands.tab_completion.LowCommandHandling;
+package at.lowdfx.lowdfx.commands.tab_completion.handling;
 
 import at.lowdfx.lowdfx.Lowdfx;
 import at.lowdfx.lowdfx.commands.subcommands.Info;

@@ -25,7 +25,7 @@ public class FlyCommand implements CommandExecutor {
                         sender.sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
                         return;
                     }
-                    fly(sender, player);
+                    fly(player);
                     return;
                 }
 
@@ -42,7 +42,7 @@ public class FlyCommand implements CommandExecutor {
                     }
 
                     if (args[0].equalsIgnoreCase(target.getName())) {
-                        flyTarget(sender, target, args);
+                        flyTarget(sender, args);
                         return;
                     }
 
@@ -54,7 +54,7 @@ public class FlyCommand implements CommandExecutor {
         return true;
     }
 
-    private void fly(CommandSender sender, @NotNull Player player) {
+    private void fly(@NotNull Player player) {
         if (!player.getAllowFlight()) {
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -67,7 +67,7 @@ public class FlyCommand implements CommandExecutor {
     }
 
 
-    private void flyTarget(CommandSender sender, Player player, String @NotNull [] args) {
+    private void flyTarget(CommandSender sender, String @NotNull [] args) {
         Player target = Bukkit.getPlayer(args[0]);
         if (!Objects.requireNonNull(target).getAllowFlight()) {
             target.setAllowFlight(true);

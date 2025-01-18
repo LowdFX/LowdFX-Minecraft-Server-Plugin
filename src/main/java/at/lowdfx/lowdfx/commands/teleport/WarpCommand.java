@@ -3,8 +3,9 @@ package at.lowdfx.lowdfx.commands.teleport;
 import at.lowdfx.lowdfx.Lowdfx;
 import at.lowdfx.lowdfx.commands.teleport.managers.WarpManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,7 +33,7 @@ public class WarpCommand implements CommandExecutor {
                     if (WarpManager.exits(args[0])) {
                         warp(sender, args[0]);
                     } else {
-                        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Der eingegebene Warppunkt " + args[0] + ChatColor.RED + " existiert nicht!");
+                        sender.sendMessage(Lowdfx.serverMessage(Component.text("Der eingegebene Warppunkt " + args[0] + " existiert nicht!", NamedTextColor.RED)));
                     }
                     return;
                 }
@@ -48,49 +49,45 @@ public class WarpCommand implements CommandExecutor {
                         if (WarpManager.exits(args[1])) {
                             remove(sender, args[1]);
                         } else {
-                            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Der Warppunkt " + ChatColor.BOLD + args[1] + ChatColor.RED + " existiert nicht!");
+                            sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Warppunkt " + args[1] + " existiert nicht!", NamedTextColor.RED)));
                         }
                         return;
                     }
                 }
             }
-
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Fehler: Benutze /warp help um eine Hilfe zu erhalten!");
-
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler: Benutze /warp help um eine Hilfe zu erhalten!", NamedTextColor.RED)));
         });
         return true;
     }
 
-    private void set(CommandSender sender, String name) {
+    private void set(@NotNull CommandSender sender, String name) {
         WarpManager.set(name, ((Player) sender).getLocation());
-        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +ChatColor.GREEN + "Du hast den Warppunkt " + ChatColor.BOLD + name + ChatColor.GREEN + " erfolgreich gesetzt!");
+        sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast den Warppunkt " + name + " erfolgreich gesetzt!", NamedTextColor.GREEN)));
     }
 
-    private void remove(CommandSender sender, String name) {
+    private void remove(@NotNull CommandSender sender, String name) {
         WarpManager.set(name, null);
-        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +ChatColor.GREEN + "Du hast den Warppunkt " + ChatColor.BOLD + name + ChatColor.GREEN + " gelöscht!");
+        sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast den Warppunkt " + name + " gelöscht!", NamedTextColor.GREEN)));
     }
 
-    private void warp(CommandSender sender, String name) {
+    private void warp(@NotNull CommandSender sender, String name) {
         Entity entity = (Entity) sender;
         WarpManager.teleport(name, entity);
-        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + Lowdfx.CONFIG.getString("basic.servername") + ChatColor.GRAY + " >> " +ChatColor.GREEN + "Du wurdest zu " + ChatColor.BOLD + name + ChatColor.GREEN + " teleportiert!");
+        sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast den Warppunkt " + name + " teleportiert!", NamedTextColor.GREEN)));
     }
 
-    private void sendHelp(CommandSender sender) {
-        String title = ChatColor.GOLD.toString();
-        String color = ChatColor.GRAY.toString();
-        String commandColor = ChatColor.YELLOW.toString();
-        String arrow = ChatColor.WHITE.toString() + " → ";
-
+    private void sendHelp(@NotNull CommandSender sender) {
         if (sender.hasPermission(PLAYER_PERMISSION) || sender.hasPermission(ADMIN_PERMISSION)) {
-            sender.sendMessage(title + ChatColor.BOLD + "------- Help: Warp -------");
-            sender.sendMessage(commandColor + "/warp <name>" + arrow + color + " Teleportiert dich zu dem eingegebenen Warppunkt.");
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("""
+                <gold><b>------- Help: Warp -------</b>
+                <yellow>/warp <white>→ <gray> Teleportiert dich zu dem eingegebenen Warppunkt!
+                """));
         }
-
         if (sender.hasPermission(ADMIN_PERMISSION)) {
-            sender.sendMessage(commandColor + "/warp set <name>" +  arrow + color +" Setzt einen Warppunkt mit dem eingegebenen Name.");
-            sender.sendMessage(commandColor + "/warp remove <name>" +  arrow + color +" Löscht einen Warppunkt mit dem eingegebenen Name.");
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("""
+                    <yellow>/warp set <name> <white>→ <gray> Setzt einen Warppunkt mit dem eingegebenen Name.
+                    <yellow>/warp remove <name> <white>→ <gray> Löscht einen Warppunkt mit dem eingegebenen Name.
+                    """));
         }
     }
 }

@@ -137,7 +137,7 @@ public class ChestShopManager {
     }
 
     public void saveShop(@NotNull UUID owner) {
-        File playerFile = new File(shopFolder, owner.toString() + ".yml");
+        File playerFile = new File(shopFolder, owner + ".yml");
         YamlConfiguration config = new YamlConfiguration();
 
         Map<Location, ShopData> shops = playerShops.getOrDefault(owner, Collections.emptyMap());
@@ -170,7 +170,7 @@ public class ChestShopManager {
             Map<Location, ShopData> shops = new HashMap<>();
 
             if (config.contains("shops")) {
-                for (String locKey : config.getConfigurationSection("shops").getKeys(false)) {
+                for (String locKey : Objects.requireNonNull(config.getConfigurationSection("shops")).getKeys(false)) {
                     Location location = parseLocation(locKey);
                     if (location == null) continue;
 

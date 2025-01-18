@@ -10,15 +10,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public class ArmorProtectionListener implements Listener {
-
     @EventHandler
-    public void onPlayerDamage(EntityDamageEvent event) {
+    public void onPlayerDamage(@NotNull EntityDamageEvent event) {
         // Überprüfen, ob das Entity ein Spieler ist
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-
+        if (event.getEntity() instanceof Player player) {
             // Überprüfe alle Rüstungsteile (Helm, Brustplatte, Hose, Schuhe)
             ItemStack helmet = player.getInventory().getHelmet();
             ItemStack chestplate = player.getInventory().getChestplate();
@@ -52,12 +50,14 @@ public class ArmorProtectionListener implements Listener {
             ItemMeta meta = item.getItemMeta();
             if (meta != null && meta.hasAttributeModifiers()) {
                 Multimap<Attribute, AttributeModifier> modifiers = meta.getAttributeModifiers();
+                if (modifiers == null) return false;
+
                 for (Attribute attribute : modifiers.keySet()) {
                     // Nur "GENERIC_ARMOR" Modifikatoren prüfen
                     if (attribute == Attribute.ARMOR) {
                         for (AttributeModifier modifier : modifiers.get(attribute)) {
-                            // Den Wert des Attribut-Modifikators holen und mit 999999999 vergleichen
-                            if (modifier.getAmount() == 999999999) {
+                            // Den Wert des Attribut-Modifikators holen und mit 2147483647 vergleichen
+                            if (modifier.getAmount() == Integer.MAX_VALUE) {
                                 return true; // Spezielle Armor-Menge gefunden
                             }
                         }

@@ -1,13 +1,13 @@
 package at.lowdfx.lowdfx.commands.chest.shop;
 
 import at.lowdfx.lowdfx.Lowdfx;
+import at.lowdfx.lowdfx.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -22,7 +22,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class ChestShopListener implements Listener {
@@ -89,7 +88,6 @@ public class ChestShopListener implements Listener {
                                 shopManager.getShop(adjacentLocation).orElseThrow(() -> new IllegalStateException("Shop data not found for adjacent chest.")));
 
                         // Zentrieren des Hologramms
-                        Location centerLocation = placedLocation.add(adjacentLocation).multiply(0.5);
                         shopManager.updateHologramForDoubleChest(player.getUniqueId(), adjacentLocation);
 
                         player.sendMessage(Component.text("You have expanded your shop to a double chest.", NamedTextColor.GREEN));
@@ -187,7 +185,7 @@ public class ChestShopListener implements Listener {
         player.sendMessage(Component.text("Purchase successful! You bought " + itemToSell.getAmount() + " ").append(itemToSell.displayName()).append(Component.text(" for " + price + " diamonds.").color(NamedTextColor.GREEN)));
 
         // Schedule stock update after purchase
-        scheduleStockUpdate(location, shopInventory, shop);
+        scheduleStockUpdate(location, shop);
     }
 
     @EventHandler
@@ -210,20 +208,11 @@ public class ChestShopListener implements Listener {
         }
     }
 
-    private void scheduleStockUpdate(Location location, Inventory inventory, ShopData shop) {
-        Bukkit.getScheduler().runTaskLater(Lowdfx.PLUGIN, () -> {
-            shopManager.startHologramUpdater(location, shop);
-        }, 20L);
+    private void scheduleStockUpdate(Location location, ShopData shop) {
+        Bukkit.getScheduler().runTaskLater(Lowdfx.PLUGIN, () -> shopManager.startHologramUpdater(location, shop), 20L);
     }
 
     private @NotNull Set<Location> getConnectedChests(Block chestBlock) {
-        Set<Location> connectedChests = new HashSet<>();
-        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
-            Block relativeBlock = chestBlock.getRelative(face);
-            if (relativeBlock.getType() == Material.CHEST) {
-                connectedChests.add(relativeBlock.getLocation());
-            }
-        }
-        return connectedChests;
+        return Utilities.connectedChests(chestBlock);
     }
 }

@@ -1,25 +1,25 @@
 package at.lowdfx.lowdfx.items.starterkit;
 
-import org.bukkit.ChatColor;
+import at.lowdfx.lowdfx.Lowdfx;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 
 public class StarterFood {
-    public static ItemStack get() {
-        ItemStack item = new ItemStack(Material.BAKED_POTATO, 32);
-        ItemMeta meta = item.getItemMeta();
+    public static final ItemStack ITEM = new ItemStack(Material.BAKED_POTATO);
 
-        meta.setDisplayName(ChatColor.RED + "Starter Essen");
+    static {
+        ITEM.editMeta(meta -> {
+            meta.displayName(Component.text("Starter Essen", NamedTextColor.RED));
+            meta.lore(Lowdfx.STARTER_LORE);
+        });
+    }
 
-
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.DARK_PURPLE + "Starter Kit");
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
+    public static @NotNull ItemStack get() {
+        ItemStack item = new ItemStack(ITEM);
+        item.setAmount(64);
         return item;
     }
 }

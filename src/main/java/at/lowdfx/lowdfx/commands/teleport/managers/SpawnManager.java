@@ -25,18 +25,17 @@ import java.util.Set;
 public class SpawnManager implements Listener {
     private static File file;
     private static final YamlConfiguration config = new YamlConfiguration();
-    private static Lowdfx plugin;
     private static final String defaultSpawnName = "spawn";
 
     // Registrieren von Events
     @EventHandler
-    public void onPlayerSpawn(PlayerRespawnEvent event) {
+    public void onPlayerSpawn(@NotNull PlayerRespawnEvent event) {
         getSpawn(event.getPlayer()).teleport(event.getPlayer(), Lowdfx.PLUGIN);
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().setBedSpawnLocation(getSpawn(event.getPlayer()).location(), true);
+    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+        event.getPlayer().setRespawnLocation(getSpawn(event.getPlayer()).location(), true);
         Bukkit.getScheduler().runTaskAsynchronously(Lowdfx.PLUGIN, () -> {
             if (!event.getPlayer().hasPlayedBefore()) {
                 getSpawn(event.getPlayer()).teleport(event.getPlayer(), Lowdfx.PLUGIN);
@@ -49,7 +48,7 @@ public class SpawnManager implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(pl, () -> {
             file = Lowdfx.DATA_DIR.resolve("spawns.yml").toFile();
 
-            // Überprüfen ob die Datei existiert, andernfalls wird sie erstellt
+            // Überprüfen, ob die Datei existiert, andernfalls wird sie erstellt
             if (!file.exists()) {
                 try {
                     // Ordner erstellen falls nicht vorhanden

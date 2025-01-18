@@ -26,7 +26,7 @@ public class FeedCommand implements CommandExecutor {
                         sender.sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
                         return;
                     }
-                    feed(sender, player);
+                    feed(player);
                     return;
                 }
 
@@ -43,7 +43,7 @@ public class FeedCommand implements CommandExecutor {
                     }
 
                     if (args[0].equalsIgnoreCase(target.getName())) {
-                        feedTarget(sender, target, args);
+                        feedTarget(sender, args);
                         return;
                     }
                 }
@@ -53,7 +53,7 @@ public class FeedCommand implements CommandExecutor {
         return true;
     }
 
-    private void feed(CommandSender sender, @NotNull Player player) {
+    private void feed(@NotNull Player player) {
         player.setFoodLevel(20);
         player.sendMessage(Lowdfx.serverMessage(Component.text("Dein Hunger wurde gestillt!", NamedTextColor.GREEN)));
         for (final PotionEffect effect : player.getActivePotionEffects()) {
@@ -61,7 +61,7 @@ public class FeedCommand implements CommandExecutor {
         }
     }
 
-    private void feedTarget(CommandSender sender, Player player, String[] args) {
+    private void feedTarget(CommandSender sender, String @NotNull [] args) {
         Player target = Objects.requireNonNull(Bukkit.getPlayer(args[0]));
 
         target.setFoodLevel(20);

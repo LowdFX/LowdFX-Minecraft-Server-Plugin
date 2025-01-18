@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.commands.tab_completion.LowCommandHandling;
+package at.lowdfx.lowdfx.commands.tab_completion.handling;
 
 import at.lowdfx.lowdfx.commands.subcommands.Info;
 import at.lowdfx.lowdfx.commands.subcommands.LowHelp;
@@ -11,12 +11,11 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class LowTabCompleter implements TabCompleter {
-    private static final String[] ADMIN_COMMANDS = { "info", "opkit" };
-    private static final String[] PLAYER_COMMANDS = { "help", "starterkit" };
+    private static final List<String> ADMIN_COMMANDS = List.of("info", "opkit");
+    private static final List<String> PLAYER_COMMANDS = List.of("help", "starterkit");
     // Eine statische Liste der Befehle.
 
     @Override
@@ -27,10 +26,10 @@ public class LowTabCompleter implements TabCompleter {
         // Wenn keine Argumente eingegeben wurden, Vervollständigung für den ersten Befehl anbieten.
         if (args.length == 1) {
             if (sender.hasPermission(LowHelp.ADMIN_PERMISSION) || sender.hasPermission(Info.ADMIN_PERMISSION) || sender.hasPermission(OPKit.ADMIN_PERMISSION)) {
-                completions.addAll(Arrays.asList(ADMIN_COMMANDS));
+                completions.addAll(ADMIN_COMMANDS);
             }
             if (sender.hasPermission(LowHelp.PLAYER_PERMISSION) || sender.hasPermission(StarterKit.PLAYER_PERMISSION)) {
-                completions.addAll(Arrays.asList(PLAYER_COMMANDS));
+                completions.addAll(PLAYER_COMMANDS);
             }
         }
 

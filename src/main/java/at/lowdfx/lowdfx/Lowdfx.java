@@ -5,9 +5,9 @@ import at.lowdfx.lowdfx.commands.basic.FeedCommand;
 import at.lowdfx.lowdfx.commands.basic.FlyCommand;
 import at.lowdfx.lowdfx.commands.basic.GamemodeCommand;
 import at.lowdfx.lowdfx.commands.basic.HealCommand;
-import at.lowdfx.lowdfx.commands.basic.inventoryCommands.*;
-import at.lowdfx.lowdfx.commands.basic.vanishCommand.InvisiblePlayerHandler;
-import at.lowdfx.lowdfx.commands.basic.vanishCommand.VanishCommand;
+import at.lowdfx.lowdfx.commands.basic.inventory.*;
+import at.lowdfx.lowdfx.commands.basic.vanish.InvisiblePlayerHandler;
+import at.lowdfx.lowdfx.commands.basic.vanish.VanishCommand;
 import at.lowdfx.lowdfx.commands.chest.lock.ChestData;
 import at.lowdfx.lowdfx.commands.chest.lock.ChestLockCommand;
 import at.lowdfx.lowdfx.commands.chest.lock.ChestLockListener;
@@ -18,11 +18,11 @@ import at.lowdfx.lowdfx.commands.subcommands.Info;
 import at.lowdfx.lowdfx.commands.subcommands.kits.OPKit;
 import at.lowdfx.lowdfx.commands.subcommands.kits.StarterKit;
 import at.lowdfx.lowdfx.commands.tab_completion.ChestLockTabCompleter;
-import at.lowdfx.lowdfx.commands.tab_completion.LowCommandHandling.LowCommandDispatcher;
-import at.lowdfx.lowdfx.commands.tab_completion.LowCommandHandling.LowTabCompleter;
 import at.lowdfx.lowdfx.commands.tab_completion.WarnTabCompleter;
-import at.lowdfx.lowdfx.commands.tab_completion.basicTabCompleters.*;
-import at.lowdfx.lowdfx.commands.tab_completion.basicTabCompleters.inventoryTabCompleters.*;
+import at.lowdfx.lowdfx.commands.tab_completion.completion.*;
+import at.lowdfx.lowdfx.commands.tab_completion.completion.inventoryTabCompleters.*;
+import at.lowdfx.lowdfx.commands.tab_completion.handling.LowCommandDispatcher;
+import at.lowdfx.lowdfx.commands.tab_completion.handling.LowTabCompleter;
 import at.lowdfx.lowdfx.commands.tab_completion.teleport.HomeTabCompleter;
 import at.lowdfx.lowdfx.commands.tab_completion.teleport.SpawnTabCompleter;
 import at.lowdfx.lowdfx.commands.tab_completion.teleport.WarpsTabCompleter;
@@ -163,7 +163,7 @@ public final class Lowdfx extends JavaPlugin {
 
         // -----------------------------------------------------------------------------------------------
         // /*Tab Completer*/
-        // Command Dispatcher - um /low Subcommands zu handlen
+        // Command Dispatcher - um /low Subcommands zu handeln
         Objects.requireNonNull(this.getCommand("low")).setExecutor(new LowCommandDispatcher());
         Objects.requireNonNull(this.getCommand("low")).setTabCompleter(new LowTabCompleter());
         Objects.requireNonNull(this.getCommand("gm")).setTabCompleter(new GamemodeTabCompleter());
@@ -242,14 +242,6 @@ public final class Lowdfx extends JavaPlugin {
             }
         }
 
-    }
-
-    public InvisiblePlayerHandler getInvisibleHandler() {
-        return invisibleHandler;
-    }
-
-    public ChestShopManager getShopManager() {
-        return shopManager;
     }
 
     public static @NotNull Component serverMessage(Component message) {
