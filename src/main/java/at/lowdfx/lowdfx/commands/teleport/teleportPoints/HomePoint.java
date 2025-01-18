@@ -1,30 +1,29 @@
 package at.lowdfx.lowdfx.commands.teleport.teleportPoints;
 
-import at.lowdfx.lowdfx.lowdfx;
+import at.lowdfx.lowdfx.Lowdfx;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class HomePoint {
-
     private final File file;
-    private YamlConfiguration config = new YamlConfiguration();
+    private final YamlConfiguration config = new YamlConfiguration();
 
-    public HomePoint(Player player) {
-        File folder = new File(lowdfx.getDataFolde().getAbsolutePath(), "HomePoints");
-        if(!folder.exists()) {
-            folder.mkdirs();
-        }
+    public HomePoint(@NotNull Player player) {
+        File folder = Lowdfx.DATA_DIR.resolve("HomePoints").toFile();
+        folder.mkdirs();
 
         this.file = new File(folder.getAbsolutePath(), player.getName() + ".yml");
         try {
-            if(this.file.exists()) {
+            if (this.file.exists()) {
                 this.config.load(this.file);
             }
         } catch (IOException | InvalidConfigurationException e) {
@@ -32,15 +31,13 @@ public class HomePoint {
         }
     }
 
-    public HomePoint(OfflinePlayer player) {
-        File folder = new File(lowdfx.getDataFolde().getAbsolutePath(), "HomePoints");
-        if(!folder.exists()) {
-            folder.mkdirs();
-        }
+    public HomePoint(@NotNull OfflinePlayer player) {
+        File folder = Lowdfx.DATA_DIR.resolve("HomePoints").toFile();
+        folder.mkdirs();
 
         this.file = new File(folder.getAbsolutePath(), player.getName() + ".yml");
         try {
-            if(this.file.exists()) {
+            if (this.file.exists()) {
                 this.config.load(this.file);
             }
         } catch (IOException | InvalidConfigurationException e) {
@@ -68,10 +65,9 @@ public class HomePoint {
         return this.config.getKeys(false);
     }
 
-    public boolean exist(String name) {
-        return this.config.getLocation(name) != null;
+    public boolean doesNotExist(String name) {
+        return this.config.getLocation(name) == null;
     }
-
 
     public TeleportPoint get(String name) {
         return new TeleportPoint(this.config.getLocation(name));

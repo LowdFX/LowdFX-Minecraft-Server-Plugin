@@ -1,36 +1,27 @@
 package at.lowdfx.lowdfx.items.opkit;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import at.lowdfx.lowdfx.Lowdfx;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 
 public class OPFood extends JavaPlugin {
+    public static final ItemStack ITEM = new ItemStack(Material.GOLDEN_CARROT);
 
-    // Item erstellen
-    public static ItemStack get() {
-        ItemStack item = new ItemStack(Material.GOLDEN_CARROT, 64);
-        ItemMeta meta = item.getItemMeta();
-
-        meta.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "OP Essen");
-
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.RED + "OP Kit");
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-        return item;
+    static {
+        ITEM.editMeta(meta -> {
+            meta.displayName(Component.text("OP Essen", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
+            meta.lore(Lowdfx.OP_LORE);
+        });
     }
 
-
+    public static @NotNull ItemStack get() {
+        ItemStack item = new ItemStack(ITEM);
+        item.setAmount(64);
+        return item;
+    }
 }

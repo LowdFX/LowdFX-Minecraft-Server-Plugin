@@ -1,7 +1,9 @@
 package at.lowdfx.lowdfx.items.opkit;
 
-import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
-import org.bukkit.ChatColor;
+import at.lowdfx.lowdfx.Lowdfx;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -9,44 +11,37 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-
+@SuppressWarnings("UnstableApiUsage")
 public class OPNetheriteSword {
-    public static ItemStack get(){
-        ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
-        ItemMeta meta = item.getItemMeta();
+    public static final ItemStack ITEM = new ItemStack(Material.NETHERITE_SWORD);
 
-        meta.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "OP Netheritschwert");
-        //meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        meta.addEnchant(Enchantment.LOOTING, 900, true);
-        meta.addEnchant(Enchantment.FIRE_ASPECT, 900, true);
-        meta.setUnbreakable(true);
+    static {
+        ITEM.editMeta(meta -> {
+            meta.displayName(Component.text("OP Netheritschwert", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
+            meta.lore(Lowdfx.OP_LORE);
+            meta.setUnbreakable(true);
 
+            // Minecraft benutzt internally signed 16-bit zahlen, was heisst das Short (-32768 bis 32767)'s #MAX_VALUE das maximum ist, ohne zu bugs zu führen.
+            meta.addEnchant(Enchantment.LOOTING, Short.MAX_VALUE, true);
+            meta.addEnchant(Enchantment.FIRE_ASPECT, Short.MAX_VALUE, true);
 
-        AttributeModifier attackDamageModifier = new AttributeModifier(
-                new NamespacedKey("lowdfx", "generic.attackdamage"),
-                999999999,
-                AttributeModifier.Operation.ADD_NUMBER,
-                EquipmentSlotGroup.MAINHAND
-        );
-        AttributeModifier attackSpeedModifier = new AttributeModifier(
-                new NamespacedKey("lowdfx", "generic.attackspeed"),
-                999999999,
-                AttributeModifier.Operation.ADD_NUMBER,
-                EquipmentSlotGroup.MAINHAND
-        );
-        // ändere Damage
-        meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamageModifier);
-        meta.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeedModifier);
+            meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, new AttributeModifier(
+                    new NamespacedKey("lowdfx", "generic.attackdamage"),
+                    999999999,
+                    AttributeModifier.Operation.ADD_NUMBER,
+                    EquipmentSlotGroup.MAINHAND
+            ));
+            meta.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
+                    new NamespacedKey("lowdfx", "generic.attackspeed"),
+                    999999999,
+                    AttributeModifier.Operation.ADD_NUMBER,
+                    EquipmentSlotGroup.MAINHAND));
+        });
+    }
 
-
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.RED + "OP Kit");
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-        return item;
+    public static @NotNull ItemStack get() {
+        return new ItemStack(ITEM);
     }
 }

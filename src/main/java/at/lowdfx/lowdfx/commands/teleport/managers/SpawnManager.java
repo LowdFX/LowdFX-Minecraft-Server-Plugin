@@ -1,8 +1,8 @@
 package at.lowdfx.lowdfx.commands.teleport.managers;
 
-import at.lowdfx.lowdfx.commands.teleport.teleportPoints.TeleportPoint;
-import at.lowdfx.lowdfx.lowdfx;
+import at.lowdfx.lowdfx.Lowdfx;
 import at.lowdfx.lowdfx.ServerProperties;
+import at.lowdfx.lowdfx.commands.teleport.teleportPoints.TeleportPoint;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -12,52 +12,55 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Set;
 
 public class SpawnManager implements Listener {
-
     private static File file;
     private static final YamlConfiguration config = new YamlConfiguration();
-    private static lowdfx plugin;
+    private static Lowdfx plugin;
     private static final String defaultSpawnName = "spawn";
 
     // Registrieren von Events
     @EventHandler
     public void onPlayerSpawn(PlayerRespawnEvent event) {
-        getSpawn(event.getPlayer()).teleport(event.getPlayer(), plugin);
+        getSpawn(event.getPlayer()).teleport(event.getPlayer(), Lowdfx.PLUGIN);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().setBedSpawnLocation(getSpawn(event.getPlayer()).getLocation(), true);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        event.getPlayer().setBedSpawnLocation(getSpawn(event.getPlayer()).location(), true);
+        Bukkit.getScheduler().runTaskAsynchronously(Lowdfx.PLUGIN, () -> {
             if (!event.getPlayer().hasPlayedBefore()) {
-                getSpawn(event.getPlayer()).teleport(event.getPlayer(), plugin);
+                getSpawn(event.getPlayer()).teleport(event.getPlayer(), Lowdfx.PLUGIN);
             }
         });
     }
 
     // Konstruktor zum Laden der Spawn-Datei und initialisieren von Spawns
-    public SpawnManager(lowdfx pl) {
+    public SpawnManager(Lowdfx pl) {
         Bukkit.getScheduler().runTaskAsynchronously(pl, () -> {
-            plugin = pl;
-            file = new File(plugin.getDataFolder(), "spawns.yml");
+            file = Lowdfx.DATA_DIR.resolve("spawns.yml").toFile();
 
             // Überprüfen ob die Datei existiert, andernfalls wird sie erstellt
             if (!file.exists()) {
                 try {
                     // Ordner erstellen falls nicht vorhanden
-                    if (!plugin.getDataFolder().exists()) {
-                        plugin.getDataFolder().mkdirs();
+                    if (Files.notExists(Lowdfx.DATA_DIR)) {
+                        Files.createDirectories(Lowdfx.DATA_DIR);
                     }
-                    file.createNewFile();
-                    plugin.getLogger().info("Spawns-Datei erstellt!");
+                    if (file.createNewFile()) {
+                        Lowdfx.LOG.info("Spawns-Datei erstellt!");
+                    }
                 } catch (IOException e) {
-                    plugin.getLogger().severe("Konnte die Spawns-Datei nicht erstellen!");
-                    e.printStackTrace();
+                    Lowdfx.LOG.error("Konnte die Spawns-Datei nicht erstellen!", e);
                 }
             }
 
@@ -70,7 +73,7 @@ public class SpawnManager implements Listener {
 
             // Falls noch kein default Spawn existiert, erstelle ihn
             if (!config.contains(defaultSpawnName)) {
-                config.set(defaultSpawnName, Bukkit.getWorld(ServerProperties.get(ServerProperties.ServerPropertieType.worldname)).getSpawnLocation());
+                config.set(defaultSpawnName, Objects.requireNonNull(Bukkit.getWorld(ServerProperties.get(ServerProperties.ServerPropertyType.WORLD_NAME))).getSpawnLocation());
             }
         });
     }
@@ -80,16 +83,16 @@ public class SpawnManager implements Listener {
         try {
             if (file != null) {
                 config.save(file);
-                plugin.getLogger().info("Spawns-Datei gespeichert.");
+                Lowdfx.LOG.info("Spawns-Datei gespeichert.");
             }
         } catch (IOException e) {
-            plugin.getLogger().severe("Fehler beim Speichern der Spawn-Datei!");
-            e.printStackTrace();
+            Lowdfx.LOG.error("Fehler beim Speichern der Spawn-Datei!", e);
         }
     }
 
     // Methode, die den passenden Spawn für den Spieler holt (z.B. mit Permissions)
-    public static TeleportPoint getSpawn(Player player) {
+    @Contract("_ -> new")
+    public static @NotNull TeleportPoint getSpawn(Player player) {
         for (String key : config.getKeys(false)) {
             if (player.hasPermission("spawn." + key)) {
                 return new TeleportPoint(config.getLocation(key));
@@ -104,7 +107,7 @@ public class SpawnManager implements Listener {
     }
 
     // Einen Spawn mit Namen zurückgeben
-    public static TeleportPoint getSpawn(String name) {
+    public static @Nullable TeleportPoint getSpawn(String name) {
         if (exists(name)) {
             return new TeleportPoint(config.getLocation(name));
         }
@@ -112,7 +115,7 @@ public class SpawnManager implements Listener {
     }
 
     // Alle verfügbaren Spawn-Namen zurückgeben
-    public static Set<String> getNames() {
+    public static @NotNull Set<String> getNames() {
         return config.getKeys(false);
     }
 

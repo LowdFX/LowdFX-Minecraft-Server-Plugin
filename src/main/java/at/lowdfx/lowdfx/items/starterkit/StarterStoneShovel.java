@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 
 public class StarterStoneShovel {
-    public static ItemStack get(){
+    public static ItemStack get() {
         ItemStack item = new ItemStack(Material.STONE_SHOVEL, 1);
         ItemMeta meta = item.getItemMeta();
 

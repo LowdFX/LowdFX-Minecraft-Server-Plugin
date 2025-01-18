@@ -1,15 +1,15 @@
 package at.lowdfx.lowdfx.items.opkit;
 
+import com.google.common.collect.Multimap;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
-import com.google.common.collect.Multimap;
 
 public class ArmorProtectionListener implements Listener {
 

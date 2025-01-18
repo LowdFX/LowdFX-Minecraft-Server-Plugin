@@ -4,16 +4,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.util.Map;
 
-import org.yaml.snakeyaml.Yaml;
-
 public class Permissions {
 
-    private final lowdfx plugin;
+    private final Lowdfx plugin;
 
-    public Permissions(lowdfx plugin) {
+    public Permissions(Lowdfx plugin) {
         this.plugin = plugin;
     }
 
@@ -52,17 +52,16 @@ public class Permissions {
                         );
                         pluginManager.addPermission(permission);
                     } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Ungültiger Standardwert für Permission: " + name);
+                        Lowdfx.LOG.error("Ungültiger Standardwert für Permission: {}", name);
                     }
                 });
 
-                plugin.getLogger().info("Permissions erfolgreich geladen.");
+                Lowdfx.LOG.info("Permissions erfolgreich geladen.");
             } else {
-                plugin.getLogger().warning("Keine Permissions gefunden oder Datei ist leer.");
+                Lowdfx.LOG.warn("Keine Permissions gefunden oder Datei ist leer.");
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("Fehler beim Verarbeiten der permissions.yml!");
-            e.printStackTrace();
+            Lowdfx.LOG.error("Fehler beim Verarbeiten der permissions.yml!", e);
         }
     }
 

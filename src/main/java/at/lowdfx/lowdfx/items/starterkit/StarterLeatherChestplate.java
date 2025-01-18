@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 
 public class StarterLeatherChestplate {
-    public static ItemStack get(){
+    public static ItemStack get() {
         ItemStack item = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
         ItemMeta meta = item.getItemMeta();
 

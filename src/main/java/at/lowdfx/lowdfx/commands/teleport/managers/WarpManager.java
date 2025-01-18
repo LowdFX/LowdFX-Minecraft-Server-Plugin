@@ -1,36 +1,31 @@
 package at.lowdfx.lowdfx.commands.teleport.managers;
 
 
-import at.lowdfx.lowdfx.lowdfx;
-import at.lowdfx.lowdfx.commands.teleport.teleportPoints.TeleportPoint;
-
-import org.bukkit.Bukkit;
+import at.lowdfx.lowdfx.Lowdfx;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
 public class WarpManager {
-
     private static File file; // Nicht-statische Datei
     private static final YamlConfiguration config = new YamlConfiguration(); // Nicht-statisch
-    private static lowdfx plugin;
 
-    public WarpManager(lowdfx pl) {
-        this.plugin = pl;
-        this.file = new File(plugin.getDataFolder(), "warps.yml"); // Dateiname mit Erweiterung
+    public WarpManager() {
+        file = Lowdfx.DATA_DIR.resolve("warps.yml").toFile(); // Dateiname mit Erweiterung
 
         if (!file.exists()) {
             try {
-                file.createNewFile(); // Neue Datei erstellen, wenn nicht vorhanden
-                plugin.getLogger().info("Warp-Datei erstellt: " + file.getName());
+                if (file.createNewFile()) { // Neue Datei erstellen, wenn nicht vorhanden
+                    Lowdfx.LOG.info("Warp-Datei erstellt: {}", file.getName());
+                }
             } catch (IOException e) {
-                plugin.getLogger().severe("Konnte Warp-Datei nicht erstellen!");
-                e.printStackTrace();
+                Lowdfx.LOG.error("Konnte Warp-Datei nicht erstellen!", e);
             }
         }
 
@@ -46,8 +41,7 @@ public class WarpManager {
             try {
                 config.save(file);
             } catch (IOException e) {
-                plugin.getLogger().severe("Fehler beim Speichern der Warp-Datei!");
-                e.printStackTrace();
+                Lowdfx.LOG.error("Fehler beim Speichern der Warp-Datei!", e);
             }
         }
     }
@@ -71,14 +65,14 @@ public class WarpManager {
             if (loc != null) {
                 entity.teleport(loc);
             } else {
-                plugin.getLogger().warning("Kein gültiger Ort für Warp: " + name);
+                Lowdfx.LOG.warn("Kein gültiger Ort für Warp: {}", name);
             }
         } else {
-            plugin.getLogger().warning("Warp existiert nicht: " + name);
+            Lowdfx.LOG.warn("Warp existiert nicht: {}", name);
         }
     }
 
-    public static Set<String> getWarpsList() {
+    public static @NotNull Set<String> getWarpsList() {
         return config.getKeys(false);
     }
 
@@ -86,8 +80,7 @@ public class WarpManager {
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().severe("Fehler beim Speichern der Warp-Konfiguration!");
-            e.printStackTrace();
+            Lowdfx.LOG.error("Fehler beim Speichern der Warp-Konfiguration!", e);
         }
     }
 }

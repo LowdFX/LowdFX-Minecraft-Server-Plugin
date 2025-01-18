@@ -1,92 +1,70 @@
 package at.lowdfx.lowdfx.commands;
 
-import at.lowdfx.lowdfx.lowdfx;
-import com.google.gson.*;
-import org.bukkit.BanList;
+import at.lowdfx.lowdfx.Lowdfx;
+import io.papermc.paper.ban.BanListType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Objects;
 
 public class WarnCommand implements CommandExecutor {
-    public static final String adminPermission = "lowdfx.warn.admin";
-    public static final String playerPermission = "lowdfx.warn";
+    public static final String ADMIN_PERMISSION = "lowdfx.warn.admin";
+    public static final String PLAYER_PERMISSION = "lowdfx.warn";
     public final File warnFolder;
 
-
-    public WarnCommand(File dataFolder) {
-        this.warnFolder = new File(dataFolder, "WarnSystem");
-        if (!warnFolder.exists()) {
-            warnFolder.mkdirs();
+    public WarnCommand() {
+        this.warnFolder = Lowdfx.DATA_DIR.resolve("WarnSystem").toFile();
+        if (warnFolder.mkdirs()) {
+            Lowdfx.LOG.info("Warn-Ordner erstellt.");
         }
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (args.length < 1) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Fehler! Benutze /warn help um Hilfe zu erhalten.");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler! Benutze /warn help um Hilfe zu erhalten.", NamedTextColor.RED)));
             return true;
         }
 
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
-            case "help":
-                sendHelp(sender);
-                break;
-            case "info":
-                handleInfoCommand(sender, args);
-                break;
-            case "removeall":  // hier den Befehl "removeall" hinzufügen
-                handleRemoveCommand(sender, args);
-                break;
-            case "remove":
-                handleRemoveCommand(sender, args);
-                break;
-            default:
-                handleWarnCommand(sender, args);
-                break;
+            case "info" -> handleInfoCommand(sender, args);
+            case "removeall" ->  handleRemoveCommand(sender, args); // TODO: Remove All!
+            case "remove" -> handleRemoveCommand(sender, args);
+            default -> handleWarnCommand(sender, args);
         }
         return true;
     }
 
-    private void sendHelp(CommandSender sender) {
-        String title = ChatColor.GOLD.toString();
-        String color = ChatColor.GRAY.toString();
-        String commandColor = ChatColor.YELLOW.toString();
-        String arrow = ChatColor.WHITE.toString() + " → ";
-
-        sender.sendMessage(title + ChatColor.BOLD + "------- Help: Warn -------");
-        if (sender.hasPermission(playerPermission)) {
-            sender.sendMessage(commandColor + "/warn info" + arrow + color + " Zeigt deine Verwarnungen an.");
-        }
-        if (sender.hasPermission(adminPermission)) {
-            sender.sendMessage(commandColor + "/warn <Spieler> <Grund>" + arrow + color + " Verwarnt einen Spieler.");
-            sender.sendMessage(commandColor + "/warn info <Spieler>" + arrow + color + " Zeigt die Verwarnungen eines anderen Spielers.");
-            sender.sendMessage(commandColor + "/warn remove <Spieler>" + arrow + color + " Entfernt den letzten Verwarnpunkt eines Spielers.");
-            sender.sendMessage(commandColor + "/warn removeall <Spieler>" + arrow + color + " Entfernt alle Verwarnungen eines Spielers.");
-        }
-    }
-
-    private void handleWarnCommand(CommandSender sender, String[] args) {
+    private void handleWarnCommand(@NotNull CommandSender sender, String[] args) {
         // Überprüfen, ob der Sender die erforderliche Berechtigung hat
-        if (!sender.hasPermission(adminPermission)) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.");
+        if (!sender.hasPermission(ADMIN_PERMISSION)) {
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.", NamedTextColor.RED)));
             return;
         }
 
         // Überprüfen, ob ausreichend Argumente vorhanden sind
         if (args.length < 2) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Fehler! Benutze /warn help um Hilfe zu erhalten.");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler! Benutze /warn help um Hilfe zu erhalten.", NamedTextColor.RED)));
             return;
         }
 
@@ -96,8 +74,8 @@ public class WarnCommand implements CommandExecutor {
         OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
         // Überprüfen, ob der angegebene Spieler existiert
-        if (target == null) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Spieler nicht gefunden.");
+        if (!target.hasPlayedBefore()) {
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Spieler nicht gefunden.", NamedTextColor.RED)));
             return;
         }
 
@@ -105,45 +83,45 @@ public class WarnCommand implements CommandExecutor {
             File playerFile = new File(warnFolder, target.getName() + ".yml");
             YamlConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
 
+            // Warns erhöhen und neuen Grund speichern
+            int warns = config.getInt("warns", 0) + 1;
+            String currentDate = LocalDateTime.now().format(Lowdfx.TIME_FORMAT);
+            config.set("warns", warns);
+            config.set("reasons." + warns, reason);
+            config.set("warned_by." + warns, sender.getName());
+            config.set("warn_date." + warns, currentDate); // Datum und Uhrzeit der Verwarnung speichern
+            config.set("uuid", target.getUniqueId().toString());
 
-                // Warns erhöhen und neuen Grund speichern
-                int warns = config.getInt("warns", 0) + 1;
-                String currentDate = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss").format(new Date());
-                config.set("warns", warns);
-                config.set("reasons." + warns, reason);
-                config.set("warned_by." + warns, sender.getName());
-                config.set("warn_date." + warns, currentDate);  // Datum und Uhrzeit der Verwarnung speichern
-                config.set("uuid", target.getUniqueId().toString());
-            if (target.isOnline()) {
+            if (target.isOnline()) { // Stattdessen die IP speichern, wenn online.
+                // noinspection DataFlowIssue
                 config.set("ip", target.getPlayer().getAddress().getAddress().getHostAddress());
-            } // Stattdessen die IP speichern, wenn online.
-                config.save(playerFile);
+            }
+            config.save(playerFile);
 
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Spieler " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurde verwarnt.");
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Aktuelle Punkte: " + ChatColor.RED + ChatColor.BOLD + warns);
+            sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler <b>" + playerName + "</b> wurde verwarnt.")));
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Aktuelle Punkte: ", NamedTextColor.GREEN).append(Component.text(warns, NamedTextColor.RED, TextDecoration.BOLD))));
             // Temporärer Bann bei 2 Verwarnungen
             if (warns == 2) {
-                long banDuration = Bukkit.getPluginManager().getPlugin("lowdfx").getConfig().getLong("warnsystem.tempban-duration", 86400);
+                long banDuration = Lowdfx.CONFIG.getLong("warnsystem.tempban-duration", 86400);
                 banPlayer(target, buildBanMessage(config), banDuration);
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Spieler " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurde für " + ChatColor.RED + banDuration / 3600 + " Stunden " + ChatColor.GREEN + "temporär gebannt.");
+                sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler <b>" + playerName + "</b> wurde für <red>" + (banDuration / 3600) + " <green>Stunden temporär gebannt.")));
             }
             // Permanenter Bann ab 3 Verwarnungen
             else if (warns >= 3) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Spieler " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurde " + ChatColor.RED + "permanent" + ChatColor.GREEN +" gebannt.");
+                sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler <b>" + playerName + "</b> wurde <red>permanent <green> gebannt.")));
                 banPlayer(target, buildBanMessage(config), -1); // Unbefristeter Bann
             }
         } catch (IOException e) {
-            sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Fehler beim Speichern der Verwarnungsdaten.");
+            sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler beim Speichern der Verwarnungsdaten.", NamedTextColor.RED)));
         }
     }
 
-
-    private void handleInfoCommand(CommandSender sender, String[] args) {
+    private void handleInfoCommand(CommandSender sender, String @NotNull [] args) {
         // Wenn der Befehl einen Spielernamen benötigt
         if (args.length > 1 ) {
             // Überprüfen, ob der Sender die Admin-Berechtigung hat
-            if (!sender.hasPermission(adminPermission)) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.");
+            if (!sender.hasPermission(ADMIN_PERMISSION)) {
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.", NamedTextColor.RED)));
                 return;
             }
 
@@ -151,35 +129,30 @@ public class WarnCommand implements CommandExecutor {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
 
             // Spieler existiert nicht oder ist ungültig
-            if (target == null) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Spieler nicht gefunden oder ungültige Nutzung des Befehls.");
+            if (!target.hasPlayedBefore()) {
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Spieler nicht gefunden.", NamedTextColor.RED)));
                 return;
             }
 
-            // Der Spieler hat das entsprechende Berechtigung, nun die Warnung auslesen
+            // Der Spieler hat die entsprechende Berechtigung, nun die Warnung auslesen
             try {
                 File playerFile = new File(warnFolder, target.getName() + ".yml");
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
 
                 int warns = config.getInt("warns", 0);
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Verwarnungen von " + ChatColor.BOLD + target.getName() + ChatColor.GREEN + ": " + ChatColor.BOLD + ChatColor.RED + warns);
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Verwarnungen von " + target.getName() + ": ", NamedTextColor.GREEN).append(Component.text(warns, NamedTextColor.RED, TextDecoration.BOLD))));
 
                 // Alle Verwarnungen auslesen und anzeigen
-                for (int i = 1; i <= warns; i++) {
-                    String warnDate = config.getString("warn_date." + i);  // Datum und Uhrzeit anzeigen
-                    sender.sendMessage(ChatColor.GRAY + "➽ " + i + ". Grund: " + ChatColor.RED + config.getString("reasons." + i)
-                            + ChatColor.GRAY + ", von: " + ChatColor.GOLD + config.getString("warned_by." + i)
-                            + ChatColor.GRAY + ", am: " + ChatColor.WHITE + warnDate);  // Datum und Uhrzeit in der Ausgabe
-                }
+                sendWarnInfo(sender, config, warns);
             } catch (Exception e) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Keine Verwarnungsdaten gefunden.");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Keine Verwarnungsdaten gefunden.", NamedTextColor.RED)));
             }
         }
         // Wenn kein Spielername angegeben wird
         else {
             // Überprüfen, ob der Sender die Spieler-Berechtigung hat
-            if (!sender.hasPermission(playerPermission)) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.");
+            if (!sender.hasPermission(PLAYER_PERMISSION)) {
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Du hast nicht die nötige Berechtigung, diesen Befehl auszuführen.", NamedTextColor.RED)));
                 return;
             }
 
@@ -192,26 +165,28 @@ public class WarnCommand implements CommandExecutor {
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
 
                 int warns = config.getInt("warns", 0);
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Deine Verwarnungen: " + ChatColor.RED + ChatColor.BOLD + warns);
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Deine Verwarnungen: ", NamedTextColor.GREEN).append(Component.text(warns, NamedTextColor.RED, TextDecoration.BOLD))));
 
-                for (int i = 1; i <= warns; i++) {
-                    String warnDate = config.getString("warn_date." + i);  // Datum und Uhrzeit anzeigen
-                    sender.sendMessage(ChatColor.GRAY + "➽ " + i + ". Grund: " + ChatColor.RED + config.getString("reasons." + i)
-                            + ChatColor.GRAY +", von: " + ChatColor.GOLD + config.getString("warned_by." + i)
-                            + ChatColor.GRAY + ", am: " + ChatColor.WHITE + warnDate);
-                }
+                sendWarnInfo(sender, config, warns);
             } catch (Exception e) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Keine Verwarnungsdaten gefunden.");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Keine Verwarnungsdaten gefunden.", NamedTextColor.RED)));
             }
         }
     }
 
+    private void sendWarnInfo(CommandSender sender, YamlConfiguration config, int warns) {
+        for (int i = 1; i <= warns; i++) {
+            String warnDate = config.getString("warn_date." + i);  // Datum und Uhrzeit anzeigen
+            sender.sendMessage(Component.text("➽ " + i + ". Grund: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("reasons." + i)), NamedTextColor.RED))
+                    .append(Component.text(", von: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("warned_by." + i)), NamedTextColor.GOLD)))
+                    .append(Component.text(", am: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(warnDate), NamedTextColor.WHITE))));
+        }
+    }
 
-
-    private void handleRemoveCommand(CommandSender sender, String[] args) {
-        if (sender.hasPermission(adminPermission)) {
+    private void handleRemoveCommand(@NotNull CommandSender sender, String[] args) {
+        if (sender.hasPermission(ADMIN_PERMISSION)) {
             if (args.length < 2) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Benutze: /warn remove <Spieler> | /warn removeall <Spieler>");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Benutze: /warn remove <Spieler> | /warn removeall <Spieler>", NamedTextColor.RED)));
                 return;
             }
 
@@ -221,7 +196,7 @@ public class WarnCommand implements CommandExecutor {
 
             File playerFile = new File(warnFolder, target.getName() + ".yml");
             if (!playerFile.exists()) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Der Spieler hat keine Verwarnungen.");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spieler hat keine Verwarnungen.", NamedTextColor.RED)));
                 return;
             }
 
@@ -231,7 +206,7 @@ public class WarnCommand implements CommandExecutor {
 
                 if (removeAll) {
                     if (warns == 0) {  // Überprüfe, ob der Spieler keine Verwarnungen hat
-                        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Der Spieler hat keine Verwarnungen zum Entfernen.");
+                        sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spieler hat keine Verwarnungen zum Entfernen.", NamedTextColor.RED)));
                         return;
                     }
 
@@ -241,119 +216,64 @@ public class WarnCommand implements CommandExecutor {
                     config.set("warn_date", null); // Löscht alle Datumseinträge
                     config.set("warns", 0);  // Setzt die Gesamtzahl der Verwarnungen auf 0
                     config.save(playerFile);
-                    sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Alle Verwarnungen von " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurden gelöscht.");
+                    sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Alle Verwarnungen von <b>" + playerName + "</b> wurden gelöscht.")));
                 } else if (warns > 0) {
                     config.set("reasons." + warns, null);
                     config.set("warned_by." + warns, null);
                     config.set("warn_date." + warns, null);  // Datum und Uhrzeit entfernen
                     config.set("warns", warns - 1);
                     config.save(playerFile);
-                    sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Letzte Verwarnung von " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurde entfernt.");
+                    sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Letzte Verwarnung von <b>" + playerName + "</b> wurde entfernt.")));
                 } else {  // Kein Fall für /warn remove, wenn keine Warnung da ist
-                    sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Der Spieler hat keine Verwarnungen zum Entfernen.");
+                    sender.sendMessage(Lowdfx.serverMessage(Component.text("Der Spieler hat keine Verwarnungen zum Entfernen.", NamedTextColor.RED)));
                 }
 
                 // Spieler vom Namen-Bann entfernen
-                Bukkit.getBanList(BanList.Type.NAME).pardon(target.getName());
+                Bukkit.getBanList(BanListType.PROFILE).pardon(target.getPlayerProfile());
 
                 // Spieler IP aus den gespeicherten Warn-Daten auslesen und IP-Bann entfernen
                 String playerIP = config.getString("ip"); // IP aus den gespeicherten Daten abrufen
                 if (playerIP != null && !playerIP.isEmpty()) {
-                    removeIPBan(playerIP, sender);
-                    sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.GREEN + "Der IP-Bann für " + ChatColor.BOLD + playerName + ChatColor.GREEN + " wurde aufgehoben.");
+                    try {
+                        Bukkit.getBanList(BanListType.IP).pardon(InetAddress.getByName(playerIP));
+                    } catch (UnknownHostException ignored) {} // Kann ignoriert werden, weil das einfach heisst, dass der spieler sowieso nicht gebannt war.
+                    sender.sendMessage(Lowdfx.serverMessage(MiniMessage.miniMessage().deserialize("<green>Der IP-Bann für <b>" + playerName + "</b> wurde aufgehoben.")));
                 }
 
             } catch (IOException e) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Fehler beim Löschen der Verwarnungsdaten.");
+                sender.sendMessage(Lowdfx.serverMessage(Component.text("Fehler beim Löschen der Verwarnungsdaten.", NamedTextColor.RED)));
             }
         }
     }
 
-
-
-    private void removeIPBan(String playerIP, CommandSender sender) {
-        // Versuchen, die IP aus der banned-ips.json zu entfernen
-        try {
-            File bannedIPsFile = new File("banned-ips.json");
-            if (!bannedIPsFile.exists()) {
-                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + lowdfx.config.getString("basic.servername") + ChatColor.GRAY + " >> " + ChatColor.RED + "Die Datei banned-ips.json wurde nicht gefunden.");
-                return;
-            }
-
-            // Lade die JSON-Datei
-            Gson gson = new Gson();
-            JsonArray bannedIPs = gson.fromJson(new FileReader(bannedIPsFile), JsonArray.class);
-
-            boolean ipFound = false;
-            for (int i = 0; i < bannedIPs.size(); i++) {
-                JsonObject entry = bannedIPs.get(i).getAsJsonObject();
-                if (entry.get("ip").getAsString().equals(playerIP)) {
-                    bannedIPs.remove(i);
-                    ipFound = true;
-                    break;
-                }
-            }
-
-            if (ipFound) {
-                // Speichere die Änderungen zurück in die Datei
-                try (FileWriter writer = new FileWriter(bannedIPsFile)) {
-                    gson.toJson(bannedIPs, writer);
-                }
-                //sender.sendMessage("[WarnSystem] Der IP-Ban für " + playerIP + " wurde entfernt.");
-                Bukkit.getBanList(BanList.Type.IP).pardon(playerIP);  // Entferne IP aus Bukkit Ban-List
-            }
-        } catch (IOException e) {
-            //sender.sendMessage("[WarnSystem] Fehler beim Bearbeiten der banned-ips.json: " + e.getMessage());
-        }
-    }
-
-
-
-
-
-
-
-    private void banPlayer(OfflinePlayer target, String reason, long duration) {
-        // Ban based on Name
-        BanList banListName = Bukkit.getBanList(BanList.Type.NAME);
-        banListName.addBan(target.getName(), reason, duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
-
-        // Ban based on UUID (by using the string representation of UUID)
-       // BanList banListUUID = Bukkit.getBanList(BanList.Type.NAME); // Use NAME because we ban by name or UUID as string
-        //banListUUID.addBan(target.getUniqueId().toString(), reason, duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
+    @SuppressWarnings("DataFlowIssue")
+    private void banPlayer(@NotNull OfflinePlayer target, Component reason, long duration) {
+        Bukkit.getBanList(BanListType.PROFILE).addBan(target.getPlayerProfile(), LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
 
         // Ban based on IP (if the player is online)
         if (target.isOnline()) {
-            String playerIP = target.getPlayer().getAddress().getAddress().getHostAddress();
-            BanList banListIP = Bukkit.getBanList(BanList.Type.IP);
-            banListIP.addBan(playerIP, reason, duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
-        }
-
-        // If the player is online, kick them
-        if (target.isOnline()) {
-            target.getPlayer().kickPlayer(reason);
+            Bukkit.getBanList(BanListType.IP).addBan(target.getPlayer().getAddress().getAddress(), LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
+            target.getPlayer().kick(reason);
         }
     }
 
+    private @NotNull Component buildBanMessage(@NotNull YamlConfiguration config) {
+        long banDuration = Lowdfx.CONFIG.getLong("warnsystem.tempban-duration", 86400);
+        TextComponent.Builder banMessage = Component.text().append(MiniMessage.miniMessage().deserialize("""
+                    <red>Bei <b>2</b> Verwarnungen hast du einen temporären Ban für <hours> Stunden!
+                    Bei <b>3</b> Verwarnungen hast du einen permanenten Ban!
+                    ------------------------------------------------------------------
+                    """, Placeholder.unparsed("hours", String.valueOf(banDuration / 3600))));
 
-
-    private String buildBanMessage(YamlConfiguration config) {
-        long banDuration = Bukkit.getPluginManager().getPlugin("lowdfx").getConfig().getLong("warnsystem.tempban-duration", 86400);
-        // Berechne Stunden
-        long hours = banDuration / 3600; // 1 Stunde = 3600 Sekunden
-        StringBuilder banMessage = new StringBuilder(
-                ChatColor.RED + "Bei " + ChatColor.BOLD + "2" + ChatColor.RED + " Verwarnungen hast du einen temporären Ban für " + hours + " Stunden!" + "\n" +
-                ChatColor.RED + "Bei " + ChatColor.BOLD + "3" + ChatColor.RED + " Verwarnungen  hast du einen permanenten Ban!" + "\n" +
-                ChatColor.DARK_RED + "------------------------------------------------------------------"+ "\n");
         int warns = config.getInt("warns", 0);
 
         for (int i = 1; i <= warns; i++) {
-            String warnDate = config.getString("warn_date." + i); // Datum und Uhrzeit einfügen
-            banMessage.append(ChatColor.GRAY).append("➽ ").append(i)
-                    .append(". Grund: ").append(ChatColor.RED).append(config.getString("reasons." + i))
-                    .append(ChatColor.GRAY).append(", von: ").append(ChatColor.GREEN).append(config.getString("warned_by." + i))
-                    .append(ChatColor.GRAY).append(", am: ").append(ChatColor.WHITE).append(warnDate).append("\n").append("\n"); // Datum und Uhrzeit anfügen
+            String warnDate = config.getString("warn_date." + i);
+            banMessage.append(Component.text("➽ " + i + ". Grund: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("reasons." + i)), NamedTextColor.RED))
+                    .append(Component.text(", von: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("warned_by." + i)), NamedTextColor.GOLD)))
+                    .append(Component.text(", am: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(warnDate), NamedTextColor.WHITE)))
+                    .appendNewline().appendNewline());
         }
-        return banMessage.toString();
+        return banMessage.build();
     }
 }

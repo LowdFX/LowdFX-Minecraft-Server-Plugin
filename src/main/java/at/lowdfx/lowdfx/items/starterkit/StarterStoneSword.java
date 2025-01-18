@@ -1,19 +1,15 @@
 package at.lowdfx.lowdfx.items.starterkit;
 
-import at.lowdfx.lowdfx.lowdfx;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 
 public class StarterStoneSword {
-    public static ItemStack get(){
+    public static ItemStack get() {
         ItemStack item = new ItemStack(Material.STONE_SWORD, 1);
         ItemMeta meta = item.getItemMeta();
 

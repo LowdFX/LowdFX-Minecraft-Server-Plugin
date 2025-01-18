@@ -3,14 +3,14 @@
 **Version**: 1.0  
 **Minecraft API-Version**: 1.21  
 **Soft Dependency**: [ProtocolLib](https://github.com/dmulloy2/ProtocolLib)  
-**ACHTUNG**: Soft Dependency ist nicht notwendig, da diese nur für Zukünftige Projekt eingebunden ist!
+**ACHTUNG**: Soft Dependency ist nicht notwendig, da diese nur für zukünftige Projekt eingebunden ist!
 
 ## Beschreibung
 Das LowdFX Plugin erweitert deinen Minecraft-Server um zahlreiche wie auch hilfreiche Befehle und Funktionen.
-Von Spielerinteraktionen über Home, Warp oder Spawn bis hin zu Invsee und Kistensperr-Befehlen bietet es ein umfangreiches Funktionsspektrum.
-Des weitern wurden Standard Commands wie Gamemode und der gleichen vereinfacht um einen besseren Umgang zu haben.
-Personalisierte Wilkommensnachricht wie auch Serverleave Nachricht, es wurde auch mit einem einfachen Vanish Befehl erweitert.
-Ein eigenes Verwarnsystem mit 3 Verwarnungen mit gespeicherter Info wie auch temp- und perma Ban.
+Von Spielerinteraktionen über Home, Warp oder Spawn bis hin zu Inv-See und Kistensperr-Befehlen bietet es ein umfangreiches Funktionsspektrum.
+Des Weiteren wurden Standard Commands wie Gamemode und der gleichen vereinfacht, um einen besseren Umgang zu haben.
+Personalisierte Willkommensnachricht wie auch Server-leave Nachricht, es wurde auch mit einem einfachen Vanish Befehl erweitert.
+Ein eigenes Verwarnsystem mit 3 Verwarnungen mit gespeicherter Information wie auch temp- und perma Ban.
 Bei den Bans wird der Name, UUID und IP gebannt!
 
 ---
@@ -45,20 +45,20 @@ Bei den Bans wird der Name, UUID und IP gebannt!
 | `/warn`            | Zugriff auf das Warnsystem.                             | `lowdfx.warn` (TRUE)      | `/warn`                |
 
 ### Plugin-Hauptbefehl
-| **Befehl**         | **Beschreibung**                                        | **Berechtigung**              | **Nutzung**        |
-|--------------------|---------------------------------------------------------|-------------------------------|--------------------|
-| `/low`             | Hauptbefehl des Plugins.                                | `lowdfx.low` (TRUE)           | `/low`             |
-| `/low help`        | Zeigt Hilfe über das Plugin.                            | `lowdfx.low.help` (TRUE)      | `/low help`        |
-| `/low info`        | Zeigt Informationen über das Plugin.                    | `lowdfx.low.info` (OP)        | `/low info`        |
-| `/low starterkit`  | Gibt ein Starterkit aus.                                | `lowdfx.low.starterkit` (TRUE)| `/low starterkit`  |
-| `/low opkit`       | Gibt ein OP Kit aus.                                    | `lowdfx.low.opkit` (OP)       | `/low opkit`       |
+| **Befehl**        | **Beschreibung**                     | **Berechtigung**               | **Nutzung**       |
+|-------------------|--------------------------------------|--------------------------------|-------------------|
+| `/low`            | Hauptbefehl des Plugins.             | `lowdfx.low` (TRUE)            | `/low`            |
+| `/low help`       | Zeigt Hilfe über das Plugin.         | `lowdfx.low.help` (TRUE)       | `/low help`       |
+| `/low info`       | Zeigt Informationen über das Plugin. | `lowdfx.low.info` (OP)         | `/low info`       |
+| `/low starterkit` | Gibt ein Starterkit aus.             | `lowdfx.low.starterkit` (TRUE) | `/low starterkit` |
+| `/low opkit`      | Gibt ein OP Kit aus.                 | `lowdfx.low.opkit` (OP)        | `/low opkit`      |
 
 ---
 
 ## Berechtigungen
 
 Die Berechtigungen und ihre Standardwerte (TRUE, OP, FALSE, usw.) steuern, wer welche Befehle nutzen kann. Hier eine vollständige Übersicht:
-Diese Permissions Anleitung ist in der permissions.yml nochmal dargestellt wie diese zu nutzen sind, dies muss nur verändert werden, wenn kein Permissions Plugin verwendet wird.
+Diese Permissions-Anleitung ist in der permissions.yml nochmal dargestellt wie diese zu nutzen sind, dies muss nur verändert werden, wenn kein Permissions-Plugin verwendet wird.
 Es wurden bereits voreingestellte Optionen angegeben.
 
 | **Berechtigung**          | **Beschreibung**                                                   | **Standard** |
@@ -101,7 +101,7 @@ Es wurden bereits voreingestellte Optionen angegeben.
 
 ## Soft Dependency
 - Das Plugin kann mit [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) erweitert werden, um zusätzliche Funktionen zu nutzen.
-- Wird aber NICHT benötigt, dies ist nur für Zukünftige Pläne integriert!
+- Wird aber NICHT benötigt, dies ist nur für zukünftige Pläne integriert!
 ---
 
 Viel Spaß mit meinem Plugin!

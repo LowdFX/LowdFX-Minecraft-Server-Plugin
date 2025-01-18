@@ -1,6 +1,6 @@
 name: lowdfx
 version: '1.0'
-main: at.lowdfx.lowdfx.lowdfx
+main: at.lowdfx.lowdfx.Lowdfx
 api-version: '1.21'
 softdepend: ['ProtocolLib']
 
