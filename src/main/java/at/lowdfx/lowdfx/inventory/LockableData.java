@@ -2,8 +2,8 @@ package at.lowdfx.lowdfx.inventory;
 
 import at.lowdfx.lowdfx.LowdFX;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -16,28 +16,28 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ChestData {
+public class LockableData {
     private final File dataFile;
     private final FileConfiguration dataConfig;
 
-    public ChestData() {
-        this.dataFile = LowdFX.DATA_DIR.resolve("chestdata.yml").toFile();
+    public LockableData() {
+        this.dataFile = LowdFX.DATA_DIR.resolve("lock-data.yml").toFile();
         try {
             if (!dataFile.createNewFile()) {
-                LowdFX.LOG.info("Chest data Datei erstellt.");
+                LowdFX.LOG.info("Lock data Datei erstellt.");
             }
         } catch (IOException e) {
-            LowdFX.LOG.warn("Konnte chest data Datei nicht erstellen.");
+            LowdFX.LOG.warn("Konnte lock data Datei nicht erstellen.");
         }
         this.dataConfig = YamlConfiguration.loadConfiguration(dataFile);
     }
 
-    public boolean isChestLocked(@NotNull Location location) {
-        return dataConfig.getBoolean("chests." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ() + ".locked", false); // Standardwert false, Kisten sind zu Beginn nicht gesperrt
+    public boolean isLocked(@NotNull Location location) {
+        return dataConfig.getBoolean("blocks." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ() + ".locked", false); // Standardwert false, Kisten sind zu Beginn nicht gesperrt
     }
 
-    public void addLockedChest(@NotNull Location location, String player) {
-        String path = "chests." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
+    public void addLocked(@NotNull Location location, String player) {
+        String path = "blocks." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
         dataConfig.set(path + ".locked", true);
         dataConfig.set(path + ".owner", player);
         dataConfig.set(path + ".whitelist", List.of(player));  // Füge den Spieler zur Whitelist hinzu
@@ -49,7 +49,7 @@ public class ChestData {
         Block block = location.getBlock();
 
         // Wenn der Block keine Kiste ist, gebe eine leere Menge zurück
-        if (block.getType() != Material.CHEST && !block.getType().name().endsWith("SHULKER_BOX")) return connectedChests;
+        if (block.getBlockData() instanceof Chest) return connectedChests;
 
         // Überprüfen der benachbarten Blöcke (Norden, Osten, Süden, Westen)
         for (Block neighbor : new Block[]{
@@ -59,7 +59,7 @@ public class ChestData {
                 block.getRelative(0, 0, -1)}) { // Nachbar im Norden
 
             // Wenn der benachbarte Block eine Kiste ist, füge ihn zur Liste hinzu
-            if (neighbor.getType() == Material.CHEST && block.getType().name().endsWith("SHULKER_BOX")) {
+            if (block.getBlockData() instanceof Chest) {
                 connectedChests.add(neighbor.getLocation());
             }
         }
@@ -69,19 +69,18 @@ public class ChestData {
 
         return connectedChests;
     }
+
     public void lockAdjacentChests(Location chestLocation, String playerName) {
-        // Hole alle benachbarten Kisten
-        Set<Location> connectedChests = getConnectedChests(chestLocation);
-
-        // Sperre die Zielkiste und alle angrenzenden Kisten
-        addLockedChest(chestLocation, playerName);
-
-        for (Location adjacentLocation : connectedChests) {
-            addLockedChest(adjacentLocation, playerName);
-        }
+        addLocked(chestLocation, playerName);
+        getConnectedChests(chestLocation).forEach(c -> addLocked(c, playerName));
     }
 
-    public void removeDestroyedChest(@NotNull Location location) {
+    public void unlockAdjacentChests(Location chestLocation) {
+        removeLocked(chestLocation);
+        getConnectedChests(chestLocation).forEach(this::removeLocked);
+    }
+
+    public void removeDestroyedBlock(@NotNull Location location) {
         String path = "chests." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
 
         if (dataConfig.contains(path)) {
@@ -115,7 +114,7 @@ public class ChestData {
         save();
     }
 
-    public void removeLockedChest(@NotNull Location location) {
+    public void removeLocked(@NotNull Location location) {
         String path = "chests." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
         dataConfig.set(path + ".locked", false);
         save();

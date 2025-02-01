@@ -21,7 +21,7 @@ public class HomePoint {
         File folder = LowdFX.DATA_DIR.resolve("HomePoints").toFile();
         folder.mkdirs();
 
-        this.file = new File(folder.getAbsolutePath(), player.getName() + ".yml");
+        this.file = new File(folder.getAbsolutePath(), player.getUniqueId() + ".yml");
         try {
             if (this.file.exists()) {
                 this.config.load(this.file);
@@ -35,7 +35,7 @@ public class HomePoint {
         File folder = LowdFX.DATA_DIR.resolve("HomePoints").toFile();
         folder.mkdirs();
 
-        this.file = new File(folder.getAbsolutePath(), player.getName() + ".yml");
+        this.file = new File(folder.getAbsolutePath(), player.getUniqueId() + ".yml");
         try {
             if (this.file.exists()) {
                 this.config.load(this.file);

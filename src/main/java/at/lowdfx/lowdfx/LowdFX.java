@@ -2,11 +2,8 @@ package at.lowdfx.lowdfx;
 
 import at.lowdfx.lowdfx.command.*;
 import at.lowdfx.lowdfx.event.*;
-import at.lowdfx.lowdfx.inventory.ChestData;
-import at.lowdfx.lowdfx.managers.ChestShopManager;
-import at.lowdfx.lowdfx.managers.HomeManager;
-import at.lowdfx.lowdfx.managers.SpawnManager;
-import at.lowdfx.lowdfx.managers.WarpManager;
+import at.lowdfx.lowdfx.inventory.LockableData;
+import at.lowdfx.lowdfx.managers.*;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Permissions;
 import io.papermc.paper.command.brigadier.Commands;
@@ -37,7 +34,7 @@ public final class LowdFX extends JavaPlugin {
     public static LowdFX PLUGIN;
     public static Path DATA_DIR;
 
-    public static ChestData CHESTS_DATA;
+    public static LockableData LOCKABLE_DATA;
     public static VanishingHandler INVISIBLE_HANDLER;
     public static ChestShopManager SHOP_MANAGER;
 
@@ -76,20 +73,23 @@ public final class LowdFX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ConnectionEvents(), this);
         getServer().getPluginManager().registerEvents(new KitEvents(), this);
         getServer().getPluginManager().registerEvents(new ChestShopEvents(), this);
-        getServer().getPluginManager().registerEvents(new ChestLockEvents(), this);
+        getServer().getPluginManager().registerEvents(new LockEvents(), this);
         getServer().getPluginManager().registerEvents(new VanishEvents(), this);
         getServer().getPluginManager().registerEvents(new MuteEvents(), this);
 
         // === ChestData Datei === //
         ensureDataFolderExists();
-        CHESTS_DATA = new ChestData();
+        LOCKABLE_DATA = new LockableData();
 
         // === Vanished Spieler Datei === //
         INVISIBLE_HANDLER.loadVanishedPlayers();
 
+        // === Playtime Datei === //
+        PlaytimeManager.load();
+
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(ChestLockCommand.command(), "Sperrt eine Kiste.");
+            registrar.register(LockCommand.command(), "Sperrt einen Block.");
             registrar.register(HomeCommand.command(), "Teleportiert dich zu deinem Home.");
             registrar.register(InventoryCommands.anvilCommand(), "Öffnet einen Amboss.", List.of("amboss"));
             registrar.register(InventoryCommands.enderseeCommand(), "Öffnet die Enderchest von einem Spieler.");
@@ -129,13 +129,16 @@ public final class LowdFX extends JavaPlugin {
         // Speichere alle Shops in die Spielerdateien
         SHOP_MANAGER.saveAllShops();
 
+        // === Playtime Datei === //
+        PlaytimeManager.save();
+
         //------------------------------------------
         if (!this.getServer().isPrimaryThread()) {
             // Hier asynchrone Aufgaben starten oder Operationen durchführen, die nicht während dem Shutdown laufen
             if (HOME_MANAGER != null) HOME_MANAGER.onDisable();
             if (WARP_MANAGER != null) WARP_MANAGER.onDisable();
             if (SPAWN_MANAGER != null) SPAWN_MANAGER.onDisable();
-            if (CHESTS_DATA != null) CHESTS_DATA.save();
+            if (LOCKABLE_DATA != null) LOCKABLE_DATA.save();
         }
         saveConfig();
     }
@@ -147,17 +150,17 @@ public final class LowdFX extends JavaPlugin {
         }
 
         // Überprüfen und sicherstellen, dass die Datei erstellt wird, falls sie nicht existiert.
-        File dataFile = DATA_DIR.resolve("chestdata.yml").toFile();
+        File dataFile = DATA_DIR.resolve("lock-data.yml").toFile();
         if (!dataFile.exists()) {
             try {
                 boolean created = dataFile.createNewFile();
                 if (created) {
                     LOG.info("Daten-Datei erstellt: {}", dataFile.getAbsolutePath());
                 } else {
-                    LOG.warn("Die Datei 'chestdata.yml' konnte nicht erstellt werden.");
+                    LOG.warn("Die Datei 'lock-data.yml' konnte nicht erstellt werden.");
                 }
             } catch (IOException e) {
-                LOG.error("Fehler beim Erstellen der Datei 'chestdata.yml'.", e);
+                LOG.error("Fehler beim Erstellen der Datei 'lock-data.yml'.", e);
             }
         }
     }

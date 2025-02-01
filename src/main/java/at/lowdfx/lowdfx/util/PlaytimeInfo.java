@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class PlaytimeInfo {
     public final UUID uuid;
-    protected Time totalTime; // 1000ms Accuracy
+    public final Time totalTime; // 1000ms Accuracy
     protected long lastLogin; // ~5ms Accuracy
     protected long lastLogout; // ~5ms Accuracy
 
