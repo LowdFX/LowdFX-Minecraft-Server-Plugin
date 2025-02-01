@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.command.LowCommand;
-import at.lowdfx.lowdfx.item.opkit.*;
+import at.lowdfx.lowdfx.kit.op.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

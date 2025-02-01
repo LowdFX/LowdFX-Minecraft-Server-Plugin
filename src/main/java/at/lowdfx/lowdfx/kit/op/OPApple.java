@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.item.opkit;
+package at.lowdfx.lowdfx.kit.op;
 
 import at.lowdfx.lowdfx.LowdFX;
 import net.kyori.adventure.text.Component;

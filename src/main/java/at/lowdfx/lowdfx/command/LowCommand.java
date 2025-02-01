@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
-import at.lowdfx.lowdfx.item.opkit.*;
-import at.lowdfx.lowdfx.item.starterkit.*;
+import at.lowdfx.lowdfx.kit.op.*;
+import at.lowdfx.lowdfx.kit.starter.*;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;

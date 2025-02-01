@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.item.opkit;
+package at.lowdfx.lowdfx.kit.op;
 
 import at.lowdfx.lowdfx.LowdFX;
 import net.kyori.adventure.text.Component;
@@ -14,12 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
-public class OPNetheritePickaxe {
-    public static final ItemStack ITEM = new ItemStack(Material.NETHERITE_PICKAXE);
+public class OPNetheriteShovel {
+    public static final ItemStack ITEM = new ItemStack(Material.NETHERITE_SHOVEL);
 
     static {
         ITEM.editMeta(meta -> {
-            meta.displayName(Component.text("OP Netheritspitzhacke", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            meta.displayName(Component.text("OP Netheritschaufel", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
             meta.lore(LowdFX.OP_LORE);
             meta.setUnbreakable(true);
 
@@ -32,7 +32,6 @@ public class OPNetheritePickaxe {
                     Integer.MAX_VALUE,
                     AttributeModifier.Operation.ADD_NUMBER,
                     EquipmentSlotGroup.MAINHAND));
-
         });
     }
 

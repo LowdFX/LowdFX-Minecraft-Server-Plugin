@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.item.opkit;
+package at.lowdfx.lowdfx.kit.op;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

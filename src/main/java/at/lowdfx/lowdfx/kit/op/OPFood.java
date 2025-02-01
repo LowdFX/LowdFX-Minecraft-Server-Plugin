@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.item.starterkit;
+package at.lowdfx.lowdfx.kit.op;
 
 import at.lowdfx.lowdfx.LowdFX;
 import net.kyori.adventure.text.Component;
@@ -6,15 +6,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class StarterFood {
-    public static final ItemStack ITEM = new ItemStack(Material.BAKED_POTATO);
+public class OPFood extends JavaPlugin {
+    public static final ItemStack ITEM = new ItemStack(Material.GOLDEN_CARROT);
 
     static {
         ITEM.editMeta(meta -> {
-            meta.displayName(Component.text("Starter Essen", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-            meta.lore(LowdFX.STARTER_LORE);
+            meta.displayName(Component.text("OP Essen", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+            meta.lore(LowdFX.OP_LORE);
         });
     }
 

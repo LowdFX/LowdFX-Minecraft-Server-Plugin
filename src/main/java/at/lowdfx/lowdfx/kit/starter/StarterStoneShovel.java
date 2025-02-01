@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.item.starterkit;
+package at.lowdfx.lowdfx.kit.starter;
 
 import at.lowdfx.lowdfx.LowdFX;
 import net.kyori.adventure.text.Component;
@@ -9,17 +9,18 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class StarterLeatherChestplate {
-    public static final ItemStack ITEM = new ItemStack(Material.LEATHER_CHESTPLATE);
+public class StarterStoneShovel {
+    public static final ItemStack ITEM = new ItemStack(Material.STONE_SHOVEL);
 
     static {
         ITEM.editMeta(meta -> {
-            meta.displayName(Component.text("Starter Lederjacke", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+            meta.displayName(Component.text("Starter Steinschaufel", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
             meta.lore(LowdFX.STARTER_LORE);
             meta.setUnbreakable(true);
 
+            meta.addEnchant(Enchantment.EFFICIENCY, 1, false);
             meta.addEnchant(Enchantment.UNBREAKING, 1, false);
-            meta.addEnchant(Enchantment.PROTECTION, 1, false);
+            meta.addEnchant(Enchantment.FORTUNE, 1, false);
         });
     }
 

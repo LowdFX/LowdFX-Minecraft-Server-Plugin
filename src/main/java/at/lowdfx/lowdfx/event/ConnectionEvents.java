@@ -7,7 +7,6 @@ import at.lowdfx.lowdfx.managers.SpawnManager;
 import at.lowdfx.lowdfx.util.PlaytimeInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,9 +56,7 @@ public class ConnectionEvents implements Listener {
         UUID uuid = player.getUniqueId();
 
         // Quit Message
-        event.quitMessage(Component.text(Objects.requireNonNullElse(LowdFX.CONFIG.getString("basic.servername"), "???"), NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(" >> ", NamedTextColor.GRAY))
-                .append(Component.text(Objects.requireNonNullElse(LowdFX.CONFIG.getString("join.quit"), "???"), NamedTextColor.YELLOW))
+        event.quitMessage(LowdFX.serverMessage(Component.text(Objects.requireNonNullElse(LowdFX.CONFIG.getString("join.quit"), "???"), NamedTextColor.YELLOW))
                 .appendSpace()
                 .append(player.name().color(NamedTextColor.GOLD))
                 .append(Component.text("!", NamedTextColor.YELLOW)));
