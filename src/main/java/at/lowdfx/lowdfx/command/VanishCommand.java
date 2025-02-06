@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -21,11 +22,9 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class VanishCommand {
-    public static final String VANISH_PERMISSION = "lowdfx.vanish";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("vanish")
-                .requires(source -> source.getSender().hasPermission(VANISH_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.VANISH))
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
@@ -109,7 +108,7 @@ public final class VanishCommand {
 
         Component adminMessage = LowdFX.serverMessage(Component.text(player.getName() + (state ? " ist nun vanished!" : " ist nicht mehr vanished."), state ? NamedTextColor.GREEN : NamedTextColor.RED));
         Bukkit.getOnlinePlayers().forEach(p -> {
-            if (p.hasPermission(VANISH_PERMISSION) && !p.equals(player))
+            if (Perms.check(p, Perms.Perm.VANISH) && !p.equals(player))
                 p.sendMessage(adminMessage);
         });
 

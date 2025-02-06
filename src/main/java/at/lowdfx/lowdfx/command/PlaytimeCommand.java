@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.PlaytimeManager;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -14,10 +15,9 @@ import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class PlaytimeCommand {
-    public static final String PLAYTIME_ADMIN_PERMISSION = "lowdfx.playtime.admin";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("playtime")
+                .requires(source -> Perms.check(source, Perms.Perm.PLAYTIME))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
@@ -28,7 +28,7 @@ public final class PlaytimeCommand {
                     return 1;
                 })
                 .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
-                        .requires(source -> source.getSender().hasPermission(PLAYTIME_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.PLAYTIME_ADMIN))
                         .executes(context -> {
                             Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                             context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Spielzeit von " + player.getName() + ": ", NamedTextColor.YELLOW).append(Component.text(PlaytimeManager.PLAYTIMES.get(player.getUniqueId()).totalTime().getPreciselyFormatted(), NamedTextColor.WHITE))));

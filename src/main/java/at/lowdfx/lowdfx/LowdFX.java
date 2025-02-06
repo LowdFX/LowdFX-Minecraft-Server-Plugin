@@ -6,7 +6,7 @@ import at.lowdfx.lowdfx.inventory.LockableData;
 import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.managers.*;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
-import at.lowdfx.lowdfx.util.Permissions;
+import at.lowdfx.lowdfx.util.Perms;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
@@ -53,7 +53,11 @@ public final class LowdFX extends JavaPlugin {
         InvUI.getInstance().setPlugin(this);
 
         // === Permissions Klasse laden === //
-        new Permissions().loadPermissions();
+        try {
+            Perms.loadPermissions();
+        } catch (IOException e) {
+            LOG.warn("Konnte permissions nicht sichern/laden.");
+        }
 
         // === Config Datei === //
         saveDefaultConfig();

@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -20,12 +21,9 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class StatCommands {
-    public static final String FEED_PERMISSION = "lowdfx.feed";
-    public static final String HEAL_PERMISSION = "lowdfx.heal";
-
     public static LiteralCommandNode<CommandSourceStack> feedCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("feed")
-                .requires(source -> source.getSender().hasPermission(FEED_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.FEED))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
@@ -54,7 +52,7 @@ public final class StatCommands {
 
     public static LiteralCommandNode<CommandSourceStack> healCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("heal")
-                .requires(source -> source.getSender().hasPermission(HEAL_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.HEAL))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));

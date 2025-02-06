@@ -1,7 +1,6 @@
 package at.lowdfx.lowdfx.command;
 
-import at.lowdfx.lowdfx.kit.op.*;
-import at.lowdfx.lowdfx.kit.starter.*;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -57,7 +56,7 @@ public final class LowCommand {
                         })
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("info")
-                        .requires(source -> source.getSender().hasPermission(INFO_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.INFO))
                         .executes(context -> {
                             context.getSource().getSender().sendMessage(MiniMessage.miniMessage().deserialize("""
                                     <yellow><b>MC-Version:</b> <gold>1.21.3+

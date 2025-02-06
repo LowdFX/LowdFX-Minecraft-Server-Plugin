@@ -2,7 +2,7 @@ package at.lowdfx.lowdfx.managers;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.teleportation.TeleportPoint;
-import at.lowdfx.lowdfx.util.ServerProperties;
+import at.lowdfx.lowdfx.util.Utilities;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;

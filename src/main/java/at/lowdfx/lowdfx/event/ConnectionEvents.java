@@ -45,6 +45,7 @@ public class ConnectionEvents implements Listener {
 
         // Homes
         HomeManager.load(player);
+        HomeManager.load(player.getUniqueId());
 
         // Spawns
         SpawnManager.getSpawn(event.getPlayer()).teleport(event.getPlayer());
@@ -67,7 +68,7 @@ public class ConnectionEvents implements Listener {
         }
 
         // Homes
-        HomeManager.save(player);
+        HomeManager.save(player.getUniqueId());
 
         // Spawns
         player.setRespawnLocation(SpawnManager.getSpawn(player).location(), true);

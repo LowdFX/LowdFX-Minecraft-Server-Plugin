@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -30,7 +31,7 @@ public final class TpaCommand {
 
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("tpa")
-                .requires(source -> source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.TPA) && source.getExecutor() instanceof Player)
                 .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) return 1;

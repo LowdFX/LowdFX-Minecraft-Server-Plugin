@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.TeleportManager;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -18,13 +19,9 @@ import java.util.Collection;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TpCommands {
-    public static final String TPHERE_PERMISSION = "lowdfx.tphere";
-    public static final String TPALL_PERMISSION = "lowdfx.tpall";
-    public static final String BACK_PERMISSION = "lowdfx.back";
-
     public static LiteralCommandNode<CommandSourceStack> tphereCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("tphere")
-                .requires(source -> source.getSender().hasPermission(TPHERE_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.TPHERE))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
                         .executes(context -> {
                             Location target = context.getSource().getLocation();
@@ -42,7 +39,7 @@ public final class TpCommands {
 
     public static LiteralCommandNode<CommandSourceStack> tpallCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("tpall")
-                .requires(source -> source.getSender().hasPermission(TPALL_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.TPALL))
                 .executes(context -> {
                     Location target = context.getSource().getLocation();
                     Component message = LowdFX.serverMessage(Component.text("Du wurdest zu " + context.getSource().getSender().getName() + " teleportiert!", NamedTextColor.GREEN));
@@ -58,7 +55,7 @@ public final class TpCommands {
 
     public static LiteralCommandNode<CommandSourceStack> backCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("back")
-                .requires(source -> source.getSender().hasPermission(BACK_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.BACK))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));

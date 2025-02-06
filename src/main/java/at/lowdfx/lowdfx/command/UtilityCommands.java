@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -18,12 +19,9 @@ import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class UtilityCommands {
-    public static final String FLY_PERMISSION = "lowdfx.fly";
-    public static final String GAMEMODE_PERMISSION = "lowdfx.gm";
-
     public static LiteralCommandNode<CommandSourceStack> flyCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("fly")
-                .requires(source -> source.getSender().hasPermission(FLY_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.FLY))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
@@ -53,7 +51,7 @@ public final class UtilityCommands {
 
     public static LiteralCommandNode<CommandSourceStack> gmCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("gm")
-                .requires(source -> source.getSender().hasPermission(GAMEMODE_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.GAME_MODE))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, GameMode>argument("mode", ArgumentTypes.gameMode())
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {

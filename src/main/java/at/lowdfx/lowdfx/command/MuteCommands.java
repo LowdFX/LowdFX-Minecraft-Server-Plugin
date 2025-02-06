@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.moderation.Mute;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Time;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -26,7 +27,7 @@ public final class MuteCommands {
 
     public static LiteralCommandNode<CommandSourceStack> muteCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("mute")
-                .requires(source -> source.getSender().hasPermission("poo.mute"))
+                .requires(source -> Perms.check(source, Perms.Perm.MUTE))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("player", StringArgumentType.word())
                         .suggests((context, builder) -> {
                             List<UUID> excluded = new ArrayList<>(MUTES.keySet());
@@ -87,7 +88,7 @@ public final class MuteCommands {
 
     public static LiteralCommandNode<CommandSourceStack> unmuteCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("unmute")
-                .requires(source -> source.getSender().hasPermission("poo.mute"))
+                .requires(source -> Perms.check(source, Perms.Perm.MUTE))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("player", StringArgumentType.word())
                         .suggests((context, builder) -> {
                             String sourceName = context.getSource().getSender() instanceof Player player ? player.getName() : "";

@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.inventory.LockableData;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,7 +35,7 @@ public class LockEvents implements Listener {
         // Überprüfen, ob die Kiste gesperrt ist.
         if (LockableData.isLocked(lockLocation)) {
             // Überprüfen, ob der Spieler berechtigt ist, auf die Kiste zuzugreifen.
-            if (LowdFX.LOCKABLE_DATA.notOwner(player.getName(), lockLocation) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(lockLocation, player.getName()) && !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
+            if (LockableData.notOwner(player.getName(), lockLocation) && !LockableData.isPlayerInWhitelist(lockLocation, player.getName()) && !Perms.check(player, Perms.Perm.LOCK_ADMIN)) {
                 // Zugriff verweigern, da der Spieler kein Besitzer ist oder nicht auf der Whitelist steht.
                 event.setCancelled(true);
                 player.sendMessage(LowdFX.serverMessage(Component.text("Diese Kiste ist gesperrt! Du hast keinen Zugriff.", NamedTextColor.RED)));
@@ -46,16 +47,16 @@ public class LockEvents implements Listener {
     public void onInventoryMoveItem(@NotNull InventoryMoveItemEvent event) {
         // Prüfe, ob die Quelle (Hopper zieht Items) oder Ziel (Items werden abgelegt) eine Kiste oder Shulkerkiste ist
         if (event.getSource().getHolder() instanceof Container container) {
-                if (event.getInitiator().getHolder() instanceof Player player && player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) return;
             if (LockableData.isLocked(container.getLocation())) {
+                if (event.getInitiator().getHolder() instanceof Player player && Perms.check(player, Perms.Perm.LOCK_ADMIN)) return;
                 event.setCancelled(true);
             }
         }
 
         // Genauso bei Ziel (Destination)
         if (event.getDestination().getHolder() instanceof Container container) {
-                if (event.getInitiator().getHolder() instanceof Player player && player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) return;
             if (LockableData.isLocked(container.getLocation())) {
+                if (event.getInitiator().getHolder() instanceof Player player && Perms.check(player, Perms.Perm.LOCK_ADMIN)) return;
                 event.setCancelled(true);
             }
         }
@@ -73,7 +74,7 @@ public class LockEvents implements Listener {
         // Überprüfen, ob die Kiste gesperrt ist
         if (LockableData.isLocked(chestLocation)) {
             // Überprüfen, ob der Spieler auf der Whitelist oder Besitzer ist
-            if (!LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(chestLocation, player.getName()) && LowdFX.LOCKABLE_DATA.notOwner(player.getName(), chestLocation) && !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
+            if (!LockableData.isPlayerInWhitelist(chestLocation, player.getName()) && LockableData.notOwner(player.getName(), chestLocation) && !Perms.check(player, Perms.Perm.LOCK_ADMIN)) {
                 // Kiste ist gesperrt und der Spieler ist weder Besitzer noch auf der Whitelist
                 event.setCancelled(true);
                 player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist gesperrt und du kannst ihn nicht abbauen.", NamedTextColor.RED)));
@@ -100,8 +101,7 @@ public class LockEvents implements Listener {
             if (LockableData.isLocked(adjacentLocation)) {
                 LockableData.lockAdjacentChests(chestLocation, player.getName());
                 // Verhindern, dass ein unberechtigter Spieler eine Doppelkiste erstellt
-                if (!LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(adjacentLocation, player.getName()) &&
-                        !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
+                if (!LockableData.isPlayerInWhitelist(adjacentLocation, player.getName()) && !Perms.check(player, Perms.Perm.LOCK_ADMIN)) {
                     event.setCancelled(true);
                     player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst keine Doppelkiste mit einer gesperrten Kiste erstellen.", NamedTextColor.RED)));
                     return;

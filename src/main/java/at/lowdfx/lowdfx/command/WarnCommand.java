@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.util.Perms;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -31,14 +32,11 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class WarnCommand {
-    public static final String WARN_PERMISSION = "lowdfx.warn";
-    public static final String WARN_ADMIN_PERMISSION = "lowdfx.warn.admin";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("warn")
-                .requires(source -> source.getSender().hasPermission(WARN_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.WARN))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerProfileListResolver>argument("players", ArgumentTypes.playerProfiles())
-                        .requires(source -> source.getSender().hasPermission(WARN_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.WARN_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("reason", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     CommandSender sender = context.getSource().getSender();

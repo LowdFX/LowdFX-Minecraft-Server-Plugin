@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.kit.Items;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -13,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
@@ -22,15 +24,9 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class InventoryCommands {
-    public static final String ANVIL_PERMISSION = "lowdfx.anvil";
-    public static final String ENDERSEE_PERMISSION = "lowdfx.endersee";
-    public static final String INVSEE_PERMISSION = "lowdfx.invsee";
-    public static final String TRASH_PERMISSION = "lowdfx.trash";
-    public static final String WORKBENCH_PERMISSION = "lowdfx.workbench";
-
     public static LiteralCommandNode<CommandSourceStack> anvilCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("anvil")
-                .requires(source -> source.getSender().hasPermission(ANVIL_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.ANVIL) && source.getExecutor() instanceof Player)
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
 
@@ -43,7 +39,7 @@ public final class InventoryCommands {
 
     public static LiteralCommandNode<CommandSourceStack> enderseeCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("endersee")
-                .requires(source -> source.getSender().hasPermission(ENDERSEE_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.ENDERSEE) && source.getExecutor() instanceof Player)
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
 
@@ -66,7 +62,7 @@ public final class InventoryCommands {
 
     public static LiteralCommandNode<CommandSourceStack> invseeCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("invsee")
-                .requires(source -> source.getSender().hasPermission(INVSEE_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.INVSEE) && source.getExecutor() instanceof Player)
                 .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
@@ -92,14 +88,6 @@ public final class InventoryCommands {
                             Window window = Window.single().setTitle("Inventar von " + target.getName()).setGui(gui).setViewer(player).build();
                             window.open();
 
-                            Bukkit.getScheduler().runTaskTimer(LowdFX.PLUGIN, r -> {
-                                if (window.isOpen()) {
-                                    window.notifyAll(); // Damit Änderungen vom Inventar live sind.
-                                } else {
-                                    r.cancel();
-                                }
-                            }, 10, 10);
-
                             player.sendMessage(Component.text("Du hast das Inventar von " + target.getName() + " geöffnet!", NamedTextColor.GREEN));
                             return 1;
                         })
@@ -109,7 +97,7 @@ public final class InventoryCommands {
 
     public static LiteralCommandNode<CommandSourceStack> trashCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("trash")
-                .requires(source -> source.getSender().hasPermission(TRASH_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.TRASH) && source.getExecutor() instanceof Player)
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
 
@@ -122,7 +110,7 @@ public final class InventoryCommands {
 
     public static LiteralCommandNode<CommandSourceStack> workbenchCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("workbench")
-                .requires(source -> source.getSender().hasPermission(WORKBENCH_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.WORKBENCH) && source.getExecutor() instanceof Player)
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
 

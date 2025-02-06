@@ -1,5 +1,6 @@
 package at.lowdfx.lowdfx.util;
 
+import at.lowdfx.lowdfx.LowdFX;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Utilities {
+public final class Utilities {
     public static @NotNull Set<Location> connectedChests(Block chestBlock) {
         Set<Location> connectedChests = new HashSet<>();
         for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {

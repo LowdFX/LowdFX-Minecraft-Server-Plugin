@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.SpawnManager;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -19,12 +20,9 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class SpawnCommand {
-    public static final String SPAWN_ADMIN_PERMISSION = "lowdfx.spawn.setremove";
-    public static final String SPAWN_PERMISSION = "lowdfx.spawn";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("spawn")
-                .requires(source -> source.getExecutor() instanceof Player && source.getSender().hasPermission(SPAWN_PERMISSION))
+                .requires(source -> source.getExecutor() instanceof Player && Perms.check(source, Perms.Perm.SPAWN))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
 
@@ -54,7 +52,7 @@ public final class SpawnCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("set")
-                        .requires(source -> source.getSender().hasPermission(SPAWN_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.SPAWN_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     SpawnManager.getNames().forEach(builder::suggest);
@@ -78,7 +76,7 @@ public final class SpawnCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove")
-                        .requires(source -> source.getSender().hasPermission(SPAWN_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.SPAWN_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     SpawnManager.getNames().forEach(builder::suggest);

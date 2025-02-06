@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.WarpManager;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -16,12 +17,9 @@ import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class WarpCommand {
-    public static final String WARP_ADMIN_PERMISSION = "lowdfx.warp.setremove";
-    public static final String WARP_PERMISSION = "lowdfx.warp";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("warp")
-                .requires(source -> source.getSender().hasPermission(WARP_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.WARP))
                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                         .requires(source -> source.getExecutor() instanceof Player)
                         .suggests((context, builder) -> {
@@ -43,7 +41,7 @@ public final class WarpCommand {
                         })
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("set")
-                        .requires(source -> source.getSender().hasPermission(WARP_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.WARP))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     WarpManager.getWarpsList().forEach(builder::suggest);
@@ -63,7 +61,7 @@ public final class WarpCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove")
-                        .requires(source -> source.getSender().hasPermission(WARP_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.WARP_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     WarpManager.getWarpsList().forEach(builder::suggest);

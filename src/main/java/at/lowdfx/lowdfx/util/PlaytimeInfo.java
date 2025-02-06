@@ -35,12 +35,4 @@ public class PlaytimeInfo {
             return totalTime;
         }
     }
-
-    public long lastLogin() {
-        return lastLogin;
-    }
-
-    public long lastLogout() {
-        return lastLogout;
-    }
 }

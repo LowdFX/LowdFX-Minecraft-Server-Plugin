@@ -1,6 +1,8 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.inventory.LockableData;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -21,12 +23,9 @@ import java.util.List;
 
 @SuppressWarnings({ "UnstableApiUsage", "DuplicatedCode" })
 public final class LockCommand {
-    public static final String LOCK_PERMISSION = "lowdfx.lock";
-    public static final String LOCK_ADMIN_PERMISSION = "lowdfx.lock.admin";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("lock")
-                .requires(source -> source.getSender().hasPermission(LOCK_PERMISSION) && source.getExecutor() instanceof Player)
+                .requires(source -> Perms.check(source, Perms.Perm.LOCK) && source.getExecutor() instanceof Player)
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                     Block targetBlock = player.getTargetBlockExact(10);
@@ -38,7 +37,7 @@ public final class LockCommand {
 
                     boolean canLock = !LockableData.isLocked(targetBlock.getLocation()) ||
                             LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName()) ||
-                            Permissions.check(context.getSource().getSender(), Permissions.Perm.LOCK_ADMIN);
+                            Perms.check(context, Perms.Perm.LOCK_ADMIN);
 
                     if (!canLock) {
                         player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht sperren, da du nicht der Besitzer bist.", NamedTextColor.RED)));
@@ -69,7 +68,7 @@ public final class LockCommand {
                                 return 1;
                             }
 
-                            if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && LowdFX.LOCKABLE_DATA.notOwner(player.getName(), targetBlock.getLocation())) {
+                            if (!Perms.check(context, Perms.Perm.LOCK_ADMIN) && LockableData.notOwner(player.getName(), targetBlock.getLocation())) {
                                 player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht entsperren, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                                 return 1;
                             }
@@ -102,7 +101,7 @@ public final class LockCommand {
                                                 return 1;
                                             }
 
-                                    if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
+                                            if (!Perms.check(context, Perms.Perm.LOCK_ADMIN) && !LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
                                                 player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                                                 return 1;
                                             }
@@ -125,7 +124,7 @@ public final class LockCommand {
                                                 return 1;
                                             }
 
-                                    if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
+                                            if (!Perms.check(context, Perms.Perm.LOCK_ADMIN) && !LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
                                                 player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                                                 return 1;
                                             }
@@ -146,7 +145,7 @@ public final class LockCommand {
                                         return 1;
                                     }
 
-                                    if (!Permissions.check(context.getSource().getSender(), Permissions.Perm.LOCK_ADMIN) && !LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
+                                    if (!Perms.check(context, Perms.Perm.LOCK_ADMIN) && !LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                                         return 1;
                                     }

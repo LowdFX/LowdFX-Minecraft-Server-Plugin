@@ -3,6 +3,7 @@ package at.lowdfx.lowdfx.command;
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.HomeManager;
 import at.lowdfx.lowdfx.teleportation.HomePoint;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -18,12 +19,9 @@ import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class HomeCommand {
-    public static final String HOME_ADMIN_PERMISSION = "lowdfx.home.admin";
-    public static final String HOME_PERMISSION = "lowdfx.home";
-
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("home")
-                .requires(source -> source.getSender().hasPermission(HOME_PERMISSION))
+                .requires(source -> Perms.check(source, Perms.Perm.HOME))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
                         context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
@@ -117,7 +115,7 @@ public final class HomeCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("tp_other")
-                        .requires(source -> source.getSender().hasPermission(HOME_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.HOME_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
                                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                         .suggests((context, builder) -> {
@@ -145,7 +143,7 @@ public final class HomeCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("set_other")
-                        .requires(source -> source.getSender().hasPermission(HOME_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.HOME_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
                                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                         .suggests((context, builder) -> {
@@ -173,7 +171,7 @@ public final class HomeCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove_other")
-                        .requires(source -> source.getSender().hasPermission(HOME_ADMIN_PERMISSION))
+                        .requires(source -> Perms.check(source, Perms.Perm.HOME_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
                                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                         .suggests((context, builder) -> {
