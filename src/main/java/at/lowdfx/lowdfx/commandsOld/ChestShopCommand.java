@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.commandsOld;
 
-import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.inventory.ShopData;
+import at.lowdfx.lowdfx.managers.ChestShopManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -52,7 +52,7 @@ public class ChestShopCommand implements CommandExecutor {
 
                 Location location = targetBlock.getLocation();
 
-                if (LowdFX.SHOP_MANAGER.isShop(location)) {
+                if (ChestShopManager.isShop(location)) {
                     player.sendMessage(Component.text("This chest is already a shop.", NamedTextColor.RED));
                     return true;
                 }
@@ -64,7 +64,7 @@ public class ChestShopCommand implements CommandExecutor {
                 }
 
                 ShopData shopData = new ShopData(player.getUniqueId(), location, heldItem.clone(), price);
-                LowdFX.SHOP_MANAGER.registerShop(player.getUniqueId(), location, shopData);
+                ChestShopManager.registerShop(player.getUniqueId(), location, shopData);
                 player.sendMessage(Component.text("Shop created successfully!", NamedTextColor.GREEN));
             }
             case "add" -> {
@@ -82,18 +82,18 @@ public class ChestShopCommand implements CommandExecutor {
                 }
 
                 Block targetBlockForWhitelist = player.getTargetBlockExact(5);
-                if (targetBlockForWhitelist == null || !LowdFX.SHOP_MANAGER.isShop(targetBlockForWhitelist.getLocation())) {
+                if (targetBlockForWhitelist == null || !ChestShopManager.isShop(targetBlockForWhitelist.getLocation())) {
                     player.sendMessage(Component.text("You must be looking at your shop to whitelist a player.", NamedTextColor.RED));
                     return true;
                 }
 
                 Location shopLocation = targetBlockForWhitelist.getLocation();
-                if (!LowdFX.SHOP_MANAGER.isOwner(player.getUniqueId(), shopLocation)) {
+                if (!ChestShopManager.isOwner(player.getUniqueId(), shopLocation)) {
                     player.sendMessage(Component.text("You are not the owner of this shop.", NamedTextColor.RED));
                     return true;
                 }
 
-                LowdFX.SHOP_MANAGER.whitelistPlayer(shopLocation, targetPlayer.getUniqueId());
+                ChestShopManager.whitelistPlayer(shopLocation, targetPlayer.getUniqueId());
                 player.sendMessage(Component.text("Player " + targetPlayerName + " has been whitelisted for this shop.", NamedTextColor.GREEN));
             }
             default -> player.sendMessage(Component.text("Unknown subcommand. Use: /shop create <price> or /shop add <player>.", NamedTextColor.RED));

@@ -21,7 +21,6 @@ public class KitEvents implements Listener {
         event.getPlayer().getPersistentDataContainer().remove(LowCommand.STARTERKIT_KEY);
     }
 
-
     // Listener für den Konsum des OP Apfels
     @EventHandler
     public void onPlayerItemConsume(@NotNull PlayerItemConsumeEvent event) {

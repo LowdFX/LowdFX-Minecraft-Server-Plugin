@@ -3,6 +3,7 @@ package at.lowdfx.lowdfx;
 import at.lowdfx.lowdfx.command.*;
 import at.lowdfx.lowdfx.event.*;
 import at.lowdfx.lowdfx.inventory.LockableData;
+import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.managers.*;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Permissions;
@@ -11,13 +12,15 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import xyz.xenondevs.invui.InvUI;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,19 +37,20 @@ public final class LowdFX extends JavaPlugin {
     public static LowdFX PLUGIN;
     public static Path DATA_DIR;
 
-    public static LockableData LOCKABLE_DATA;
-    public static VanishingHandler INVISIBLE_HANDLER;
-    public static ChestShopManager SHOP_MANAGER;
-
-    private static HomeManager HOME_MANAGER;
-    private static WarpManager WARP_MANAGER;
-    private static SpawnManager SPAWN_MANAGER;
-
     @Override
     public void onEnable() {
         LOG = getSLF4JLogger();
         PLUGIN = this;
         DATA_DIR = getDataPath();
+
+        try {
+            Files.createDirectories(DATA_DIR);
+        } catch (IOException e) {
+            // Runtime exception, weil das sehr kritisch ist und der rest dann nicht funktioniert.
+            throw new RuntimeException(e);
+        }
+
+        InvUI.getInstance().setPlugin(this);
 
         // === Permissions Klasse laden === //
         new Permissions().loadPermissions();
@@ -55,19 +59,13 @@ public final class LowdFX extends JavaPlugin {
         saveDefaultConfig();
         CONFIG = getConfig();
 
-        // === ChestShop Manager === //
-        File shopFolder = DATA_DIR.resolve("ChestShops").toFile();
-        if (shopFolder.mkdirs())
-            LOG.info("ChestShops-Ordner wurde erstellt.");
 
-        // === Statische Manager === //
-        HOME_MANAGER = new HomeManager();
-        WARP_MANAGER = new WarpManager();
-        SPAWN_MANAGER = new SpawnManager();
-        INVISIBLE_HANDLER = new VanishingHandler();
-
-        SHOP_MANAGER = new ChestShopManager(shopFolder);
-        SHOP_MANAGER.loadAllShops();
+        ChestShopManager.loadAllShops();
+        SpawnManager.loadData();
+        HomeManager.loadAll();
+        WarpManager.loadData();
+        LockableData.loadData();
+        KitManager.loadAll();
 
         // === Events === //
         getServer().getPluginManager().registerEvents(new ConnectionEvents(), this);
@@ -79,26 +77,26 @@ public final class LowdFX extends JavaPlugin {
 
         // === ChestData Datei === //
         ensureDataFolderExists();
-        LOCKABLE_DATA = new LockableData();
 
         // === Vanished Spieler Datei === //
-        INVISIBLE_HANDLER.loadVanishedPlayers();
+        VanishingHandler.loadAll();
 
         // === Playtime Datei === //
         PlaytimeManager.load();
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(LockCommand.command(), "Sperrt einen Block.");
             registrar.register(HomeCommand.command(), "Teleportiert dich zu deinem Home.");
             registrar.register(InventoryCommands.anvilCommand(), "Öffnet einen Amboss.", List.of("amboss"));
             registrar.register(InventoryCommands.enderseeCommand(), "Öffnet die Enderchest von einem Spieler.");
             registrar.register(InventoryCommands.invseeCommand(), "Öffnet das Inventar von einem Spieler.");
             registrar.register(InventoryCommands.trashCommand(), "Öffnet einen Mülleimer.", List.of("rubbish", "mülleimer"));
             registrar.register(InventoryCommands.workbenchCommand(), "Öffnet eine Werkbank.", List.of("crafting", "crafting-table"));
+            registrar.register(LockCommand.command(), "Sperrt einen Block.");
             registrar.register(LowCommand.command(), "Generelle features vom Plugin.");
             registrar.register(MuteCommands.muteCommand(), "Schaltet einen Spieler stumm.");
             registrar.register(MuteCommands.unmuteCommand(), "Entfernt den Mute eines Spielers.");
+            registrar.register(PlaytimeCommand.command(), "Zeigt deine Spielzeit auf dem Server.");
             registrar.register(SpawnCommand.command(), "Teleportiert dich zum Spawn.");
             registrar.register(StatCommands.feedCommand(), "Füttert einen Spieler.", List.of("saturate"));
             registrar.register(StatCommands.healCommand(), "Heilt einen Spieler und löscht alle negativen effekte.", List.of("regen"));
@@ -111,6 +109,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(UtilityCommands.flyCommand(), "Erlaubt einen Spieler zu fliegen.");
             registrar.register(UtilityCommands.gmCommand(), "Setzt den Spielmodus eines Spielers.");
             registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
+            registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
         });
 
@@ -123,23 +122,18 @@ public final class LowdFX extends JavaPlugin {
 
         boolean vanish = CONFIG.getBoolean("basic.vanish", false);
         if (CONFIG.getBoolean("basic.vanish")) {
-            INVISIBLE_HANDLER.saveVanishedPlayers();}
+            VanishingHandler.saveAll();}
         LOG.info("Vanish war: {}", vanish ? "An" : "Aus");
 
-        // Speichere alle Shops in die Spielerdateien
-        SHOP_MANAGER.saveAllShops();
-
-        // === Playtime Datei === //
+        // Speichere von Sachen
+        ChestShopManager.saveAllShops();
         PlaytimeManager.save();
+        HomeManager.saveAll();
+        WarpManager.saveData();
+        SpawnManager.saveData();
+        LockableData.saveData();
+        KitManager.saveAll();
 
-        //------------------------------------------
-        if (!this.getServer().isPrimaryThread()) {
-            // Hier asynchrone Aufgaben starten oder Operationen durchführen, die nicht während dem Shutdown laufen
-            if (HOME_MANAGER != null) HOME_MANAGER.onDisable();
-            if (WARP_MANAGER != null) WARP_MANAGER.onDisable();
-            if (SPAWN_MANAGER != null) SPAWN_MANAGER.onDisable();
-            if (LOCKABLE_DATA != null) LOCKABLE_DATA.save();
-        }
         saveConfig();
     }
 
@@ -150,19 +144,7 @@ public final class LowdFX extends JavaPlugin {
         }
 
         // Überprüfen und sicherstellen, dass die Datei erstellt wird, falls sie nicht existiert.
-        File dataFile = DATA_DIR.resolve("lock-data.yml").toFile();
-        if (!dataFile.exists()) {
-            try {
-                boolean created = dataFile.createNewFile();
-                if (created) {
-                    LOG.info("Daten-Datei erstellt: {}", dataFile.getAbsolutePath());
-                } else {
-                    LOG.warn("Die Datei 'lock-data.yml' konnte nicht erstellt werden.");
-                }
-            } catch (IOException e) {
-                LOG.error("Fehler beim Erstellen der Datei 'lock-data.yml'.", e);
-            }
-        }
+
     }
 
     public static @NotNull Component serverMessage(Component message) {

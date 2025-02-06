@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.command.LockCommand;
+import at.lowdfx.lowdfx.inventory.LockableData;
 import at.lowdfx.lowdfx.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -32,7 +32,7 @@ public class LockEvents implements Listener {
         Location lockLocation = block.getLocation();
 
         // Überprüfen, ob die Kiste gesperrt ist.
-        if (LowdFX.LOCKABLE_DATA.isLocked(lockLocation)) {
+        if (LockableData.isLocked(lockLocation)) {
             // Überprüfen, ob der Spieler berechtigt ist, auf die Kiste zuzugreifen.
             if (LowdFX.LOCKABLE_DATA.notOwner(player.getName(), lockLocation) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(lockLocation, player.getName()) && !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
                 // Zugriff verweigern, da der Spieler kein Besitzer ist oder nicht auf der Whitelist steht.
@@ -46,16 +46,16 @@ public class LockEvents implements Listener {
     public void onInventoryMoveItem(@NotNull InventoryMoveItemEvent event) {
         // Prüfe, ob die Quelle (Hopper zieht Items) oder Ziel (Items werden abgelegt) eine Kiste oder Shulkerkiste ist
         if (event.getSource().getHolder() instanceof Container container) {
-            if (LowdFX.LOCKABLE_DATA.isLocked(container.getLocation())) {
                 if (event.getInitiator().getHolder() instanceof Player player && player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) return;
+            if (LockableData.isLocked(container.getLocation())) {
                 event.setCancelled(true);
             }
         }
 
         // Genauso bei Ziel (Destination)
         if (event.getDestination().getHolder() instanceof Container container) {
-            if (LowdFX.LOCKABLE_DATA.isLocked(container.getLocation())) {
                 if (event.getInitiator().getHolder() instanceof Player player && player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) return;
+            if (LockableData.isLocked(container.getLocation())) {
                 event.setCancelled(true);
             }
         }
@@ -71,7 +71,7 @@ public class LockEvents implements Listener {
         Location chestLocation = block.getLocation();
 
         // Überprüfen, ob die Kiste gesperrt ist
-        if (LowdFX.LOCKABLE_DATA.isLocked(chestLocation)) {
+        if (LockableData.isLocked(chestLocation)) {
             // Überprüfen, ob der Spieler auf der Whitelist oder Besitzer ist
             if (!LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(chestLocation, player.getName()) && LowdFX.LOCKABLE_DATA.notOwner(player.getName(), chestLocation) && !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
                 // Kiste ist gesperrt und der Spieler ist weder Besitzer noch auf der Whitelist
@@ -79,7 +79,7 @@ public class LockEvents implements Listener {
                 player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist gesperrt und du kannst ihn nicht abbauen.", NamedTextColor.RED)));
             } else {
                 // Spieler ist Besitzer oder auf der Whitelist, Kiste kann gelöscht werden
-                LowdFX.LOCKABLE_DATA.removeDestroyedBlock(chestLocation);
+                LockableData.removeDestroyedBlock(chestLocation);
                 player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block wurde gelöscht.", NamedTextColor.GREEN)));
             }
         }
@@ -97,8 +97,8 @@ public class LockEvents implements Listener {
         Location chestLocation = block.getLocation();
         for (Location adjacentLocation : connectedChests) {
             // Wenn die Kiste gesperrt ist
-            if (LowdFX.LOCKABLE_DATA.isLocked(adjacentLocation)) {
-                LowdFX.LOCKABLE_DATA.lockAdjacentChests(chestLocation, player.getName());
+            if (LockableData.isLocked(adjacentLocation)) {
+                LockableData.lockAdjacentChests(chestLocation, player.getName());
                 // Verhindern, dass ein unberechtigter Spieler eine Doppelkiste erstellt
                 if (!LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(adjacentLocation, player.getName()) &&
                         !player.hasPermission(LockCommand.LOCK_ADMIN_PERMISSION)) {
@@ -113,7 +113,6 @@ public class LockEvents implements Listener {
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
         try {
-            if (LowdFX.LOCKABLE_DATA == null) return;
             event.blockList().removeAll(explosionBlocks(event.blockList()));
         } catch (Exception e) {
             LowdFX.LOG.error("Couldn't save locked blocks from explosion.", e);
@@ -123,7 +122,6 @@ public class LockEvents implements Listener {
     @EventHandler
     public void onBlockExplosion(BlockExplodeEvent event) {
         try {
-            if (LowdFX.LOCKABLE_DATA == null) return;
             event.blockList().removeAll(explosionBlocks(event.blockList()));
         } catch (Exception e) {
             LowdFX.LOG.error("Couldn't save locked blocks from explosion.", e);
@@ -134,7 +132,7 @@ public class LockEvents implements Listener {
     public static @NotNull List<Block> explosionBlocks(@NotNull List<Block> blocks) {
         return blocks.stream()
                 .filter(b -> b.getState() instanceof Container || b.getBlockData() instanceof Openable)
-                .filter(b -> LowdFX.LOCKABLE_DATA.isLocked(b.getLocation()))
+                .filter(b -> LockableData.isLocked(b.getLocation()))
                 .toList();
     }
 
@@ -150,13 +148,11 @@ public class LockEvents implements Listener {
 
     public void pistonStuff(BlockPistonEvent event, List<Block> blocks) {
         try {
-            if (LowdFX.LOCKABLE_DATA == null) return; // Frühes Abbrechen, falls `chestData` nicht verfügbar ist.
-
             // Überprüfe, ob einer der Blöcke gesperrt ist, bevor der Block gezogen/gepusht wird.
             for (Block block : blocks) {
                 if (!(block.getState() instanceof Container || block.getBlockData() instanceof Openable)) continue;
 
-                if (LowdFX.LOCKABLE_DATA.isLocked(block.getLocation())) {
+                if (LockableData.isLocked(block.getLocation())) {
                     event.setCancelled(true);
                     return;
                 }

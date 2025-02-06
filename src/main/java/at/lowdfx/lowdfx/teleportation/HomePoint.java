@@ -2,40 +2,25 @@ package at.lowdfx.lowdfx.teleportation;
 
 import at.lowdfx.lowdfx.LowdFX;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class HomePoint {
     private final File file;
     private final YamlConfiguration config = new YamlConfiguration();
 
-    public HomePoint(@NotNull Player player) {
+    public HomePoint(@NotNull UUID player) {
         File folder = LowdFX.DATA_DIR.resolve("HomePoints").toFile();
         folder.mkdirs();
 
-        this.file = new File(folder.getAbsolutePath(), player.getUniqueId() + ".yml");
-        try {
-            if (this.file.exists()) {
-                this.config.load(this.file);
-            }
-        } catch (IOException | InvalidConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public HomePoint(@NotNull OfflinePlayer player) {
-        File folder = LowdFX.DATA_DIR.resolve("HomePoints").toFile();
-        folder.mkdirs();
-
-        this.file = new File(folder.getAbsolutePath(), player.getUniqueId() + ".yml");
+        this.file = new File(folder.getAbsolutePath(), player + ".yml");
         try {
             if (this.file.exists()) {
                 this.config.load(this.file);

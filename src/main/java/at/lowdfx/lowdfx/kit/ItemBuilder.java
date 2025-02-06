@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.kit;
 
 import at.lowdfx.lowdfx.LowdFX;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -34,8 +35,8 @@ public final class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder name(Component name) {
-        meta.displayName(name);
+    public ItemBuilder name(@NotNull Component name) {
+        meta.displayName(name.decoration(TextDecoration.ITALIC, false));
         return this;
     }
 

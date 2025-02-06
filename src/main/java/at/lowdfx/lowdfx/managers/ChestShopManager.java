@@ -23,20 +23,15 @@ import java.io.IOException;
 import java.util.*;
 
 public class ChestShopManager {
-    private final File shopFolder;
-    private final Map<UUID, Map<Location, ShopData>> playerShops = new HashMap<>();
-    private final Map<Location, List<ArmorStand>> holograms = new HashMap<>();
-    private final Map<Location, Set<UUID>> whitelistedPlayers = new HashMap<>();
+    private static final Map<UUID, Map<Location, ShopData>> PLAYER_SHOPS = new HashMap<>();
+    private static final Map<Location, List<ArmorStand>> HOLOGRAMS = new HashMap<>();
+    private static final Map<Location, Set<UUID>> WHITELISTED_PLAYERS = new HashMap<>();
 
-    public ChestShopManager(File shopFolder) {
-        this.shopFolder = shopFolder;
-    }
-
-    public void registerShop(UUID owner, Location location, ShopData shopData) {
-        playerShops.computeIfAbsent(owner, k -> new HashMap<>()).put(location, shopData);
-        whitelistedPlayers.put(location, new HashSet<>());// Initialize empty whitelist
+    public static void registerShop(UUID owner, Location location, ShopData shopData) {
+        PLAYER_SHOPS.computeIfAbsent(owner, k -> new HashMap<>()).put(location, shopData);
+        WHITELISTED_PLAYERS.put(location, new HashSet<>());// Initialize empty whitelist
         // Check for connected chests and register them as part of the shop
-        Map<Location, ShopData> ownerShops = playerShops.computeIfAbsent(owner, k -> new HashMap<>());
+        Map<Location, ShopData> ownerShops = PLAYER_SHOPS.computeIfAbsent(owner, k -> new HashMap<>());
         ownerShops.put(location, shopData);
 
         Set<Location> connectedChests = getConnectedChests(location);
@@ -51,17 +46,17 @@ public class ChestShopManager {
         updateHologramForDoubleChest(owner, location);
     }
 
-    public void removeShop(Location location) {
+    public static void removeShop(Location location) {
         location = normalizeLocation(location); // Normierte Location verwenden
-        for (UUID owner : playerShops.keySet()) {
-            Map<Location, ShopData> shops = playerShops.get(owner);
+        for (UUID owner : PLAYER_SHOPS.keySet()) {
+            Map<Location, ShopData> shops = PLAYER_SHOPS.get(owner);
 
             if (shops.remove(location) != null) {
                 Set<Location> connectedChests = getConnectedChests(location);
                 connectedChests.add(location); // Aktuelle Kiste hinzufügen
 
                 // Entferne Hologramme aller verbundenen Kisten
-                connectedChests.forEach(this::removeHologram);
+                connectedChests.forEach(ChestShopManager::removeHologram);
 
                 // Falls eine Kiste übrig bleibt, aktualisiere deren Hologramm
                 connectedChests.remove(location);
@@ -79,23 +74,23 @@ public class ChestShopManager {
         }
     }
 
-    private void updateHologramForSingleChest(Location location, ShopData shopData) {
+    private static void updateHologramForSingleChest(Location location, ShopData shopData) {
         removeHologram(location); // Altes Hologramm entfernen
         spawnHologram(location.clone().add(0.5, 1.3, 0.5), shopData); // Neues Hologramm leicht angepasst
     }
 
-    public boolean isShop(Location location) {
-        return playerShops.values().stream().anyMatch(shops -> shops.containsKey(location));
+    public static boolean isShop(Location location) {
+        return PLAYER_SHOPS.values().stream().anyMatch(shops -> shops.containsKey(location));
     }
 
-    public Optional<ShopData> getShop(Location location) {
-        return playerShops.values().stream()
+    public static Optional<ShopData> getShop(Location location) {
+        return PLAYER_SHOPS.values().stream()
                 .map(shops -> shops.get(location))
                 .filter(Objects::nonNull)
                 .findFirst();
     }
 
-    public void updateHologramForDoubleChest(UUID owner, Location location) {
+    public static void updateHologramForDoubleChest(UUID owner, Location location) {
         location = normalizeLocation(location);
         Set<Location> connectedChests = getConnectedChests(location);
         connectedChests.add(location);
@@ -113,35 +108,32 @@ public class ChestShopManager {
         centerZ /= connectedChests.size();
 
         Location centerLocation = new Location(location.getWorld(), centerX, centerY, centerZ);
-        connectedChests.forEach(this::removeHologram);
+        connectedChests.forEach(ChestShopManager::removeHologram);
 
-        ShopData shopData = playerShops.getOrDefault(owner, Collections.emptyMap()).get(location);
+        ShopData shopData = PLAYER_SHOPS.getOrDefault(owner, Collections.emptyMap()).get(location);
         if (shopData != null) {
             spawnHologram(centerLocation.add(0.5, 1.5, 0.5), shopData);
         }
     }
 
-
-
-
-    public boolean isOwner(UUID playerUUID, Location location) {
+    public static boolean isOwner(UUID playerUUID, Location location) {
         ShopData shop = getShop(location).orElse(null);
         return shop != null && shop.owner().equals(playerUUID);
     }
 
-    public void whitelistPlayer(Location location, UUID playerUUID) {
-        whitelistedPlayers.computeIfAbsent(location, k -> new HashSet<>()).add(playerUUID);
+    public static void whitelistPlayer(Location location, UUID playerUUID) {
+        WHITELISTED_PLAYERS.computeIfAbsent(location, k -> new HashSet<>()).add(playerUUID);
     }
 
-    public boolean isWhitelisted(UUID playerUUID, Location location) {
-        return whitelistedPlayers.getOrDefault(location, Collections.emptySet()).contains(playerUUID);
+    public static boolean isWhitelisted(UUID playerUUID, Location location) {
+        return WHITELISTED_PLAYERS.getOrDefault(location, Collections.emptySet()).contains(playerUUID);
     }
 
-    public void saveShop(@NotNull UUID owner) {
-        File playerFile = new File(shopFolder, owner + ".yml");
+    public static void saveShop(@NotNull UUID owner) {
+        File playerFile = new File(LowdFX.DATA_DIR.resolve("chest-shops").toFile(), owner + ".yml");
         YamlConfiguration config = new YamlConfiguration();
 
-        Map<Location, ShopData> shops = playerShops.getOrDefault(owner, Collections.emptyMap());
+        Map<Location, ShopData> shops = PLAYER_SHOPS.getOrDefault(owner, Collections.emptyMap());
         for (Map.Entry<Location, ShopData> entry : shops.entrySet()) {
             String locKey = locationToString(entry.getKey());
             ShopData shop = entry.getValue();
@@ -149,7 +141,7 @@ public class ChestShopManager {
             config.set("shops." + locKey + ".item", shop.item());
             config.set("shops." + locKey + ".price", shop.price());
 
-            Set<UUID> whitelist = whitelistedPlayers.getOrDefault(entry.getKey(), new HashSet<>());
+            Set<UUID> whitelist = WHITELISTED_PLAYERS.getOrDefault(entry.getKey(), new HashSet<>());
             config.set("shops." + locKey + ".whitelist", new ArrayList<>(whitelist));
         }
 
@@ -160,8 +152,8 @@ public class ChestShopManager {
         }
     }
 
-    public void loadAllShops() {
-        File[] playerFiles = shopFolder.listFiles();
+    public static void loadAllShops() {
+        File[] playerFiles = LowdFX.DATA_DIR.resolve("chest-shops").toFile().listFiles();
         if (playerFiles == null) return;
 
         for (File playerFile : playerFiles) {
@@ -182,24 +174,24 @@ public class ChestShopManager {
                     shops.put(location, shopData);
 
                     List<String> whitelist = config.getStringList("shops." + locKey + ".whitelist");
-                    whitelistedPlayers.put(location, new HashSet<>());
-                    whitelist.forEach(uuid -> whitelistedPlayers.get(location).add(UUID.fromString(uuid)));
+                    WHITELISTED_PLAYERS.put(location, new HashSet<>());
+                    whitelist.forEach(uuid -> WHITELISTED_PLAYERS.get(location).add(UUID.fromString(uuid)));
 
                     spawnHologram(location, shopData);
                 }
             }
 
-            playerShops.put(owner, shops);
+            PLAYER_SHOPS.put(owner, shops);
         }
     }
 
-    public void saveAllShops() {
-        for (UUID owner : playerShops.keySet()) {
+    public static void saveAllShops() {
+        for (UUID owner : PLAYER_SHOPS.keySet()) {
             saveShop(owner);
         }
     }
 
-    private void spawnHologram(Location location, @NotNull ShopData shopData) {
+    private static void spawnHologram(Location location, @NotNull ShopData shopData) {
         location = normalizeLocation(location); // Normierte Location verwenden
         removeHologram(location); // Alte Hologramme entfernen
 
@@ -210,11 +202,11 @@ public class ChestShopManager {
         hologramLines.add(spawnArmorStand(holoLocation.subtract(0, 0.25, 0), "§aStock: " + getStock(location, shopData)));
         hologramLines.add(spawnArmorStand(holoLocation.subtract(0, 0.25, 0), "§bPrice: " + shopData.price() + " Diamonds"));
 
-        holograms.put(location, hologramLines);
+        HOLOGRAMS.put(location, hologramLines);
         LowdFX.LOG.info("[Debug] Hologram created at: {} -> {} ArmorStands added.", location, hologramLines.size());
     }
 
-    private @NotNull Location normalizeLocation(@NotNull Location location) {
+    private static @NotNull Location normalizeLocation(@NotNull Location location) {
         return new Location(
                 location.getWorld(),
                 location.getBlockX(), // Nur Block-Koordinaten verwenden
@@ -223,10 +215,10 @@ public class ChestShopManager {
         );
     }
 
-    private void removeHologram(Location location) {
+    private static void removeHologram(Location location) {
         location = normalizeLocation(location); // Normierte Location verwenden
 
-        List<ArmorStand> stands = holograms.remove(location);
+        List<ArmorStand> stands = HOLOGRAMS.remove(location);
         if (stands == null || stands.isEmpty()) {
             LowdFX.LOG.info("[Debug] No holograms found at: {}", location);
             return;
@@ -240,7 +232,7 @@ public class ChestShopManager {
         }
     }
 
-    private @NotNull ArmorStand spawnArmorStand(@NotNull Location location, String text) {
+    private static @NotNull ArmorStand spawnArmorStand(@NotNull Location location, String text) {
         return location.getWorld().spawn(location, ArmorStand.class, stand -> {
             stand.setGravity(false);
             stand.setVisible(false);
@@ -250,21 +242,21 @@ public class ChestShopManager {
         });
     }
 
-    public void startHologramUpdater(Location location, ShopData shopData) {
+    public static void startHologramUpdater(Location location, ShopData shopData) {
         Bukkit.getScheduler().runTaskTimer(LowdFX.PLUGIN, r -> {
-            if (!holograms.containsKey(location)) {
+            if (!HOLOGRAMS.containsKey(location)) {
                 r.cancel();
                 return;
             }
 
-            List<ArmorStand> stands = holograms.get(location);
+            List<ArmorStand> stands = HOLOGRAMS.get(location);
             if (stands.size() >= 2) {
                 stands.get(1).customName(Component.text("Bestand: " + getStock(location, shopData)));
             }
         }, 20, 100);
     }
 
-    private int getStock(@NotNull Location location, ShopData shopData) {
+    private static int getStock(@NotNull Location location, ShopData shopData) {
         Block block = location.getBlock();
         Inventory inventory = null;
 
@@ -283,11 +275,11 @@ public class ChestShopManager {
                 .sum();
     }
 
-    private @NotNull String locationToString(@NotNull Location location) {
+    private static @NotNull String locationToString(@NotNull Location location) {
         return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
     }
 
-    private @Nullable Location parseLocation(@NotNull String locString) {
+    private static @Nullable Location parseLocation(@NotNull String locString) {
         String[] parts = locString.split(",");
         if (parts.length != 4) return null;
 
@@ -299,7 +291,7 @@ public class ChestShopManager {
         return new Location(Bukkit.getWorld(worldName), x, y, z);
     }
 
-    private @NotNull Set<Location> getConnectedChests(@NotNull Location location) {
+    private static @NotNull Set<Location> getConnectedChests(@NotNull Location location) {
         Set<Location> connectedChests = new HashSet<>();
         Block block = location.getBlock();
 

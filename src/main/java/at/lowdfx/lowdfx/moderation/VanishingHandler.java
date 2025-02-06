@@ -1,41 +1,25 @@
 package at.lowdfx.lowdfx.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.util.FileUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class VanishingHandler {
+    private static final BossBar BOSS_BAR = BossBar.bossBar(Component.text("Vanish"), 1.0f, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
+    private static final Set<UUID> VANISHED = new HashSet<>();
 
-    private final Map<Player, BossBar> playerBossBars = new HashMap<>();
-    private final Set<UUID> vanishedPlayers = new HashSet<>();
-
-    public VanishingHandler() {
-        // Erstellen oder Öffnen der Datei "VanishedPlayers.yml"
-        File vanishedPlayersFile = LowdFX.DATA_DIR.resolve("VanishedPlayers.yml").toFile();
-        if (!vanishedPlayersFile.exists()) {
-            LowdFX.PLUGIN.saveResource("VanishedPlayers.yml", false); // Erstelle die Datei beim ersten Start
-        }
-    }
-
-    // Spieler unsichtbar machen und BossBar hinzufügen
-    public void makePlayerInvisible(Player player) {
-        // Überprüfe, ob der Spieler bereits eine BossBar hat und entferne sie
-        if (playerBossBars.containsKey(player)) {
-            BossBar existingBossBar = playerBossBars.get(player);
-            existingBossBar.removeViewer(player); // Entfernen der bestehenden BossBar
-        }
-
-        // Neue BossBar erstellen
-        BossBar bossBar = BossBar.bossBar(Component.text("Vanish"), 1.0f, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
-
+    // Spieler unsichtbar machen und BossBar anzeigen.
+    public static void makePlayerInvisible(@NotNull Player player) {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (!onlinePlayer.equals(player)) {
                 onlinePlayer.hidePlayer(LowdFX.PLUGIN, player);
@@ -43,54 +27,32 @@ public class VanishingHandler {
         }
 
         player.setMetadata("vanished", new FixedMetadataValue(LowdFX.PLUGIN, true));
-        bossBar.addViewer(player);
-
-        playerBossBars.put(player, bossBar);
-        vanishedPlayers.add(player.getUniqueId());
+        BOSS_BAR.addViewer(player);
+        VANISHED.add(player.getUniqueId());
     }
 
-    public void saveVanishedPlayers() {
-        File file = LowdFX.DATA_DIR.resolve("VanishedPlayers.yml").toFile();
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-        List<String> vanishedPlayerIds = new ArrayList<>();
-        for (UUID uuid : vanishedPlayers) {
-            vanishedPlayerIds.add(uuid.toString()); // UUIDs in Strings umwandeln
-        }
-
-        config.set("vanished", vanishedPlayerIds);
-
-        try {
-            config.save(file); // Speichern der Datei
-        } catch (IOException e) {
-            LowdFX.LOG.error("Konnte nicht vanish Spieler speichern.", e);
-        }
-    }
-
-    public void loadVanishedPlayers() {
-        File file = LowdFX.DATA_DIR.resolve("VanishedPlayers.yml").toFile();
-        if (!file.exists())
-            return; // Wenn die Datei nicht existiert, gibt es keine "vanished"-Spieler
-
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        List<String> vanishedPlayerIds = config.getStringList("vanished");
-
-        vanishedPlayers.clear(); // Liste zurücksetzen
-        for (String id : vanishedPlayerIds) {
-            try {
-                vanishedPlayers.add(UUID.fromString(id));  // UUID hinzufügen
-            } catch (IllegalArgumentException e) {
-                LowdFX.LOG.error("Konnte nicht vanish Spieler laden.", e);
+    // Spieler sichtbar machen und BossBar wegmachen.
+    public static void makePlayerVisible(@NotNull Player player) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (!onlinePlayer.equals(player)) {
+                onlinePlayer.showPlayer(LowdFX.PLUGIN, player);
             }
         }
 
+        player.removeMetadata("vanished", LowdFX.PLUGIN);
+        BOSS_BAR.removeViewer(player);
+        VANISHED.remove(player.getUniqueId());
     }
 
-    public Map<Player, BossBar> playerBossBars() {
-        return playerBossBars;
+    public static void saveAll() {
+        FileUtils.save(VANISHED, "vanished.json");
     }
 
-    public Set<UUID> getVanishedPlayers() {
-        return vanishedPlayers;  // Gibt das Set von Spielern, die vanish sind, zurück
+    public static void loadAll() {
+        VANISHED.addAll(FileUtils.load("vanished.json", List.of()));
+    }
+
+    public static Set<UUID> getVanishedPlayers() {
+        return VANISHED;
     }
 }

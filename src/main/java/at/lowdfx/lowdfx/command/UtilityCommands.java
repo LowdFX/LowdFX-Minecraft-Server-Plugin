@@ -48,7 +48,7 @@ public final class UtilityCommands {
     public static void setFly(@NotNull Player player, boolean fly) {
         player.setAllowFlight(fly);
         player.setFlying(fly);
-        player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst nun " + (fly ? "" : "nicht mehr ") + "fliegen!", NamedTextColor.GREEN)));
+        player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst nun " + (fly ? "" : "nicht mehr ") + "fliegen!", fly ? NamedTextColor.GREEN : NamedTextColor.RED)));
     }
 
     public static LiteralCommandNode<CommandSourceStack> gmCommand() {

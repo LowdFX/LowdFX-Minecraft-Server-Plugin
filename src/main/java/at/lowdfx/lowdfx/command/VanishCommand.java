@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -16,8 +17,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -48,13 +47,12 @@ public final class VanishCommand {
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("list")
                         .executes(context -> {
                             CommandSender sender = context.getSource().getSender();
-                            Set<UUID> vanishedPlayers = LowdFX.INVISIBLE_HANDLER.getVanishedPlayers();
-                            if (vanishedPlayers.isEmpty()) {
+                            if (VanishingHandler.getVanishedPlayers().isEmpty()) {
                                 sender.sendMessage(LowdFX.serverMessage(Component.text("Es gibt keine vanished Spieler.", NamedTextColor.GREEN)));
                             } else {
                                 sender.sendMessage(LowdFX.serverMessage(Component.text("Vanished Spieler:", NamedTextColor.GREEN)));
 
-                                for (UUID uuid : vanishedPlayers) {
+                                for (UUID uuid : VanishingHandler.getVanishedPlayers()) {
                                     Player vanishedPlayer = Bukkit.getPlayer(uuid);
                                     if (vanishedPlayer != null) {
                                         sender.sendMessage(Component.text("- ").append(vanishedPlayer.name()).color(NamedTextColor.GREEN));
@@ -89,10 +87,10 @@ public final class VanishCommand {
 
         if (state) {
             player.setMetadata("vanished", new FixedMetadataValue(LowdFX.PLUGIN, true));
-            LowdFX.INVISIBLE_HANDLER.makePlayerInvisible(player);
+            VanishingHandler.makePlayerInvisible(player);
         } else {
             player.removeMetadata("vanished", LowdFX.PLUGIN);
-            LowdFX.INVISIBLE_HANDLER.makePlayerInvisible(player);
+            VanishingHandler.makePlayerVisible(player);
         }
         player.setSleepingIgnored(state);
         player.setCollidable(!state);

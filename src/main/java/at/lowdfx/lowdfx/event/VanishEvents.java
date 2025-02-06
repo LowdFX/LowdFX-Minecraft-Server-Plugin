@@ -1,9 +1,10 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import net.kyori.adventure.bossbar.BossBar;
+import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -24,8 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
 public class VanishEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
@@ -33,8 +32,8 @@ public class VanishEvents implements Listener {
         event.joinMessage(null);
 
         // Nur eine Nachricht wird hier gesendet, wenn der Spieler vanishing hat.
-        if (LowdFX.INVISIBLE_HANDLER.getVanishedPlayers().contains(player.getUniqueId())) {
-            LowdFX.INVISIBLE_HANDLER.makePlayerInvisible(player);
+        if (VanishingHandler.getVanishedPlayers().contains(player.getUniqueId())) {
+            VanishingHandler.makePlayerInvisible(player);
 
             // Sende deine eigene Nachricht (nachdem das Setzen von setJoinMessage null verhindert wurde)
             if (!player.hasMetadata("vanishedSent")) {
@@ -46,11 +45,13 @@ public class VanishEvents implements Listener {
             }
         }
 
-        // Verstecke vanished-Spieler vor dem beigetretenen Spieler
-        for (Map.Entry<Player, BossBar> entry : LowdFX.INVISIBLE_HANDLER.playerBossBars().entrySet()) {
-            Player vanishedPlayer = entry.getKey();
-            if (vanishedPlayer.hasMetadata("vanished")) {
-                player.hidePlayer(LowdFX.PLUGIN, vanishedPlayer);
+        // Verstecke vanished-Spieler vor dem beigetretenen Spieler.
+        // Für alle online-spieler, falls jemand un-vanished, während der Spieler offline ist.
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (target.hasMetadata("vanished")) {
+                player.hidePlayer(LowdFX.PLUGIN, target);
+            } else {
+                player.showPlayer(LowdFX.PLUGIN, target);
             }
         }
     }
@@ -58,7 +59,7 @@ public class VanishEvents implements Listener {
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         if (event.getPlayer().hasMetadata("vanished")) {
-            LowdFX.INVISIBLE_HANDLER.getVanishedPlayers().add(event.getPlayer().getUniqueId());
+            VanishingHandler.getVanishedPlayers().add(event.getPlayer().getUniqueId());
             event.quitMessage(null);
         }
     }

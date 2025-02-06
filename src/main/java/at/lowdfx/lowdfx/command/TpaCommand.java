@@ -151,7 +151,7 @@ public final class TpaCommand {
     }
 
     public static boolean isExpired(UUID uuid) {
-        return CREATIONS.get(uuid) + EXPIRATION_TIME < System.currentTimeMillis();
+        return CREATIONS.containsKey(uuid) && CREATIONS.get(uuid) + EXPIRATION_TIME < System.currentTimeMillis();
     }
 
     public static void remove(UUID uuid) {

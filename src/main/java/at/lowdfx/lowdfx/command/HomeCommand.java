@@ -30,7 +30,7 @@ public final class HomeCommand {
                         return 1;
                     }
 
-                    HomePoint homePoint = HomeManager.get(player);
+                    HomePoint homePoint = HomeManager.get(player.getUniqueId());
                     if (homePoint.doesNotExist("home")) {
                         player.sendMessage(LowdFX.serverMessage(Component.text("Dein Home wurde noch nicht gesetzt!", NamedTextColor.RED)));
                         return 1;
@@ -45,14 +45,14 @@ public final class HomeCommand {
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     if (context.getSource().getSender() instanceof Player player && player.hasPlayedBefore())
-                                        HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                        HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
                                 .executes(context -> {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                                     String name = context.getArgument("name", String.class);
 
-                                    HomePoint homePoint = HomeManager.get(player);
+                                    HomePoint homePoint = HomeManager.get(player.getUniqueId());
                                     if (homePoint.doesNotExist(name)) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Dein Home " + name + " wurde noch nicht gesetzt!", NamedTextColor.RED)));
                                         return 1;
@@ -69,7 +69,7 @@ public final class HomeCommand {
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     if (context.getSource().getSender() instanceof Player player && player.hasPlayedBefore())
-                                        HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                        HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
                                 .then(RequiredArgumentBuilder.<CommandSourceStack, FinePositionResolver>argument("location", ArgumentTypes.finePosition(true))
@@ -78,7 +78,7 @@ public final class HomeCommand {
                                             String name = context.getArgument("name", String.class);
                                             Location location = context.getArgument("location", FinePositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
 
-                                            HomePoint homePoint = HomeManager.get(player);
+                                            HomePoint homePoint = HomeManager.get(player.getUniqueId());
                                             if (homePoint.getHomes().size() >= LowdFX.CONFIG.getInt("basic.maxhomes")) {
                                                 player.sendMessage(LowdFX.serverMessage(Component.text("Die maximale Home-Grenze von " + LowdFX.CONFIG.getInt("basic.maxhomes") + " wurde erreicht!", NamedTextColor.RED)));
                                                 return 1;
@@ -97,14 +97,14 @@ public final class HomeCommand {
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     if (context.getSource().getSender() instanceof Player player && player.hasPlayedBefore())
-                                        HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                        HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
                                 .executes(context -> {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                                     String name = context.getArgument("name", String.class);
 
-                                    HomePoint homePoint = HomeManager.get(player);
+                                    HomePoint homePoint = HomeManager.get(player.getUniqueId());
                                     if (homePoint.doesNotExist(name)) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " existiert nicht!", NamedTextColor.RED)));
                                         return 1;
@@ -123,14 +123,14 @@ public final class HomeCommand {
                                         .suggests((context, builder) -> {
                                             Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                                             if (player.hasPlayedBefore())
-                                                HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                                HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                             return builder.buildFuture();
                                         })
                                         .executes(context -> {
                                             String name = context.getArgument("name", String.class);
                                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
-                                            HomePoint homePoint = HomeManager.get(target);
+                                            HomePoint homePoint = HomeManager.get(target.getUniqueId());
                                             if (homePoint.doesNotExist(name)) {
                                                 context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " existiert nicht!", NamedTextColor.RED)));
                                                 return 1;
@@ -151,7 +151,7 @@ public final class HomeCommand {
                                         .suggests((context, builder) -> {
                                             Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                                             if (player.hasPlayedBefore())
-                                                HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                                HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                             return builder.buildFuture();
                                         })
                                         .then(RequiredArgumentBuilder.<CommandSourceStack, FinePositionResolver>argument("location", ArgumentTypes.finePosition(true))
@@ -160,7 +160,7 @@ public final class HomeCommand {
                                                     Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                                                     Location location = context.getArgument("location", FinePositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
 
-                                                    HomePoint homePoint = HomeManager.get(target);
+                                                    HomePoint homePoint = HomeManager.get(target.getUniqueId());
                                                     homePoint.set(name, location);
                                                     homePoint.save();
 
@@ -179,14 +179,14 @@ public final class HomeCommand {
                                         .suggests((context, builder) -> {
                                             Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                                             if (player.hasPlayedBefore())
-                                                HomeManager.get(player).getHomes().forEach(builder::suggest);
+                                                HomeManager.get(player.getUniqueId()).getHomes().forEach(builder::suggest);
                                             return builder.buildFuture();
                                         })
                                         .executes(context -> {
                                             String name = context.getArgument("name", String.class);
                                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
-                                            HomePoint homePoint = HomeManager.get(target);
+                                            HomePoint homePoint = HomeManager.get(target.getUniqueId());
                                             if (homePoint.doesNotExist(name)) {
                                                 context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " existiert nicht!", NamedTextColor.RED)));
                                                 return 1;

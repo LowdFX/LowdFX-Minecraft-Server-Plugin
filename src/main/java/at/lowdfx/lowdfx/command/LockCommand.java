@@ -17,6 +17,7 @@ import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings({ "UnstableApiUsage", "DuplicatedCode" })
 public final class LockCommand {
@@ -35,24 +36,24 @@ public final class LockCommand {
                         return 1;
                     }
 
-                    boolean canLock = !LowdFX.LOCKABLE_DATA.isLocked(targetBlock.getLocation()) ||
-                            LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName()) ||
-                            context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION);
+                    boolean canLock = !LockableData.isLocked(targetBlock.getLocation()) ||
+                            LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName()) ||
+                            Permissions.check(context.getSource().getSender(), Permissions.Perm.LOCK_ADMIN);
 
                     if (!canLock) {
                         player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht sperren, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                         return 1;
                     }
 
-                    if (LowdFX.LOCKABLE_DATA.isLocked(targetBlock.getLocation())) {
+                    if (LockableData.isLocked(targetBlock.getLocation())) {
                         player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist bereits gesperrt.", NamedTextColor.RED)));
                         return 1;
                     }
 
                     if (targetBlock.getBlockData() instanceof Chest) {
-                        Utilities.connectedChests(targetBlock).forEach(l -> LowdFX.LOCKABLE_DATA.lockAdjacentChests(l, player.getName()));
+                        Utilities.connectedChests(targetBlock).forEach(l -> LockableData.lockAdjacentChests(l, player.getName()));
                     } else {
-                        LowdFX.LOCKABLE_DATA.addLocked(targetBlock.getLocation(), player.getName());
+                        LockableData.addLocked(targetBlock.getLocation(), player.getName());
                     }
 
                     player.sendMessage(LowdFX.serverMessage(Component.text("Block gesperrt und du bist automatisch auf die Whitelist gesetzt!", NamedTextColor.GREEN)));
@@ -73,42 +74,71 @@ public final class LockCommand {
                                 return 1;
                             }
 
+                            if (LockableData.isLocked(targetBlock.getLocation())) {
+                                player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist nicht gesperrt.", NamedTextColor.RED)));
+                                return 1;
+                            }
+
                             if (targetBlock.getBlockData() instanceof Chest) {
-                                Utilities.connectedChests(targetBlock).forEach(l -> LowdFX.LOCKABLE_DATA.unlockAdjacentChests(l));
+                                Utilities.connectedChests(targetBlock).forEach(LockableData::unlockAdjacentChests);
                             } else {
-                                LowdFX.LOCKABLE_DATA.removeLocked(targetBlock.getLocation());
+                                LockableData.removeLocked(targetBlock.getLocation());
                             }
 
                             player.sendMessage(LowdFX.serverMessage(Component.text("Block entsperrt!", NamedTextColor.GREEN)));
                             return 1;
                         })
                 )
-                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("whitelist")
                         .then(LiteralArgumentBuilder.<CommandSourceStack>literal("add")
-                                .executes(context -> {
-                                    if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
-                                    Collection<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
-                                    Block targetBlock = player.getTargetBlockExact(10);
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+                                        .executes(context -> {
+                                            if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
+                                            Collection<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+                                            Block targetBlock = player.getTargetBlockExact(10);
 
-                                    if (targetBlock == null || !(targetBlock.getState() instanceof Container || targetBlock.getBlockData() instanceof Openable)) {
-                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen Block anvisieren, den man öffnen kann, um diesen Befehl auszuführen.", NamedTextColor.RED)));
-                                        return 1;
-                                    }
+                                            if (targetBlock == null || !(targetBlock.getState() instanceof Container || targetBlock.getBlockData() instanceof Openable)) {
+                                                player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen Block anvisieren, den man öffnen kann, um diesen Befehl auszuführen.", NamedTextColor.RED)));
+                                                return 1;
+                                            }
 
                                     if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
-                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
-                                        return 1;
-                                    }
+                                                player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
+                                                return 1;
+                                            }
 
-                                    LowdFX.LOCKABLE_DATA.addWhitelisted(targetBlock.getLocation(), players.stream().map(Player::getName).toList());
-                                    player.sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler zur Whitelist hinzugefügt!", NamedTextColor.GREEN)));
-                                    return 1;
-                                })
+                                            LockableData.addWhitelisted(targetBlock.getLocation(), players.stream().map(Player::getName).toList());
+                                            player.sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler zur Whitelist hinzugefügt!", NamedTextColor.GREEN)));
+                                            return 1;
+                                        })
+                                )
                         )
                         .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove")
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+                                        .executes(context -> {
+                                            if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
+                                            Collection<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+                                            Block targetBlock = player.getTargetBlockExact(10);
+
+                                            if (targetBlock == null || !(targetBlock.getState() instanceof Container || targetBlock.getBlockData() instanceof Openable)) {
+                                                player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen Block anvisieren, den man öffnen kann, um diesen Befehl auszuführen.", NamedTextColor.RED)));
+                                                return 1;
+                                            }
+
+                                    if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
+                                                player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
+                                                return 1;
+                                            }
+
+                                            LockableData.removeWhitelisted(targetBlock.getLocation(), players.stream().map(Player::getName).toList());
+                                            player.sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler von der Whitelist entfernt!", NamedTextColor.GREEN)));
+                                            return 1;
+                                        })
+                                )
+                        )
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("list")
                                 .executes(context -> {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
-                                    Collection<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
                                     Block targetBlock = player.getTargetBlockExact(10);
 
                                     if (targetBlock == null || !(targetBlock.getState() instanceof Container || targetBlock.getBlockData() instanceof Openable)) {
@@ -116,13 +146,19 @@ public final class LockCommand {
                                         return 1;
                                     }
 
-                                    if (!context.getSource().getSender().hasPermission(LOCK_ADMIN_PERMISSION) && !LowdFX.LOCKABLE_DATA.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
+                                    if (!Permissions.check(context.getSource().getSender(), Permissions.Perm.LOCK_ADMIN) && !LockableData.isPlayerInWhitelist(targetBlock.getLocation(), player.getName())) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht bearbeiten, da du nicht der Besitzer bist.", NamedTextColor.RED)));
                                         return 1;
                                     }
 
-                                    LowdFX.LOCKABLE_DATA.removeWhitelisted(targetBlock.getLocation(), players.stream().map(Player::getName).toList());
-                                    player.sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler von der Whitelist entfernt!", NamedTextColor.GREEN)));
+                                    List<String> whitelist = LockableData.whitelist(targetBlock.getLocation());
+                                    if (whitelist.isEmpty()) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Es sind keine Spieler in der Whitelist von dem Block.", NamedTextColor.RED)));
+                                    } else {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Spieler in der Whitelist von dem Block:", NamedTextColor.GREEN)));
+                                        whitelist.forEach(p -> player.sendMessage(Component.text("- " + p, NamedTextColor.GREEN)));
+                                    }
+
                                     return 1;
                                 })
                         )
