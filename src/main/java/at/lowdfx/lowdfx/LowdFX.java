@@ -63,6 +63,8 @@ public final class LowdFX extends JavaPlugin {
         saveDefaultConfig();
         CONFIG = getConfig();
 
+        ConnectionEvents.JOIN_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.join"), ""));
+        ConnectionEvents.QUIT_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.quit"), ""));
 
         ChestShopManager.loadAllShops();
         SpawnManager.loadData();

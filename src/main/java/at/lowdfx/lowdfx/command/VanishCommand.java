@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.event.ConnectionEvents;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -10,6 +11,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -120,10 +122,10 @@ public final class VanishCommand {
     }
 
     public static void fakeJoin(@NotNull Player player) {
-        Bukkit.getServer().sendMessage(Component.text(Objects.requireNonNull(LowdFX.CONFIG.getString("join.welcome")), NamedTextColor.YELLOW).appendSpace().append(player.name().color(NamedTextColor.GOLD)).append(Component.text("!", NamedTextColor.YELLOW)));
+        Bukkit.getServer().sendMessage(LowdFX.serverMessage(ConnectionEvents.JOIN_MESSAGE.replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build())));
     }
 
     public static void fakeLeave(@NotNull Player player) {
-        Bukkit.getServer().sendMessage(Component.text(Objects.requireNonNull(LowdFX.CONFIG.getString("join.quit")), NamedTextColor.YELLOW).appendSpace().append(player.name().color(NamedTextColor.GOLD)).append(Component.text("!", NamedTextColor.YELLOW)));
+        Bukkit.getServer().sendMessage(LowdFX.serverMessage(ConnectionEvents.QUIT_MESSAGE.replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build())));
     }
 }
