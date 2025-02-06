@@ -1,9 +1,35 @@
-join:
-  welcome: "Guten Tag" # Willkommensnachricht
-  quit: "Bis bald" # Verabschiedungsnachricht
+#################################################################################
+##                   _                        _  _____ __  __                  ##
+##_________________ | |     ___ __      __ __| ||  ___|\ \/ / _________________##
+##_________________ | |    / _ \\ \ /\ / // _` || |_    \  /  _________________##
+##_________________ | |___| (_) |\ V  V /| (_| ||  _|   /  \  _________________##
+##_________________ |_____|\___/  \_/\_/  \__,_||_|    /_/\_\ _________________##
+##                                Configuration                                ##
+#################################################################################
+
+## Alle Nachrichten, wenn Spieler den Server betreten oder verlassen.
+# Im MiniMessage format: https://docs.advntr.dev/minimessage/index.html.
+# Der Placeholder "{0}" ist der Spielername.
+connection:
+
+  # Gesendet, wenn ein Spieler beitritt.
+  join: "<yellow>Guten Tag, <gold>{0}<yellow>!"
+
+  # Gesendet, wenn ein Spieler verlässt. Im MiniMessage format. {0} ist der Spielername.
+  quit: "<yellow>Bis bald, <gold>{0}<yellow>!"
+
+## Allgemeine Einstellungen.
 basic:
-  servername: "HiyarCraft" # Servername steht vor jeder Befehlsnachricht wie auch Willkommens und Verabschiedungsnachricht
-  maxhomes: 5 # Maximale Homes pro Spieler
+
+  # Steht vor jeder Befehlsnachricht.
+  servername: "HiyarCraft"
+
+  # Maximale Homes pro Spieler.
+  maxhomes: 5
+
+## Einstellungen für das Verwarnungssystem.
 warnsystem:
-  tempban-duration: 86400 # Dauer des temporären Bans in Sekunden (Standard: 24 Stunden)
+
+  # Dauer des temporären Bans in Sekunden (Standard: 24 Stunden)
+  tempban-duration: 86400
 

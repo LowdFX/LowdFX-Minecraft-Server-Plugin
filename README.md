@@ -99,9 +99,4 @@ Es wurden bereits voreingestellte Optionen angegeben.
 
 ---
 
-## Soft Dependency
-- Das Plugin kann mit [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) erweitert werden, um zusätzliche Funktionen zu nutzen.
-- Wird aber NICHT benötigt, dies ist nur für zukünftige Pläne integriert!
----
-
-Viel Spaß mit meinem Plugin!
+Viel Spaß mit dem Plugin!
