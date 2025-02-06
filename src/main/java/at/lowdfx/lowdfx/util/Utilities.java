@@ -10,10 +10,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class Utilities {
@@ -42,5 +43,16 @@ public final class Utilities {
                 return entry;
         }
         return null;
+    }
+
+    public static String getServerProperty(@NotNull String key) {
+        try (InputStream input = new FileInputStream(new File(Bukkit.getWorldContainer(), "server.properties"))) {
+            Properties properties = new Properties();
+            properties.load(input);
+            return properties.getProperty(key);
+        } catch (IOException e) {
+            LowdFX.LOG.error("Konnte nicht server.properties lesen.", e);
+            throw new RuntimeException(e);
+        }
     }
 }

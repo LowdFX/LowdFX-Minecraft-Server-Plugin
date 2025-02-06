@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TeleportManager {
-    public static final long EXPIRATION = 600000; // 10 Minutes
+    public static final long EXPIRATION = 300000; // 5 Minutes
     public static final Map<UUID, Map.Entry<Location, AtomicLong>> BACK_POINTS = new HashMap<>();
 
     public static void update(@NotNull Entity entity) {

@@ -40,9 +40,9 @@ public class SpawnManager {
             throw new RuntimeException("Fehler beim Laden der Spawn-Konfiguration!", e);
         }
 
-                config.set(defaultSpawnName, Objects.requireNonNull(Bukkit.getWorld(ServerProperties.get(ServerProperties.ServerPropertyType.WORLD_NAME))).getSpawnLocation());
         // Falls noch kein default Spawn existiert, erstelle ihn
         if (!DATA.contains(DEFAULT_SPAWN_NAME)) {
+            DATA.set(DEFAULT_SPAWN_NAME, Objects.requireNonNull(Bukkit.getWorld(Utilities.getServerProperty("level-name"))).getSpawnLocation());
         }
     }
 

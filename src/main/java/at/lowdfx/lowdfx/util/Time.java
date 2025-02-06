@@ -19,16 +19,8 @@ public class Time {
         this.seconds = seconds;
     }
 
-    public Time(@NotNull Time time) {
-        this.seconds = time.seconds;
-    }
-
     public Time(long time, @NotNull Unit unit) {
         this.seconds = time * unit.sec;
-    }
-
-    public String getOneUnitFormatted() {
-        return oneUnitFormat(this);
     }
 
     public String getPreciselyFormatted() {
@@ -39,61 +31,12 @@ public class Time {
         return seconds;
     }
 
-    public long getAs(@NotNull Unit unit) {
-        return seconds / unit.sec;
-    }
-
-    public double getAsExact(@NotNull Unit unit) {
-        return (double) seconds / unit.sec;
-    }
-
-    public void increment(long time, @NotNull Unit unit) {
-        seconds += time * unit.sec;
-    }
-
     public void increment(long seconds) {
         this.seconds += seconds;
     }
 
     public void increment() {
         seconds++;
-    }
-
-    public void decrement(long time, @NotNull Unit unit) {
-        decrement(time * unit.sec);
-    }
-
-    public void decrement(long seconds) {
-        this.seconds -= seconds;
-    }
-
-    public void decrement() {
-        seconds--;
-    }
-
-    /**
-     * Sets the {@link Time time}.
-     * @param time The {@link Time time} in the {@link Unit unit} of the second parameter.
-     * @param unit The {@link Unit unit} of the {@link Time time}.
-     */
-    public void set(long time, @NotNull Unit unit) {
-        seconds = time * unit.sec;
-    }
-
-    /**
-     * Sets the {@link Time time}.
-     * @param seconds The {@link Time time} in {@link Unit#SECONDS seconds}.
-     */
-    public void set(long seconds) {
-        this.seconds = seconds;
-    }
-
-    /**
-     * Sets this {@link Time time} to the same amount as the provided time.
-     * @param time The time to copy.
-     */
-    public void set(@NotNull Time time) {
-        seconds = time.get();
     }
 
     @Override
@@ -107,21 +50,6 @@ public class Time {
     @Override
     public String toString() {
         return "Time [seconds=" + seconds + "]";
-    }
-
-    public static @NotNull String oneUnitFormat(long s) {
-        Unit[] units = Unit.values();
-
-        for (int i = units.length; i >= 1; i--) {
-            Unit unit = units[i - 1];
-            if (s >= unit.sec) return (s / unit.sec) + unit.abb;
-        }
-
-        return s + Unit.SECONDS.abb;
-    }
-
-    public static @NotNull String oneUnitFormat(@NotNull Time time) {
-        return oneUnitFormat(time.seconds);
     }
 
     public static @NotNull String preciselyFormat(long s) {
@@ -189,10 +117,7 @@ public class Time {
         MONTHS(2629800L, "mo"),
         YEARS(31557600L, "yr");
 
-        /**The number of {@link #SECONDS seconds} in one {@link Unit unit}. (source: <a href="https://en.wikipedia.org/wiki/Unit_of_time">Wikipedia/Unit of time</a>) */
         public final long sec;
-
-        /** The {@link Unit unit}'s abbreviation. */
         public final String abb;
 
         Unit(long seconds, String abbreviation) {
@@ -200,29 +125,14 @@ public class Time {
             this.abb = abbreviation;
         }
 
-        /**
-         * Get {@link #pluralEng()} but as singular. <br>
-         * The full english name of the {@link Unit unit} as listed in the english dictionary.
-         * @return The english name.
-         */
         public @NotNull String eng() {
             return pluralEng().substring(0, name().length() - 1).replace("ies", "y");
         }
 
-        /**
-         * Get {@link #eng()} but as plural. <br>
-         * Most times just with an s, but changes for century = centuries
-         * @return Plural form of {@link #eng}
-         * @since 0.0.1
-         */
         public @NotNull String pluralEng() {
             return name().toLowerCase();
         }
 
-        /**
-         * Just the same as {@link #eng()}.
-         * @since 0.0.1
-         */
         @Override
         public @NotNull String toString() {
             return eng();
