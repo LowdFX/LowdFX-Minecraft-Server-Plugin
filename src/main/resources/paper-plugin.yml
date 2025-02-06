@@ -7,6 +7,9 @@ version: '1.0'
 ### Main Class ###
 main: at.lowdfx.lowdfx.LowdFX
 
+### Loader Class (1.20.4+) ###
+loader: at.lowdfx.lowdfx.LowLoader
+
 ### PaperAPI Version ###
 api-version: '1.21'
 
@@ -14,25 +17,3 @@ api-version: '1.21'
 authors:
   - LowdFX
   - MarcPG
-
-### Soft-Dependencies für ProtocolEvents ###
-dependencies:
-  server:
-    ProtocolLib:
-      load: BEFORE
-      required: false
-    ProtocolSupport:
-      load: BEFORE
-      required: false
-    ViaVersion:
-      load: BEFORE
-      required: false
-    ViaBackwards:
-      load: BEFORE
-      required: false
-    ViaRewind:
-      load: BEFORE
-      required: false
-    Geyser-Spigot:
-      load: BEFORE
-      required: false

@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "8.3.0" // ShadowJar ist das gleiche wie shade in Maven.
-    id("xyz.jpenilla.run-paper") version "2.2.3" // Um code zu ändern ohne den server neu zu starten.
+    id("xyz.jpenilla.run-paper") version "2.2.3" // Um code zu ändern, ohne den server neu zu starten.
 }
 
 group = "at.lowdfx"
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
-    implementation("xyz.xenondevs.invui:invui:1.43")
+    compileOnly("xyz.xenondevs.invui:invui:1.43")
 }
 
 tasks {
