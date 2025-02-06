@@ -47,6 +47,9 @@ public class ConnectionEvents implements Listener {
         // Homes
         HomeManager.load(player.getUniqueId());
 
+        // Kits
+        KitManager.load(player.getUniqueId());
+
         // Spawns
         SpawnManager.getSpawn(event.getPlayer()).teleport(event.getPlayer());
     }

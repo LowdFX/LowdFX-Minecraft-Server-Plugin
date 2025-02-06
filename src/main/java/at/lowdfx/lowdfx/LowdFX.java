@@ -98,6 +98,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(InventoryCommands.invseeCommand(), "Öffnet das Inventar von einem Spieler.");
             registrar.register(InventoryCommands.trashCommand(), "Öffnet einen Mülleimer.", List.of("rubbish", "mülleimer"));
             registrar.register(InventoryCommands.workbenchCommand(), "Öffnet eine Werkbank.", List.of("crafting", "crafting-table"));
+            registrar.register(KitCommand.command(), "Gibt dir eines deiner Kits.");
             registrar.register(LockCommand.command(), "Sperrt einen Block.");
             registrar.register(LowCommand.command(), "Generelle features vom Plugin.");
             registrar.register(MuteCommands.muteCommand(), "Schaltet einen Spieler stumm.");

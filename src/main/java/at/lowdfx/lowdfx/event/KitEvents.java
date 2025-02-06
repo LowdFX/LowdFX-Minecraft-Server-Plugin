@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.event;
 
-import at.lowdfx.lowdfx.command.LowCommand;
+import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.kit.op.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class KitEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(@NotNull PlayerDeathEvent event) {
-        event.getPlayer().getPersistentDataContainer().remove(LowCommand.STARTERKIT_KEY);
+        event.getPlayer().getPersistentDataContainer().remove(KitManager.STARTERKIT_KEY);
     }
 
     // Listener für den Konsum des OP Apfels
