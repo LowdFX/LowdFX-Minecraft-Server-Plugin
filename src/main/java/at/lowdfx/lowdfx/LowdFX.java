@@ -76,7 +76,7 @@ public final class LowdFX extends JavaPlugin {
 
         ChestShopManager.loadAllShops();
         SpawnManager.loadData();
-        HomeManager.loadAll();
+        HomeManager.load();
         WarpManager.loadData();
         LockableData.load();
         KitManager.load();
@@ -129,7 +129,7 @@ public final class LowdFX extends JavaPlugin {
         // Speichere von Sachen
         ChestShopManager.saveAllShops();
         PlaytimeManager.save();
-        HomeManager.saveAll();
+        HomeManager.save();
         WarpManager.saveData();
         SpawnManager.saveData();
         LockableData.save();

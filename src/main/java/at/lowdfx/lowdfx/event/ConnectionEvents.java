@@ -45,7 +45,7 @@ public class ConnectionEvents implements Listener {
         }
 
         // Homes
-        HomeManager.load(player.getUniqueId());
+        HomeManager.add(player.getUniqueId());
 
         // Kits
         KitManager.load(player.getUniqueId());
@@ -66,9 +66,6 @@ public class ConnectionEvents implements Listener {
         if (PlaytimeManager.PLAYTIMES.containsKey(uuid)) {
             PlaytimeManager.PLAYTIMES.get(uuid).logout();
         }
-
-        // Homes
-        HomeManager.save(player.getUniqueId());
 
         // Spawns
         player.setRespawnLocation(SpawnManager.getSpawn(player).location(), true);
