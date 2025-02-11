@@ -1,26 +1,21 @@
 package at.lowdfx.lowdfx.kit.starter;
 
 import at.lowdfx.lowdfx.LowdFX;
+import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class StarterFood {
-    public static final ItemStack ITEM = new ItemStack(Material.BAKED_POTATO);
-
-    static {
-        ITEM.editMeta(meta -> {
-            meta.displayName(Component.text("Starter Essen", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-            meta.lore(LowdFX.STARTER_LORE);
-        });
-    }
+    public static final ItemStack ITEM = new ItemBuilder(Material.BAKED_POTATO)
+            .name(Component.text("Starter Essen", NamedTextColor.RED))
+            .lore(LowdFX.STARTER_LORE)
+            .amount(64)
+            .build();
 
     public static @NotNull ItemStack get() {
-        ItemStack item = new ItemStack(ITEM);
-        item.setAmount(64);
-        return item;
+        return new ItemStack(ITEM);
     }
 }

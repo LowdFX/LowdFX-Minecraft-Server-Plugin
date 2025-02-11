@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.kit.op;
 
 import at.lowdfx.lowdfx.LowdFX;
+import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -14,32 +15,28 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class OPNetheriteChestplate {
-    public static final ItemStack ITEM = new ItemStack(Material.NETHERITE_CHESTPLATE);
-
-    static {
-        ITEM.editMeta(meta -> {
-            meta.displayName(Component.text("OP Netheritharnisch", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-            meta.lore(LowdFX.OP_LORE);
-            meta.setUnbreakable(true);
-
-            meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(
-                    new NamespacedKey("lowdfx", "generic.armor"),
-                    Integer.MAX_VALUE,
-                    AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlotGroup.FEET
-            ));
-            meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(
-                    new NamespacedKey("lowdfx", "generic.armortoughness"),
-                    Integer.MAX_VALUE,
-                    AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlotGroup.FEET));
-            meta.addAttributeModifier(Attribute.EXPLOSION_KNOCKBACK_RESISTANCE, new AttributeModifier(
-                    new NamespacedKey("lowdfx", "generic.explosionknockbackresistance"),
-                    Integer.MAX_VALUE,
-                    AttributeModifier.Operation.ADD_NUMBER,
-                    EquipmentSlotGroup.FEET));
-        });
-    }
+    public static final ItemStack ITEM = new ItemBuilder(Material.NETHERITE_CHESTPLATE)
+            .name(Component.text("OP Netheritharnisch", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
+            .lore(LowdFX.OP_LORE)
+            .editMeta(m -> {
+                m.setUnbreakable(true);
+                m.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(
+                        new NamespacedKey("lowdfx", "generic.armor"),
+                        Integer.MAX_VALUE,
+                        AttributeModifier.Operation.ADD_NUMBER,
+                        EquipmentSlotGroup.CHEST));
+                m.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(
+                        new NamespacedKey("lowdfx", "generic.armortoughness"),
+                        Integer.MAX_VALUE,
+                        AttributeModifier.Operation.ADD_NUMBER,
+                        EquipmentSlotGroup.CHEST));
+                m.addAttributeModifier(Attribute.EXPLOSION_KNOCKBACK_RESISTANCE, new AttributeModifier(
+                        new NamespacedKey("lowdfx", "generic.explosionknockbackresistance"),
+                        Integer.MAX_VALUE,
+                        AttributeModifier.Operation.ADD_NUMBER,
+                        EquipmentSlotGroup.CHEST));
+            })
+            .build();
 
     public static @NotNull ItemStack get() {
         return new ItemStack(ITEM);

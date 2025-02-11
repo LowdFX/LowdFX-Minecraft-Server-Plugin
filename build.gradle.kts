@@ -11,15 +11,19 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
 
 repositories {
+    mavenLocal()
     mavenCentral()
 
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases/")
+    maven("https://marcpg.com/repo/")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("xyz.xenondevs.invui:invui:1.43")
+    implementation("com.marcpg:libpg-paper:1.0.0")
+    implementation("com.marcpg:libpg-storage-json:1.0.0")
 }
 
 tasks {
