@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.util;
 
 import at.lowdfx.lowdfx.LowdFX;
+import com.marcpg.libpg.storage.YamlUtils;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
@@ -9,11 +10,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,12 +19,6 @@ import static org.bukkit.permissions.PermissionDefault.OP;
 import static org.bukkit.permissions.PermissionDefault.TRUE;
 
 public final class Perms {
-    public static final Yaml YAML = new Yaml();
-
-    // Can use the LowdFX.DATA_DIR, because Java loads classes at runtime, meaning this will only
-    // be executed, once the Permissions class actually gets accessed for the first time.
-    public static final File FILE = LowdFX.DATA_DIR.resolve("permissions.yml").toFile();
-
     public enum Perm {
         ANVIL(          "lowdfx.inv.anvil",         "/anvil",               OP),
         BACK(           "lowdfx.back",              "/back",                OP),
@@ -74,7 +65,7 @@ public final class Perms {
 
     // Lädt die Berechtigungen aus der permissions.yml und registriert sie.
     public static void loadPermissions() throws IOException {
-        if (FILE.createNewFile()) {
+        if (LowdFX.DATA_DIR.resolve("permissions.yml").toFile().createNewFile()) {
             Map<String, Object> data = new LinkedHashMap<>();
             for (Perm perm : Perm.values()) {
                 Map<String, Object> permData = new LinkedHashMap<>();
@@ -82,15 +73,13 @@ public final class Perms {
                 permData.put("default", perm.def.name().toLowerCase());
                 data.put(perm.permission, permData);
             }
-            YAML.dump(data, new FileWriter(FILE));
-
+            YamlUtils.saveSafe(data, LowdFX.DATA_DIR.resolve("permissions.yml").toFile());
             LowdFX.LOG.info("Permission-Konfiguration erstellt.");
             return;
         }
 
         PluginManager manager = Bukkit.getPluginManager();
-        Map<String, Object> data = YAML.load(new FileReader(FILE));
-        data.forEach((s, o) -> {
+        YamlUtils.loadSafe(LowdFX.DATA_DIR.resolve("permissions.yml").toFile(), Map.of()).forEach((s, o) -> {
             if (!(o instanceof Map<?, ?> map)) return;
             manager.addPermission(new Permission(
                     (String) map.get("permission"),

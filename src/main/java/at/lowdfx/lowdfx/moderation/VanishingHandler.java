@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.util.FileUtils;
+import com.marcpg.libpg.storage.JsonUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -45,11 +45,11 @@ public class VanishingHandler {
     }
 
     public static void saveAll() {
-        FileUtils.save(VANISHED, "vanished.json");
+        JsonUtils.saveSafe(VANISHED, LowdFX.DATA_DIR.resolve("vanished.json").toFile());
     }
 
     public static void loadAll() {
-        VANISHED.addAll(FileUtils.load("vanished.json", List.of()));
+        VANISHED.addAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("vanished.json").toFile(), List.of()));
     }
 
     public static Set<UUID> getVanishedPlayers() {

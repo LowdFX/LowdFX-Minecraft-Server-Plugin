@@ -16,7 +16,7 @@ import java.util.Set;
 public class LockableData {
     private static final YamlConfiguration DATA = new YamlConfiguration();
 
-    public static void loadData() {
+    public static void load() {
         try {
             if (LowdFX.DATA_DIR.resolve("lock-data.yml").toFile().createNewFile()) {
                 LowdFX.LOG.info("Lock data Datei erstellt.");
@@ -27,7 +27,7 @@ public class LockableData {
         }
     }
 
-    public static void saveData() {
+    public static void save() {
         try {
             DATA.save(LowdFX.DATA_DIR.resolve("lock-data.yml").toFile());
         } catch (IOException e) {
@@ -44,7 +44,7 @@ public class LockableData {
         DATA.set(path + ".locked", true);
         DATA.set(path + ".owner", player);
         DATA.set(path + ".whitelist", List.of(player));  // Füge den Spieler zur Whitelist hinzu
-        saveData();
+        save();
     }
 
     public static @NotNull Set<Location> getConnectedChests(@NotNull Location location) {
@@ -88,7 +88,7 @@ public class LockableData {
 
         if (DATA.contains(path)) {
             DATA.set(path, null);  // Entfernt den gesamten Kistenpfad
-            saveData();
+            save();
         }
     }
 
@@ -104,7 +104,7 @@ public class LockableData {
                 whitelist.add(p);
         }
         DATA.set(path, whitelist);
-        saveData();
+        save();
     }
 
     public static void removeWhitelisted(@NotNull Location location, Collection<String> players) {
@@ -112,7 +112,7 @@ public class LockableData {
         List<String> whitelist = DATA.getStringList(path);
         whitelist.removeAll(players);
         DATA.set(path, whitelist);
-        saveData();
+        save();
     }
 
     public static @NotNull List<String> whitelist(@NotNull Location location) {
@@ -122,7 +122,7 @@ public class LockableData {
 
     public static void removeLocked(@NotNull Location location) {
         DATA.set("chests." + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ() + ".locked", false);
-        saveData();
+        save();
     }
 
     public static String getChestOwner(@NotNull Location location) {

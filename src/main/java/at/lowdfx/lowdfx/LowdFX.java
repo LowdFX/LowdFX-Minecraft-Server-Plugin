@@ -7,6 +7,8 @@ import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.managers.*;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Perms;
+import com.marcpg.libpg.MinecraftLibPG;
+import com.marcpg.libpg.util.ServerUtils;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
@@ -51,6 +53,7 @@ public final class LowdFX extends JavaPlugin {
         }
 
         InvUI.getInstance().setPlugin(this);
+        MinecraftLibPG.init(this);
 
         // === Permissions Klasse laden === //
         try {
@@ -66,30 +69,21 @@ public final class LowdFX extends JavaPlugin {
         ConnectionEvents.JOIN_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.join"), ""));
         ConnectionEvents.QUIT_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.quit"), ""));
 
+        // === Data-Dir Erstellen === //
+        if (DATA_DIR.toFile().mkdirs()) {
+            LOG.info("Datenordner erstellt: {}", getDataFolder().getAbsolutePath());
+        }
+
         ChestShopManager.loadAllShops();
         SpawnManager.loadData();
         HomeManager.loadAll();
         WarpManager.loadData();
-        LockableData.loadData();
-        KitManager.loadAll();
-
-        // === Events === //
-        getServer().getPluginManager().registerEvents(new ConnectionEvents(), this);
-        getServer().getPluginManager().registerEvents(new KitEvents(), this);
-        getServer().getPluginManager().registerEvents(new ChestShopEvents(), this);
-        getServer().getPluginManager().registerEvents(new LockEvents(), this);
-        getServer().getPluginManager().registerEvents(new VanishEvents(), this);
-        getServer().getPluginManager().registerEvents(new MuteEvents(), this);
-
-        // === ChestData Datei === //
-        ensureDataFolderExists();
-
-        // === Vanished Spieler Datei === //
+        LockableData.load();
+        KitManager.load();
+        PlaytimeManager.load();
         VanishingHandler.loadAll();
 
-        // === Playtime Datei === //
-        PlaytimeManager.load();
-
+        ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
             registrar.register(HomeCommand.command(), "Teleportiert dich zu deinem Home.");
@@ -138,20 +132,10 @@ public final class LowdFX extends JavaPlugin {
         HomeManager.saveAll();
         WarpManager.saveData();
         SpawnManager.saveData();
-        LockableData.saveData();
-        KitManager.saveAll();
+        LockableData.save();
+        KitManager.save();
 
         saveConfig();
-    }
-
-    // Diese Methode stellt sicher, dass der Plugin-Ordner und die Datei existieren.
-    private void ensureDataFolderExists() {
-        if (DATA_DIR.toFile().mkdirs()) {
-            LOG.info("Datenordner erstellt: {}", getDataFolder().getAbsolutePath());
-        }
-
-        // Überprüfen und sicherstellen, dass die Datei erstellt wird, falls sie nicht existiert.
-
     }
 
     public static @NotNull Component serverMessage(Component message) {

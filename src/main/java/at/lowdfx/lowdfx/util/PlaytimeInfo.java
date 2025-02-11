@@ -1,5 +1,7 @@
 package at.lowdfx.lowdfx.util;
 
+import com.marcpg.libpg.data.time.Time;
+
 import java.util.UUID;
 
 public class PlaytimeInfo {

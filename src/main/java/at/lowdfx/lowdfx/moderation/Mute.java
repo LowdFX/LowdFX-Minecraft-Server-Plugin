@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.moderation;
 
-import at.lowdfx.lowdfx.util.Time;
 import at.lowdfx.lowdfx.util.Utilities;
+import com.marcpg.libpg.data.time.Time;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
