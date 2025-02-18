@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.managers.TeleportManager;
 import at.lowdfx.lowdfx.managers.WarpManager;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -23,19 +24,19 @@ public final class WarpCommand {
                 .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                         .requires(source -> source.getExecutor() instanceof Player)
                         .suggests((context, builder) -> {
-                            WarpManager.getWarpsList().forEach(builder::suggest);
+                            WarpManager.WARPS.keySet().forEach(builder::suggest);
                             return builder.buildFuture();
                         })
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                             String name = context.getArgument("name", String.class);
 
-                            if (!WarpManager.exits(name)) {
+                            if (!WarpManager.WARPS.containsKey(name)) {
                                 player.sendMessage(LowdFX.serverMessage(Component.text("Der eingegebene Warppunkt " + name + " existiert nicht!", NamedTextColor.RED)));
                                 return 1;
                             }
 
-                            WarpManager.teleport(name, player);
+                            TeleportManager.teleportSafe(player, WarpManager.WARPS.get(name));
                             player.sendMessage(LowdFX.serverMessage(Component.text("Du hast dich zu dem Warppunkt " + name + " teleportiert!", NamedTextColor.GREEN)));
                             return 1;
                         })
@@ -44,7 +45,7 @@ public final class WarpCommand {
                         .requires(source -> Perms.check(source, Perms.Perm.WARP))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
-                                    WarpManager.getWarpsList().forEach(builder::suggest);
+                                    WarpManager.WARPS.keySet().forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
                                 .then(RequiredArgumentBuilder.<CommandSourceStack, FinePositionResolver>argument("location", ArgumentTypes.finePosition(true))
@@ -64,19 +65,19 @@ public final class WarpCommand {
                         .requires(source -> Perms.check(source, Perms.Perm.WARP_ADMIN))
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .suggests((context, builder) -> {
-                                    WarpManager.getWarpsList().forEach(builder::suggest);
+                                    WarpManager.WARPS.keySet().forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
                                 .executes(context -> {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                                     String name = context.getArgument("name", String.class);
 
-                                    if (!WarpManager.exits(name)) {
+                                    if (!WarpManager.WARPS.containsKey(name)) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Der eingegebene Warppunkt " + name + " existiert nicht!", NamedTextColor.RED)));
                                         return 1;
                                     }
 
-                                    WarpManager.set(name, null);
+                                    WarpManager.remove(name);
                                     player.sendMessage(LowdFX.serverMessage(Component.text("Du hast den Warppunkt " + name + " gelöscht!", NamedTextColor.GREEN)));
                                     return 1;
                                 })
