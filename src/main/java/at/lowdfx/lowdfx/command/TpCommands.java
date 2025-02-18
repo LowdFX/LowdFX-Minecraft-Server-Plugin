@@ -27,8 +27,7 @@ public final class TpCommands {
                             Location target = context.getSource().getLocation();
                             Component message = LowdFX.serverMessage(Component.text("Du wurdest zu " + context.getSource().getSender().getName() + " teleportiert!", NamedTextColor.GREEN));
                             context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).forEach(p -> {
-                                TeleportManager.update(p);
-                                p.teleport(target);
+                                TeleportManager.teleportSafe(p, target);
                                 p.sendMessage(message);
                             });
                             return 1;
@@ -44,8 +43,7 @@ public final class TpCommands {
                     Location target = context.getSource().getLocation();
                     Component message = LowdFX.serverMessage(Component.text("Du wurdest zu " + context.getSource().getSender().getName() + " teleportiert!", NamedTextColor.GREEN));
                     Bukkit.getOnlinePlayers().forEach(p -> {
-                        TeleportManager.update(p);
-                        p.teleport(target);
+                        TeleportManager.teleportSafe(p, target);
                         p.sendMessage(message);
                     });
                     return 1;
@@ -68,7 +66,7 @@ public final class TpCommands {
                         return 1;
                     }
 
-                    player.teleport(target);
+                    TeleportManager.teleportSafe(player, target);
                     player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest zurück teleportiert!", NamedTextColor.GREEN)));
                     return 1;
                 })
@@ -81,7 +79,7 @@ public final class TpCommands {
                                     context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(p.getName() + " kann nicht zurück teleportieren!", NamedTextColor.RED)));
                                     return 1;
                                 }
-                                p.teleport(target);
+                                TeleportManager.teleportSafe(p, target);
                                 p.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest zurück teleportiert!", NamedTextColor.GREEN)));
                             }
 

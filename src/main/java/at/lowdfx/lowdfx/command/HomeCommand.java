@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.HomeManager;
+import at.lowdfx.lowdfx.managers.TeleportManager;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -35,7 +36,7 @@ public final class HomeCommand {
                         return 1;
                     }
 
-                    player.teleport(homes.get("home"));
+                    TeleportManager.teleportSafe(player, homes.get("home"));
                     player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause teleportiert!", NamedTextColor.GREEN)));
                     return 1;
                 })
@@ -57,7 +58,7 @@ public final class HomeCommand {
                                         return 1;
                                     }
 
-                                    player.teleport(homes.get(name));
+                                    TeleportManager.teleportSafe(player, homes.get("home"));
                                     player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause " + name + " teleportiert!", NamedTextColor.GREEN)));
                                     return 1;
                                 })
@@ -132,7 +133,7 @@ public final class HomeCommand {
                                                 context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " existiert nicht!", NamedTextColor.RED)));
                                                 return 1;
                                             }
-                                            target.teleport(homes.get(name));
+                                            TeleportManager.teleportSafe(target, homes.get("home"));
 
                                             target.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause " + name + " teleportiert!", NamedTextColor.GREEN)));
                                             context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(target.getName() + " wurde zum Home " + name + " teleportiert!", NamedTextColor.GREEN)));

@@ -5,11 +5,11 @@ import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.managers.HomeManager;
 import at.lowdfx.lowdfx.managers.PlaytimeManager;
 import at.lowdfx.lowdfx.managers.SpawnManager;
+import at.lowdfx.lowdfx.managers.TeleportManager;
 import at.lowdfx.lowdfx.util.PlaytimeInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,7 +51,8 @@ public class ConnectionEvents implements Listener {
         KitManager.load(player.getUniqueId());
 
         // Spawns
-        SpawnManager.getSpawn(event.getPlayer()).teleport(event.getPlayer());
+        if (!event.getPlayer().hasPlayedBefore())
+            TeleportManager.teleportSafe(player, SpawnManager.getSpawn(player));
     }
 
     @EventHandler
@@ -68,11 +69,6 @@ public class ConnectionEvents implements Listener {
         }
 
         // Spawns
-        player.setRespawnLocation(SpawnManager.getSpawn(player).location(), true);
-        Bukkit.getScheduler().runTaskAsynchronously(LowdFX.PLUGIN, () -> {
-            if (!event.getPlayer().hasPlayedBefore()) {
-                SpawnManager.getSpawn(event.getPlayer()).teleport(event.getPlayer());
-            }
-        });
+        player.setRespawnLocation(SpawnManager.getSpawn(player), true);
     }
 }

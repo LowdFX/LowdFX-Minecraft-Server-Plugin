@@ -31,11 +31,9 @@ public class WarpManager {
 
     public static void teleport(String name, Entity entity) {
         if (exits(name)) {
-            TeleportManager.update(entity);
-
             Location loc = getLocation(name);
             if (loc != null) {
-                entity.teleport(loc);
+                TeleportManager.teleportSafe(entity, loc);
             } else {
                 LowdFX.LOG.warn("Kein gültiger Ort für Warp: {}", name);
             }

@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.managers.TeleportManager;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -119,7 +120,7 @@ public final class TpaCommand {
                             target.sendActionBar(Component.text("Du wirst teleportiert, beweg dich nicht!", NamedTextColor.GREEN));
 
                             Location targetLocation = player.getLocation().clone(); // In case the target logs out.
-                            Bukkit.getScheduler().runTaskLater(LowdFX.PLUGIN, () -> target.teleport(targetLocation), 60);
+                            Bukkit.getScheduler().runTaskLater(LowdFX.PLUGIN, () -> TeleportManager.teleportSafe(target, targetLocation), 60);
                             return 1;
                         })
                 )
