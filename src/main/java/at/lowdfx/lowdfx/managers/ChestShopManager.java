@@ -22,10 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class ChestShopManager {
     private static final Map<UUID, Map<Location, ShopData>> PLAYER_SHOPS = new HashMap<>();
     private static final Map<Location, List<ArmorStand>> HOLOGRAMS = new HashMap<>();
     private static final Map<Location, Set<UUID>> WHITELISTED_PLAYERS = new HashMap<>();
+public final class ChestShopManager {
 
     public static void registerShop(UUID owner, Location location, ShopData shopData) {
         PLAYER_SHOPS.computeIfAbsent(owner, k -> new HashMap<>()).put(location, shopData);

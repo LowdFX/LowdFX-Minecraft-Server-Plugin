@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class HomeManager {
+public final class HomeManager {
     public static final Map<UUID, Map<String, Location>> HOMES = new HashMap<>();
 
     public static void save() {

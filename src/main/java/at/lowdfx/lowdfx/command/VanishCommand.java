@@ -1,9 +1,9 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.event.ConnectionEvents;
 import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Perms;
+import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -11,13 +11,11 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -67,7 +65,7 @@ public final class VanishCommand {
                         .requires(source -> source.getExecutor() instanceof Player)
                         .executes(context -> {
                             if (context.getSource().getExecutor() instanceof Player player)
-                                fakeJoin(player);
+                                Bukkit.getServer().sendMessage(Utilities.joinMessage(player));
                             return 1;
                         })
                 )
@@ -75,7 +73,7 @@ public final class VanishCommand {
                         .requires(source -> source.getExecutor() instanceof Player)
                         .executes(context -> {
                             if (context.getSource().getExecutor() instanceof Player player)
-                                fakeLeave(player);
+                                Bukkit.getServer().sendMessage(Utilities.quitMessage(player));
                             return 1;
                         })
                 )
@@ -115,17 +113,9 @@ public final class VanishCommand {
         });
 
         if (state) {
-            fakeLeave(player);
+            Bukkit.getServer().sendMessage(Utilities.quitMessage(player));
         } else {
-            fakeJoin(player);
+            Bukkit.getServer().sendMessage(Utilities.joinMessage(player));
         }
-    }
-
-    public static void fakeJoin(@NotNull Player player) {
-        Bukkit.getServer().sendMessage(LowdFX.serverMessage(ConnectionEvents.JOIN_MESSAGE.replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build())));
-    }
-
-    public static void fakeLeave(@NotNull Player player) {
-        Bukkit.getServer().sendMessage(LowdFX.serverMessage(ConnectionEvents.QUIT_MESSAGE.replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build())));
     }
 }

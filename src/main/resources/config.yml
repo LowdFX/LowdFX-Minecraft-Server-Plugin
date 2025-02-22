@@ -12,6 +12,9 @@
 # Der Placeholder "{0}" ist der Spielername.
 connection:
 
+  # Gesendet, wenn ein Spieler das erste Mal spielt.
+  first-join: "<yellow>Heißt, <gold>{0}<yellow>willkommen, er ist das erste Mal gejoint!"
+
   # Gesendet, wenn ein Spieler beitritt.
   join: "<yellow>Guten Tag, <gold>{0}<yellow>!"
 

@@ -130,11 +130,11 @@ public final class WarnCommand {
     }
 
     public static void ban(PlayerProfile target, Component reason, long duration) {
-        Bukkit.getBanList(BanListType.PROFILE).addBan(target, LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
+        Bukkit.getBanList(BanListType.PROFILE).addBan(target, LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + (duration * 1000)) : null, "WarnSystem");
 
         Player t = Bukkit.getPlayer(Objects.requireNonNull(target.getId()));
         if (t != null) {
-            Bukkit.getBanList(BanListType.IP).addBan(Objects.requireNonNull(t.getAddress()).getAddress(), LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + duration * 1000) : null, "WarnSystem");
+            Bukkit.getBanList(BanListType.IP).addBan(Objects.requireNonNull(t.getAddress()).getAddress(), LegacyComponentSerializer.legacySection().serialize(reason), duration > 0 ? new java.util.Date(System.currentTimeMillis() + (duration * 1000)) : null, "WarnSystem");
             t.kick(reason);
         }
     }
