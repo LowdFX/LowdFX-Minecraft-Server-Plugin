@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import xyz.xenondevs.invui.gui.Gui;
@@ -53,7 +54,7 @@ public final class InventoryCommands {
                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
                             player.openInventory(target.getEnderChest());
-                            player.sendMessage(Component.text("Du hast die Enderchest von " + target.getName() + " geöffnet!", NamedTextColor.GREEN));
+                            player.sendMessage(LowdFX.serverMessage(Component.text("Du hast die Enderchest von " + target.getName() + " geöffnet!", NamedTextColor.GREEN)));
                             return 1;
                         })
                 )
@@ -69,26 +70,28 @@ public final class InventoryCommands {
                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                             PlayerInventory inv = target.getInventory();
 
+                            Inventory customInv = Bukkit.createInventory(target, 54, Component.text("Inventar von ").append(target.name()));
+
                             Gui gui = Gui.normal().setStructure(
-                                    ". h c l b . . o .", // h = Helmet
-                                    ". . . . . . . . .", // c = Chestplate
+                                    "# h c l b # # o #", // h = Helmet
+                                    "# # # # # # # # #", // c = Chestplate
                                     "I I I I I I I I I", // l = Leggings
                                     "I I I I I I I I I", // b = Boots
                                     "I I I I I I I I I", // o = Offhand
                                     "I I I I I I I I I") // I = Inventory
-                                    .setBackground(Items.BLACK_BACKGROUND)
-                                    .addIngredient('h', new Items.LiveItem(target, PlayerInventory::setHelmet, () -> Objects.requireNonNullElse(inv.getHelmet(), Items.WHITE_BACKGROUND)))
-                                    .addIngredient('c', new Items.LiveItem(target, PlayerInventory::setChestplate, () -> Objects.requireNonNullElse(inv.getChestplate(), Items.WHITE_BACKGROUND)))
-                                    .addIngredient('l', new Items.LiveItem(target, PlayerInventory::setLeggings, () -> Objects.requireNonNullElse(inv.getLeggings(), Items.WHITE_BACKGROUND)))
-                                    .addIngredient('b', new Items.LiveItem(target, PlayerInventory::setBoots, () -> Objects.requireNonNullElse(inv.getBoots(), Items.WHITE_BACKGROUND)))
-                                    .addIngredient('o', new Items.LiveItem(target, PlayerInventory::setItemInOffHand, inv::getItemInOffHand))
-                                    .addIngredient('I', ReferencingInventory.fromReversedPlayerStorageContents(inv))
+                                    .addIngredient('#', Items.BLACK_BACKGROUND)
+                                    .addIngredient('h', new Items.LiveItem(target, PlayerInventory::setHelmet, () -> Objects.requireNonNullElse(inv.getHelmet(), ItemStack.empty()), false))
+                                    .addIngredient('c', new Items.LiveItem(target, PlayerInventory::setChestplate, () -> Objects.requireNonNullElse(inv.getChestplate(), ItemStack.empty()), false))
+                                    .addIngredient('l', new Items.LiveItem(target, PlayerInventory::setLeggings, () -> Objects.requireNonNullElse(inv.getLeggings(), ItemStack.empty()), false))
+                                    .addIngredient('b', new Items.LiveItem(target, PlayerInventory::setBoots, () -> Objects.requireNonNullElse(inv.getBoots(), ItemStack.empty()), false))
+                                    .addIngredient('o', new Items.LiveItem(target, PlayerInventory::setItemInOffHand, inv::getItemInOffHand, true))
+                                    .addIngredient('I', ReferencingInventory.fromContents(inv))
                                     .build();
 
                             Window window = Window.single().setTitle("Inventar von " + target.getName()).setGui(gui).setViewer(player).build();
                             window.open();
 
-                            player.sendMessage(Component.text("Du hast das Inventar von " + target.getName() + " geöffnet!", NamedTextColor.GREEN));
+                            player.sendMessage(LowdFX.serverMessage(Component.text("Du hast das Inventar von " + target.getName() + " geöffnet!", NamedTextColor.GREEN)));
                             return 1;
                         })
                 )

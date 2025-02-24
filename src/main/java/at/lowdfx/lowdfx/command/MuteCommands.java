@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.moderation.Mute;
+import at.lowdfx.lowdfx.util.Mute;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.marcpg.libpg.data.time.Time;
@@ -55,26 +55,26 @@ public final class MuteCommands {
                                             String reason = context.getArgument("reason", String.class);
 
                                             if (time.get() <= 0) {
-                                                source.sendMessage(Component.text("Die Zeit " + time.getPreciselyFormatted() + " ist nicht gültig!", NamedTextColor.RED));
+                                                source.sendMessage(LowdFX.serverMessage(Component.text("Die Zeit " + time.getPreciselyFormatted() + " ist nicht gültig!", NamedTextColor.RED)));
                                                 return 1;
                                             }
                                             if (time.get() > MAX_TIME.get()) {
-                                                source.sendMessage(Component.text("Die Zeit " + time.getPreciselyFormatted() + " ist zu hoch! Limit ist " + MAX_TIME.getPreciselyFormatted() + ".", NamedTextColor.RED));
+                                                source.sendMessage(LowdFX.serverMessage(Component.text("Die Zeit " + time.getPreciselyFormatted() + " ist zu hoch! Limit ist " + MAX_TIME.getPreciselyFormatted() + ".", NamedTextColor.RED)));
                                                 return 1;
                                             }
                                             if (time.get() <= 0) {
-                                                source.sendMessage(Component.text("Der Spieler " + target.getName() + " ist schon stumm geschaltet!", NamedTextColor.RED));
+                                                source.sendMessage(LowdFX.serverMessage(Component.text("Der Spieler " + target.getName() + " ist schon stumm geschaltet!", NamedTextColor.RED)));
                                                 return 1;
                                             }
 
                                             MUTES.put(target.getUniqueId(), new Mute(target.getUniqueId(), source instanceof Player player ? player.getUniqueId() : null, time, Utilities.currentTimeSecs(), reason));
 
                                             if (target.isOnline()) {
-                                                Objects.requireNonNull(target.getPlayer()).sendMessage(Component.text("Du bist ab jetzt auf diesem Server stumm geschaltet!", NamedTextColor.RED)
+                                                Objects.requireNonNull(target.getPlayer()).sendMessage(LowdFX.serverMessage(Component.text("Du bist ab jetzt auf diesem Server stumm geschaltet!", NamedTextColor.RED)
                                                         .appendNewline()
                                                         .append(Component.text("Verfall: ", NamedTextColor.GRAY).append(Component.text("In " + time.getPreciselyFormatted(), NamedTextColor.BLUE)))
                                                         .appendNewline()
-                                                        .append(Component.text("Grund: ", NamedTextColor.GRAY).append(Component.text(reason, NamedTextColor.BLUE))));
+                                                        .append(Component.text("Grund: ", NamedTextColor.GRAY).append(Component.text(reason, NamedTextColor.BLUE)))));
                                             }
                                             source.sendMessage(LowdFX.serverMessage(Component.text(target.getName() + " erfolgreich für " + time.getPreciselyFormatted() + " stumm geschaltet mit dem Grund: \"" + reason + "\"", NamedTextColor.YELLOW)));
                                             LowdFX.LOG.info("{} muted {} for {} with the reason: \"{}\"!", source.getName(), target.getName(), time.getPreciselyFormatted(), reason);
@@ -102,7 +102,7 @@ public final class MuteCommands {
                             OfflinePlayer target = Bukkit.getOfflinePlayer(context.getArgument("player", String.class));
 
                             if (!MUTES.containsKey(target.getUniqueId())) {
-                                source.sendMessage(Component.text("Der Spieler " + target.getName() + " ist nicht stumm geschaltet!", NamedTextColor.RED));
+                                source.sendMessage(LowdFX.serverMessage(Component.text("Der Spieler " + target.getName() + " ist nicht stumm geschaltet!", NamedTextColor.RED)));
                                 return 1;
                             }
 

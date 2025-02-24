@@ -41,6 +41,42 @@ public final class KitManager {
     }
 
     public static void showConfig(@NotNull Player player) {
+        Kit kit = KITS.get(player.getUniqueId());
+        if (kit == null) return;
+
+        VirtualInventory inv = kit.inv();
+
+        Gui gui = Gui.normal().setStructure(
+                        "# h c l b # # * #", // h = Helmet
+                        "# # # # # # # # #", // c = Chestplate
+                        "* * * * * * * * *", // l = Leggings
+                        "* * * * * * * * *", // b = Boots
+                        "* * * * * * * * *", // o = Offhand
+                        "* * * * * * * * *") // I = Inventory
+                .addIngredient('#', Items.BLACK_BACKGROUND)
+                .addIngredient('h', KitSlot.HELMET.asItem())
+                .addIngredient('c', KitSlot.CHESTPLATE.asItem())
+                .addIngredient('l', KitSlot.LEGGINGS.asItem())
+                .addIngredient('b', KitSlot.BOOTS.asItem())
+                .addIngredient('*', inv)
+                .build();
+
+        Window.single().setGui(gui)
+                .setTitle("Dein Kit Layout")
+                .setCloseable(true)
+                .addCloseHandler(() -> {
+                    kit.items.clear();
+                    ItemStack[] items = inv.getItems();
+                    for (int i = 0; i < items.length; i++) {
+                        if (items[i] == null) continue;
+                        try {
+                            Integer ordinal = items[i].getItemMeta().getPersistentDataContainer().get(KEY, PersistentDataType.INTEGER);
+                            if (ordinal != null)
+                                kit.items.put(KitSlot.values()[ordinal], i);
+                        } catch (IndexOutOfBoundsException ignored) {}
+                    }
+                })
+                .open(player);
     }
 
     public static final class Kit {

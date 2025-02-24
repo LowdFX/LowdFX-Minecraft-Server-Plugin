@@ -2,7 +2,8 @@ package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.command.MuteCommands;
-import at.lowdfx.lowdfx.moderation.Mute;
+import at.lowdfx.lowdfx.util.Mute;
+import at.lowdfx.lowdfx.util.Perms;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,22 +12,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 public class MuteEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onAsyncChat(@NotNull AsyncChatEvent event) {
         Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
 
-        if (!MuteCommands.MUTES.containsKey(event.getPlayer().getUniqueId())) return;
+        Mute mute = MuteCommands.MUTES.get(player.getUniqueId());
+        if (mute == null) return;
 
-        Mute mute = MuteCommands.MUTES.get(uuid);
-
-        if (player.hasPermission("poo.mute") || player.hasPermission("poo.admin")) {
-            MuteCommands.MUTES.remove(uuid);
+        if (Perms.check(player, Perms.Perm.MUTE)) {
+            MuteCommands.MUTES.remove(player.getUniqueId());
         } else if (mute.isOver()) {
-            MuteCommands.MUTES.remove(uuid);
+            MuteCommands.MUTES.remove(player.getUniqueId());
             player.sendMessage(LowdFX.serverMessage(Component.text("Deine Stummschaltung ist abgelaufen. Viel Spaß im Chat und sei nett!", NamedTextColor.GREEN)));
         } else {
             event.message(Component.empty());

@@ -26,7 +26,7 @@ public final class StatCommands {
                 .requires(source -> Perms.check(source, Perms.Perm.FEED))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 
@@ -55,7 +55,7 @@ public final class StatCommands {
                 .requires(source -> Perms.check(source, Perms.Perm.HEAL))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 

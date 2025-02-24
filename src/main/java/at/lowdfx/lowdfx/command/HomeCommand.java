@@ -4,6 +4,7 @@ import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.HomeManager;
 import at.lowdfx.lowdfx.managers.TeleportManager;
 import at.lowdfx.lowdfx.util.Perms;
+import at.lowdfx.lowdfx.util.SimpleLocation;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -26,17 +27,17 @@ public final class HomeCommand {
                 .requires(source -> Perms.check(source, Perms.Perm.HOME))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 
-                    Map<String, Location> homes = HomeManager.get(player.getUniqueId());
+                    Map<String, SimpleLocation> homes = HomeManager.get(player.getUniqueId());
                     if (!homes.containsKey("home")) {
                         player.sendMessage(LowdFX.serverMessage(Component.text("Dein Home wurde noch nicht gesetzt!", NamedTextColor.RED)));
                         return 1;
                     }
 
-                    TeleportManager.teleportSafe(player, homes.get("home"));
+                    TeleportManager.teleportSafe(player, homes.get("home").asLocation());
                     player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause teleportiert!", NamedTextColor.GREEN)));
                     return 1;
                 })
@@ -52,13 +53,13 @@ public final class HomeCommand {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                                     String name = context.getArgument("name", String.class);
 
-                                    Map<String, Location> homes = HomeManager.get(player.getUniqueId());
+                                    Map<String, SimpleLocation> homes = HomeManager.get(player.getUniqueId());
                                     if (!homes.containsKey(name)) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Dein Home " + name + " wurde noch nicht gesetzt!", NamedTextColor.RED)));
                                         return 1;
                                     }
 
-                                    TeleportManager.teleportSafe(player, homes.get("home"));
+                                    TeleportManager.teleportSafe(player, homes.get(name).asLocation());
                                     player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause " + name + " teleportiert!", NamedTextColor.GREEN)));
                                     return 1;
                                 })
@@ -78,12 +79,12 @@ public final class HomeCommand {
                                             String name = context.getArgument("name", String.class);
                                             Location location = context.getArgument("location", FinePositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
 
-                                            Map<String, Location> homes = HomeManager.get(player.getUniqueId());
+                                            Map<String, SimpleLocation> homes = HomeManager.get(player.getUniqueId());
                                             if (homes.size() >= LowdFX.CONFIG.getInt("basic.maxhomes")) {
                                                 player.sendMessage(LowdFX.serverMessage(Component.text("Die maximale Home-Grenze von " + LowdFX.CONFIG.getInt("basic.maxhomes") + " wurde erreicht!", NamedTextColor.RED)));
                                                 return 1;
                                             }
-                                            homes.put(name, location);
+                                            homes.put(name, SimpleLocation.ofLocation(location));
                                             player.sendMessage(LowdFX.serverMessage(Component.text("Dein Home " + name + " wurde gesetzt!", NamedTextColor.GREEN)));
                                             return 1;
                                         })
@@ -102,7 +103,7 @@ public final class HomeCommand {
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return 1;
                                     String name = context.getArgument("name", String.class);
 
-                                    Map<String, Location> homes = HomeManager.get(player.getUniqueId());
+                                    Map<String, SimpleLocation> homes = HomeManager.get(player.getUniqueId());
                                     if (!homes.containsKey(name)) {
                                         player.sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " existiert nicht!", NamedTextColor.RED)));
                                         return 1;
@@ -128,12 +129,12 @@ public final class HomeCommand {
                                             String name = context.getArgument("name", String.class);
                                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
-                                            Map<String, Location> homes = HomeManager.get(target.getUniqueId());
+                                            Map<String, SimpleLocation> homes = HomeManager.get(target.getUniqueId());
                                             if (!homes.containsKey(name)) {
                                                 context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " existiert nicht!", NamedTextColor.RED)));
                                                 return 1;
                                             }
-                                            TeleportManager.teleportSafe(target, homes.get("home"));
+                                            TeleportManager.teleportSafe(target, homes.get("home").asLocation());
 
                                             target.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest nach Hause " + name + " teleportiert!", NamedTextColor.GREEN)));
                                             context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(target.getName() + " wurde zum Home " + name + " teleportiert!", NamedTextColor.GREEN)));
@@ -158,8 +159,8 @@ public final class HomeCommand {
                                                     Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                                                     Location location = context.getArgument("location", FinePositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
 
-                                                    Map<String, Location> homes = HomeManager.get(target.getUniqueId());
-                                                    homes.put(name, location);
+                                                    Map<String, SimpleLocation> homes = HomeManager.get(target.getUniqueId());
+                                                    homes.put(name, SimpleLocation.ofLocation(location));
 
                                                     target.sendMessage(LowdFX.serverMessage(Component.text("Dein Home " + name + " wurde gesetzt!", NamedTextColor.GREEN)));
                                                     context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " wurde gesetzt!", NamedTextColor.RED)));
@@ -183,7 +184,7 @@ public final class HomeCommand {
                                             String name = context.getArgument("name", String.class);
                                             Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
-                                            Map<String, Location> homes = HomeManager.get(target.getUniqueId());
+                                            Map<String, SimpleLocation> homes = HomeManager.get(target.getUniqueId());
                                             if (!homes.containsKey(name)) {
                                                 context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Das Home " + name + " von " + target.getName() + " existiert nicht!", NamedTextColor.RED)));
                                                 return 1;

@@ -45,7 +45,7 @@ public final class WarnCommand {
 
                                     for (PlayerProfile t : targets) {
                                         try {
-                                            File file = LowdFX.DATA_DIR.resolve("WarnSystem").resolve(Objects.requireNonNullElse(t.getName(), "unknown")).toFile();
+                                            File file = LowdFX.PLUGIN_DIR.resolve("WarnSystem").resolve(Objects.requireNonNullElse(t.getName(), "unknown")).toFile();
                                             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
                                             // Warns erhöhen und neuen Grund speichern
@@ -81,12 +81,12 @@ public final class WarnCommand {
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("info")
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {
-                                context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                                 return 1;
                             }
 
                             try {
-                                File file = LowdFX.DATA_DIR.resolve("WarnSystem").resolve(player.getName()).toFile();
+                                File file = LowdFX.PLUGIN_DIR.resolve("WarnSystem").resolve(player.getName()).toFile();
                                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
                                 int warns = config.getInt("warns", 0);
@@ -103,7 +103,7 @@ public final class WarnCommand {
                                     Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
 
                                     try {
-                                        File file = LowdFX.DATA_DIR.resolve("WarnSystem").resolve(player.getName()).toFile();
+                                        File file = LowdFX.PLUGIN_DIR.resolve("WarnSystem").resolve(player.getName()).toFile();
                                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
                                         int warns = config.getInt("warns", 0);
@@ -123,9 +123,9 @@ public final class WarnCommand {
     private static void sendWarnInfo(CommandSender sender, YamlConfiguration config, int warns) {
         for (int i = 1; i <= warns; i++) {
             String warnDate = config.getString("warn_date." + i);  // Datum und Uhrzeit anzeigen
-            sender.sendMessage(Component.text("➽ " + i + ". Grund: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("reasons." + i)), NamedTextColor.RED))
+            sender.sendMessage(LowdFX.serverMessage(Component.text("➽ " + i + ". Grund: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("reasons." + i)), NamedTextColor.RED))
                     .append(Component.text(", von: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(config.getString("warned_by." + i)), NamedTextColor.GOLD)))
-                    .append(Component.text(", am: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(warnDate), NamedTextColor.WHITE))));
+                    .append(Component.text(", am: ", NamedTextColor.GRAY).append(Component.text(Objects.requireNonNull(warnDate), NamedTextColor.WHITE)))));
         }
     }
 

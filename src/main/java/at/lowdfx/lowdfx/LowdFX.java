@@ -2,10 +2,8 @@ package at.lowdfx.lowdfx;
 
 import at.lowdfx.lowdfx.command.*;
 import at.lowdfx.lowdfx.event.*;
-import at.lowdfx.lowdfx.inventory.LockableData;
 import at.lowdfx.lowdfx.kit.KitManager;
 import at.lowdfx.lowdfx.managers.*;
-import at.lowdfx.lowdfx.moderation.VanishingHandler;
 import at.lowdfx.lowdfx.util.Perms;
 import com.marcpg.libpg.MinecraftLibPG;
 import com.marcpg.libpg.util.ServerUtils;
@@ -37,13 +35,15 @@ public final class LowdFX extends JavaPlugin {
     public static Logger LOG;
     public static FileConfiguration CONFIG;
     public static LowdFX PLUGIN;
+    public static Path PLUGIN_DIR;
     public static Path DATA_DIR;
 
     @Override
     public void onEnable() {
         LOG = getSLF4JLogger();
         PLUGIN = this;
-        DATA_DIR = getDataPath();
+        PLUGIN_DIR = getDataPath();
+        DATA_DIR = PLUGIN_DIR.resolve("data");
 
         try {
             Files.createDirectories(DATA_DIR);
@@ -71,18 +71,18 @@ public final class LowdFX extends JavaPlugin {
         ConnectionEvents.QUIT_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.quit"), ""));
 
         // === Data-Dir Erstellen === //
-        if (DATA_DIR.toFile().mkdirs()) {
+        if (PLUGIN_DIR.toFile().mkdirs()) {
             LOG.info("Datenordner erstellt: {}", getDataFolder().getAbsolutePath());
         }
 
-        ChestShopManager.loadAllShops();
-        SpawnManager.load();
+        ChestShopManager.load();
         HomeManager.load();
-        WarpManager.load();
-        LockableData.load();
         KitManager.load();
+        LockableManager.load();
         PlaytimeManager.load();
-        VanishingHandler.loadAll();
+        SpawnManager.load();
+        VanishManager.load();
+        WarpManager.load();
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
@@ -113,6 +113,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
+            registrar.register(ChestShopCommand.command(), "Erstelle oder verwalte einen Kisten-Shop.", List.of("shop"));
         });
 
         LOG.info("LowdFX Plugin gestartet!");
@@ -122,26 +123,19 @@ public final class LowdFX extends JavaPlugin {
     public void onDisable() {
         CONFIG = getConfig();
 
-        boolean vanish = CONFIG.getBoolean("basic.vanish", false);
-        if (CONFIG.getBoolean("basic.vanish")) {
-            VanishingHandler.saveAll();}
-        LOG.info("Vanish war: {}", vanish ? "An" : "Aus");
-
-        // Speichere von Sachen
-        ChestShopManager.saveAllShops();
-        PlaytimeManager.save();
+        ChestShopManager.save();
         HomeManager.save();
-        WarpManager.save();
-        SpawnManager.save();
-        LockableData.save();
         KitManager.save();
-
-        saveConfig();
+        LockableManager.save();
+        PlaytimeManager.save();
+        SpawnManager.save();
+        VanishManager.save();
+        WarpManager.save();
     }
 
     public static @NotNull Component serverMessage(Component message) {
         return Component.text(Objects.requireNonNullElse(LowdFX.CONFIG.getString("basic.servername"), "???"), NamedTextColor.GOLD, TextDecoration.BOLD)
                 .append(Component.text(" >> ", NamedTextColor.GRAY))
-                .append(message);
+                .append(message.decoration(TextDecoration.BOLD, false));
     }
 }

@@ -24,7 +24,7 @@ public final class UtilityCommands {
                 .requires(source -> Perms.check(source, Perms.Perm.FLY))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 
@@ -55,7 +55,7 @@ public final class UtilityCommands {
                 .then(RequiredArgumentBuilder.<CommandSourceStack, GameMode>argument("mode", ArgumentTypes.gameMode())
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {
-                                context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                                 return 1;
                             }
 
@@ -76,7 +76,7 @@ public final class UtilityCommands {
                 .then(RequiredArgumentBuilder.<CommandSourceStack, Integer>argument("modeNumber", IntegerArgumentType.integer(0, 3))
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {
-                                context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                                 return 1;
                             }
 

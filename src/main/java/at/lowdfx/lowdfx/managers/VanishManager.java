@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.moderation;
+package at.lowdfx.lowdfx.managers;
 
 import at.lowdfx.lowdfx.LowdFX;
 import com.marcpg.libpg.storage.JsonUtils;
@@ -14,9 +14,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class VanishingHandler {
+public class VanishManager {
     private static final BossBar BOSS_BAR = BossBar.bossBar(Component.text("Vanish"), 1.0f, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
     private static final Set<UUID> VANISHED = new HashSet<>();
+
+    public static void save() {
+        JsonUtils.saveSafe(VANISHED, LowdFX.DATA_DIR.resolve("vanished.json").toFile());
+    }
+
+    public static void load() {
+        VANISHED.addAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("vanished.json").toFile(), List.of()));
+    }
 
     // Spieler unsichtbar machen und BossBar anzeigen.
     public static void makePlayerInvisible(@NotNull Player player) {
@@ -42,14 +50,6 @@ public class VanishingHandler {
         player.removeMetadata("vanished", LowdFX.PLUGIN);
         BOSS_BAR.removeViewer(player);
         VANISHED.remove(player.getUniqueId());
-    }
-
-    public static void saveAll() {
-        JsonUtils.saveSafe(VANISHED, LowdFX.DATA_DIR.resolve("vanished.json").toFile());
-    }
-
-    public static void loadAll() {
-        VANISHED.addAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("vanished.json").toFile(), List.of()));
     }
 
     public static Set<UUID> getVanishedPlayers() {

@@ -35,4 +35,3 @@ warnsystem:
 
   # Dauer des temporären Bans in Sekunden (Standard: 24 Stunden)
   tempban-duration: 86400
-

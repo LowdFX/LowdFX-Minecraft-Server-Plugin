@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.moderation.VanishingHandler;
+import at.lowdfx.lowdfx.managers.VanishManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -32,8 +32,8 @@ public class VanishEvents implements Listener {
         event.joinMessage(null);
 
         // Nur eine Nachricht wird hier gesendet, wenn der Spieler vanishing hat.
-        if (VanishingHandler.getVanishedPlayers().contains(player.getUniqueId())) {
-            VanishingHandler.makePlayerInvisible(player);
+        if (VanishManager.getVanishedPlayers().contains(player.getUniqueId())) {
+            VanishManager.makePlayerInvisible(player);
 
             // Sende deine eigene Nachricht (nachdem das Setzen von setJoinMessage null verhindert wurde)
             if (!player.hasMetadata("vanishedSent")) {
@@ -59,7 +59,7 @@ public class VanishEvents implements Listener {
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         if (event.getPlayer().hasMetadata("vanished")) {
-            VanishingHandler.getVanishedPlayers().add(event.getPlayer().getUniqueId());
+            VanishManager.getVanishedPlayers().add(event.getPlayer().getUniqueId());
             event.quitMessage(null);
         }
     }

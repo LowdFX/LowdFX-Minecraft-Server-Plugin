@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "at.lowdfx"
-version = "1.0"
+version = "1.0.0"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -33,7 +33,7 @@ tasks {
     }
     runServer {
         dependsOn(shadowJar)
-        minecraftVersion("1.21.3")
+        minecraftVersion("1.21.4")
     }
     shadowJar {
         archiveClassifier.set("") // Kein -all im .jar Namen.

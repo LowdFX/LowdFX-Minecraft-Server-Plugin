@@ -7,7 +7,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Properties;
 
 public final class Utilities {
     public static long currentTimeSecs() {
@@ -41,6 +41,20 @@ public final class Utilities {
             LowdFX.LOG.error("Konnte nicht server.properties lesen.", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public static Block connectedChest(Block block) {
+        if (block != null && block.getBlockData() instanceof Chest chestBlockData && chestBlockData.getType() != Chest.Type.SINGLE) {
+            BlockFace direction = switch (chestBlockData.getFacing()) {
+                case NORTH -> chestBlockData.getType() == Chest.Type.LEFT ? BlockFace.EAST : BlockFace.WEST;
+                case EAST -> chestBlockData.getType() == Chest.Type.LEFT ? BlockFace.SOUTH : BlockFace.NORTH;
+                case SOUTH -> chestBlockData.getType() == Chest.Type.LEFT ? BlockFace.WEST : BlockFace.EAST;
+                case WEST -> chestBlockData.getType() == Chest.Type.LEFT ? BlockFace.NORTH : BlockFace.SOUTH;
+                default -> null;
+            };
+            return direction == null ? null : block.getRelative(direction);
+        }
+        return null;
     }
 
     public static @NotNull Component joinMessage(@NotNull Player player) {

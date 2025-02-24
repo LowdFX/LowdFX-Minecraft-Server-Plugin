@@ -1,17 +1,16 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.inventory.ShopData;
 import at.lowdfx.lowdfx.managers.ChestShopManager;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
+import com.marcpg.libpg.exception.MessagedException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.Container;
+import org.bukkit.block.Lidded;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,174 +19,92 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 public class ChestShopEvents implements Listener {
-    public static final String ADMIN_PERMISSION = "lowdfx.chestshop.admin";
-    public static final String PLAYER_PERMISSION = "lowdfx.chestshop";
-
     @EventHandler
+    public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        Block block = event.getClickedBlock();
+        if (block == null || !(block.getState() instanceof Lidded && block.getState() instanceof Container container)) return;
+
+        ChestShopManager.Shop shop = ChestShopManager.getShop(block.getLocation());
+        if (shop == null) return;
+
+        if (player.isSneaking() && event.getHand() == EquipmentSlot.HAND && Perms.check(player, Perms.Perm.CHEST_SHOP_ADMIN)) {
+            player.sendMessage(LowdFX.serverMessage(Component.text("Du hast den Shop als Admin geöffnet.", NamedTextColor.GOLD)));
+            return;
+        }
+
+        if (shop.isOwner(player)) {
+            player.sendMessage(LowdFX.serverMessage(Component.text("Du hast deinen Shop geöffnet.", NamedTextColor.GREEN)));
+            return;
+        }
+
+        event.setCancelled(true);
+
+        try {
+            shop.transaction(container, player);
+            player.sendMessage(LowdFX.serverMessage(Component.text("Erfolgreich! Du hast " + shop.item().getAmount() + " ").append(Component.translatable(shop.item().translationKey())).append(Component.text(" für " + shop.price() + " Diamanten gekauft.").color(NamedTextColor.GREEN))));
+        } catch (MessagedException e) {
+            player.sendMessage(e.message());
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
-        Block block = event.getBlock();
-        Location location = block.getLocation();
+        ChestShopManager.Shop shop = ChestShopManager.getShop(event.getBlock().getLocation());
+        if (shop == null) return;
 
-        if (ChestShopManager.isShop(location)) {
-            Player player = event.getPlayer();
-
-            ShopData shop = ChestShopManager.getShop(location).orElse(null);
-
-            if (shop == null) return;
-
-            if (player.getUniqueId().equals(shop.owner())) {
-                ChestShopManager.removeShop(location);
-                player.sendMessage(Component.text("You destroyed your shop.", NamedTextColor.YELLOW));
-                return;
-            }
-
-            if (player.hasPermission(ADMIN_PERMISSION)) {
-                ChestShopManager.removeShop(location);
-                player.sendMessage(Component.text("You destroyed a shop as an admin.", NamedTextColor.YELLOW));
-                block.breakNaturally();
-                return;
-            }
-
-            player.sendMessage(Component.text("You cannot break this shop!", NamedTextColor.RED));
-            event.setCancelled(true);
+        if (shop.isOwner(event.getPlayer())) {
+            ChestShopManager.removeShop(event.getBlock());
+            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du hast den Shop zerstört.", NamedTextColor.YELLOW)));
+            return;
         }
+
+        event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Shop nicht zerstören!", NamedTextColor.RED)));
+        event.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
-        Block block = event.getBlock();
+        if (!(event.getBlock().getBlockData() instanceof Chest)) return;
+        Block connectedChest = Utilities.connectedChest(event.getBlock());
 
-        // Prüfen, ob die platzierte Kiste eine CHEST ist
-        if (block.getType() == Material.CHEST) {
-            Location placedLocation = block.getLocation();
-            Set<Location> connectedChests = getConnectedChests(block);
+        ChestShopManager.Shop shop = ChestShopManager.getShop(connectedChest.getLocation());
+        if (shop == null) return;
 
-            for (Location adjacentLocation : connectedChests) {
-                if (ChestShopManager.isShop(adjacentLocation)) {
-                    Player player = event.getPlayer();
-
-                    // Prüfen, ob der Spieler berechtigt ist
-                    if (!ChestShopManager.isOwner(player.getUniqueId(), adjacentLocation) &&
-                            !ChestShopManager.isWhitelisted(player.getUniqueId(), adjacentLocation)) {
-                        event.setCancelled(true);
-                        player.sendMessage(Component.text("You cannot create a double chest with a shop you don't own!", NamedTextColor.RED));
-                    } else {
-                        // Spieler ist Besitzer, erweitern der Shop-Kiste
-                        ChestShopManager.registerShop(player.getUniqueId(), placedLocation,
-                                ChestShopManager.getShop(adjacentLocation).orElseThrow(() -> new IllegalStateException("Shop data not found for adjacent chest.")));
-
-                        // Zentrieren des Hologramms
-                        ChestShopManager.updateHologramForDoubleChest(player.getUniqueId(), adjacentLocation);
-
-                        player.sendMessage(Component.text("You have expanded your shop to a double chest.", NamedTextColor.GREEN));
-                    }
-                    return;
-                }
-            }
+        // Prüfen, ob der Spieler berechtigt ist
+        if (shop.notAllowed(event.getPlayer())) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst keine große Kiste aus einem Shop, den du nicht besitzt, machen!", NamedTextColor.RED)));
+        } else {
+            ChestShopManager.registerShop(event.getBlock(), shop);
+            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Dein Shop wurde zu einer großen Kiste erweitert.", NamedTextColor.GREEN)));
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(@NotNull BlockExplodeEvent event) {
         event.blockList().removeIf(block -> ChestShopManager.isShop(block.getLocation()));
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(@NotNull EntityExplodeEvent event) {
         event.blockList().removeIf(block -> ChestShopManager.isShop(block.getLocation()));
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryMove(@NotNull InventoryMoveItemEvent event) {
-        Block sourceBlock = null;
-        Block targetBlock = null;
-
-        if (event.getSource().getHolder() instanceof Chest || event.getSource().getHolder() instanceof ShulkerBox) {
-            sourceBlock = ((org.bukkit.block.Container) event.getSource().getHolder()).getBlock();
-        } else if (event.getDestination().getHolder() instanceof Chest || event.getDestination().getHolder() instanceof ShulkerBox) {
-            targetBlock = ((org.bukkit.block.Container) event.getDestination().getHolder()).getBlock();
-        }
-
-        if ((sourceBlock != null && ChestShopManager.isShop(sourceBlock.getLocation())) ||
-                (targetBlock != null && ChestShopManager.isShop(targetBlock.getLocation()))) {
+        if (ChestShopManager.isShop(event.getSource().getLocation()) || ChestShopManager.isShop(event.getDestination().getLocation()))
             event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getClickedBlock();
-
-        if (block == null || !(block.getType() == Material.CHEST || block.getType().name().endsWith("SHULKER_BOX"))) return;
-
-        Location location = block.getLocation();
-
-        if (!ChestShopManager.isShop(location)) return;
-
-        ShopData shop = ChestShopManager.getShop(location).orElse(null);
-        if (shop == null) return;
-
-        event.setCancelled(true);
-
-        if (player.hasPermission(ADMIN_PERMISSION) || ChestShopManager.isOwner(player.getUniqueId(), location)) {
-            if (event.getAction().isLeftClick()) {
-                ChestShopManager.removeShop(location);
-                player.sendMessage(Component.text("You destroyed the shop as an admin.", NamedTextColor.YELLOW));
-                block.breakNaturally();
-                return;
-            } else if (player.isSneaking() && event.getHand() == EquipmentSlot.HAND) {
-                player.openInventory(((org.bukkit.block.Container) block.getState()).getInventory());
-                player.sendMessage(Component.text("Admin access granted.", NamedTextColor.GOLD));
-                return;
-            }
-        }
-
-        if (player.getUniqueId().equals(shop.owner())) {
-            player.openInventory(((org.bukkit.block.Container) block.getState()).getInventory());
-            player.sendMessage(Component.text("You opened your shop.", NamedTextColor.GREEN));
-            return;
-        }
-
-        Inventory shopInventory = ((org.bukkit.block.Container) block.getState()).getInventory();
-        ItemStack itemToSell = shop.item().clone();
-        int price = shop.price();
-
-        Inventory playerInventory = player.getInventory();
-        ItemStack payment = new ItemStack(Material.DIAMOND, price);
-
-        if (!shopInventory.containsAtLeast(itemToSell, itemToSell.getAmount())) {
-            player.sendMessage(Component.text("The shop is out of stock!", NamedTextColor.RED));
-            return;
-        }
-
-        if (!playerInventory.containsAtLeast(payment, price)) {
-            player.sendMessage(Component.text("You don't have enough diamonds to purchase this item.", NamedTextColor.RED));
-            return;
-        }
-
-        shopInventory.removeItem(itemToSell);
-        playerInventory.removeItem(payment);
-        playerInventory.addItem(itemToSell);
-        shopInventory.addItem(payment);
-
-        player.sendMessage(Component.text("Purchase successful! You bought " + itemToSell.getAmount() + " ").append(itemToSell.displayName()).append(Component.text(" for " + price + " diamonds.").color(NamedTextColor.GREEN)));
-
-        // Schedule stock update after purchase
-        scheduleStockUpdate(location, shop);
     }
 
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
         for (Block block : event.getBlocks()) {
-            if (ChestShopManager.isShop(block.getLocation())) {
+            if (!ChestShopManager.isShop(block.getLocation())) {
                 event.setCancelled(true);
                 return;
             }
@@ -202,13 +119,5 @@ public class ChestShopEvents implements Listener {
                 return;
             }
         }
-    }
-
-    private void scheduleStockUpdate(Location location, ShopData shop) {
-        Bukkit.getScheduler().runTaskLater(LowdFX.PLUGIN, () -> ChestShopManager.startHologramUpdater(location, shop), 20L);
-    }
-
-    private @NotNull Set<Location> getConnectedChests(Block chestBlock) {
-        return Utilities.connectedChests(chestBlock);
     }
 }

@@ -20,7 +20,7 @@ public final class PlaytimeCommand {
                 .requires(source -> Perms.check(source, Perms.Perm.PLAYTIME))
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        context.getSource().getSender().sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 

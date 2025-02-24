@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.moderation.VanishingHandler;
+import at.lowdfx.lowdfx.managers.VanishManager;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -28,7 +28,7 @@ public final class VanishCommand {
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (!(context.getSource().getExecutor() instanceof Player player)) {
-                        sender.sendMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED));
+                        sender.sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                         return 1;
                     }
 
@@ -46,15 +46,15 @@ public final class VanishCommand {
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("list")
                         .executes(context -> {
                             CommandSender sender = context.getSource().getSender();
-                            if (VanishingHandler.getVanishedPlayers().isEmpty()) {
+                            if (VanishManager.getVanishedPlayers().isEmpty()) {
                                 sender.sendMessage(LowdFX.serverMessage(Component.text("Es gibt keine vanished Spieler.", NamedTextColor.GREEN)));
                             } else {
                                 sender.sendMessage(LowdFX.serverMessage(Component.text("Vanished Spieler:", NamedTextColor.GREEN)));
 
-                                for (UUID uuid : VanishingHandler.getVanishedPlayers()) {
+                                for (UUID uuid : VanishManager.getVanishedPlayers()) {
                                     Player vanishedPlayer = Bukkit.getPlayer(uuid);
                                     if (vanishedPlayer != null) {
-                                        sender.sendMessage(Component.text("- ").append(vanishedPlayer.name()).color(NamedTextColor.GREEN));
+                                        sender.sendMessage(LowdFX.serverMessage(Component.text("- ").append(vanishedPlayer.name()).color(NamedTextColor.GREEN)));
                                     }
                                 }
                             }
@@ -86,10 +86,10 @@ public final class VanishCommand {
 
         if (state) {
             player.setMetadata("vanished", new FixedMetadataValue(LowdFX.PLUGIN, true));
-            VanishingHandler.makePlayerInvisible(player);
+            VanishManager.makePlayerInvisible(player);
         } else {
             player.removeMetadata("vanished", LowdFX.PLUGIN);
-            VanishingHandler.makePlayerVisible(player);
+            VanishManager.makePlayerVisible(player);
         }
         player.setSleepingIgnored(state);
         player.setCollidable(!state);

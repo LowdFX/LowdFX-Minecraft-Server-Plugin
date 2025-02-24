@@ -16,6 +16,6 @@ public final class PlaytimeManager {
     }
 
     public static void load() {
-        PLAYTIMES.putAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("playtime.json").toFile(), Map.of()));
+        PLAYTIMES.putAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("playtime.json").toFile(), Map.of(), Map.class));
     }
 }
