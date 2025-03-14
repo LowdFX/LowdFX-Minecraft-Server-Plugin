@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.kit.op;
 
-import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.KitManager;
 import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class OPNetheriteChestplate {
     public static final ItemStack ITEM = new ItemBuilder(Material.NETHERITE_CHESTPLATE)
             .name(Component.text("OP Netheritharnisch", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
-            .lore(LowdFX.OP_LORE)
+            .lore(KitManager.OP_LORE)
             .editMeta(m -> {
                 m.setUnbreakable(true);
                 m.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(

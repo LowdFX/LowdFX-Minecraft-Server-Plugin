@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.kit.op;
 
-import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.KitManager;
 import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 public class OPStick {
     public static final ItemStack ITEM = new ItemBuilder(Material.STICK)
             .name(Component.text("OP Schlagstock", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
-            .lore(LowdFX.OP_LORE)
+            .lore(KitManager.OP_LORE)
             .enchant(Enchantment.KNOCKBACK, Short.MAX_VALUE)
             .editMeta(m -> m.setUnbreakable(true))
             .build();
 
     public static @NotNull ItemStack get() {
-        return ITEM;
+        return new ItemStack(ITEM);
     }
 }

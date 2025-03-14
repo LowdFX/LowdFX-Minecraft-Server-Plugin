@@ -22,9 +22,9 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("xyz.xenondevs.invui:invui:1.43")
-    implementation("com.marcpg:libpg-paper:1.0.0")
-    implementation("com.marcpg:libpg-storage-json:1.0.0")
-    implementation("com.marcpg:libpg-storage-yaml:1.0.0")
+    implementation("com.marcpg:libpg-paper:1.0.1")
+    implementation("com.marcpg:libpg-storage-json:1.0.1")
+    implementation("com.marcpg:libpg-storage-yaml:1.0.1")
 }
 
 tasks {

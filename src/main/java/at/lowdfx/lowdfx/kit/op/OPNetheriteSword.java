@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.kit.op;
 
-import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.KitManager;
 import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class OPNetheriteSword {
     public static final ItemStack ITEM = new ItemBuilder(Material.NETHERITE_SWORD)
             .name(Component.text("OP Netheritschwert", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
-            .lore(LowdFX.OP_LORE)
+            .lore(KitManager.OP_LORE)
             .enchant(Enchantment.LOOTING, Short.MAX_VALUE)
             .enchant(Enchantment.FIRE_ASPECT, Short.MAX_VALUE)
             .editMeta(m -> {

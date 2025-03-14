@@ -1,13 +1,10 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.kit.KitManager;
-import at.lowdfx.lowdfx.managers.HomeManager;
 import at.lowdfx.lowdfx.managers.PlaytimeManager;
-import at.lowdfx.lowdfx.managers.SpawnManager;
-import at.lowdfx.lowdfx.managers.TeleportManager;
-import at.lowdfx.lowdfx.util.PlaytimeInfo;
+import at.lowdfx.lowdfx.managers.teleport.HomeManager;
+import at.lowdfx.lowdfx.managers.teleport.SpawnManager;
 import at.lowdfx.lowdfx.util.Utilities;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,10 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public final class ConnectionEvents implements Listener {
-    public static Component FIRST_JOIN_MESSAGE;
-    public static Component JOIN_MESSAGE;
-    public static Component QUIT_MESSAGE;
-
     @EventHandler
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -34,7 +27,7 @@ public final class ConnectionEvents implements Listener {
         if (PlaytimeManager.PLAYTIMES.containsKey(uuid)) {
             PlaytimeManager.PLAYTIMES.get(uuid).login();
         } else {
-            PlaytimeManager.PLAYTIMES.put(uuid, new PlaytimeInfo(uuid));
+            PlaytimeManager.PLAYTIMES.put(uuid, new PlaytimeManager.PlaytimeInfo(uuid));
         }
 
         // Homes
@@ -45,7 +38,7 @@ public final class ConnectionEvents implements Listener {
 
         // Spawns
         if (!event.getPlayer().hasPlayedBefore())
-            TeleportManager.teleportSafe(player, SpawnManager.getSpawn(player));
+            SpawnManager.getSpawn(player).teleportSafe(player);
     }
 
     @EventHandler
@@ -62,6 +55,6 @@ public final class ConnectionEvents implements Listener {
         }
 
         // Spawns
-        player.setRespawnLocation(SpawnManager.getSpawn(player), true);
+        player.setRespawnLocation(SpawnManager.getSpawn(player).asLocation(), true);
     }
 }

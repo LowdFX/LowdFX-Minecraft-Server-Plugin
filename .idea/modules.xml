@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lowdfx.main.iml" filepath="$PROJECT_DIR$/.idea/modules/lowdfx.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lowdfx.test.iml" filepath="$PROJECT_DIR$/.idea/modules/lowdfx.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/LowdFX.main.iml" filepath="$PROJECT_DIR$/.idea/modules/LowdFX.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/LowdFX.test.iml" filepath="$PROJECT_DIR$/.idea/modules/LowdFX.test.iml" />
     </modules>
   </component>
 </project>

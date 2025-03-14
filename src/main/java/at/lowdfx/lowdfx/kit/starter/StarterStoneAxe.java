@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.kit.starter;
 
-import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.KitManager;
 import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class StarterStoneAxe {
     public static final ItemStack ITEM = new ItemBuilder(Material.STONE_AXE)
             .name(Component.text("Starter Steinaxt", NamedTextColor.RED))
-            .lore(LowdFX.STARTER_LORE)
+            .lore(KitManager.STARTER_LORE)
             .enchant(Enchantment.EFFICIENCY, 1)
             .enchant(Enchantment.UNBREAKING, 1)
             .enchant(Enchantment.FORTUNE, 1)

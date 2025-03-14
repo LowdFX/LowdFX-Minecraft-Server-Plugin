@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.util.Perms;
+import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -48,6 +49,7 @@ public final class StatCommands {
         player.setFoodLevel(20);
         player.removePotionEffect(PotionEffectType.HUNGER);
         player.sendMessage(LowdFX.serverMessage(Component.text("Dein Hunger wurde gestillt!", NamedTextColor.GREEN)));
+        Utilities.positiveSound(player);
     }
 
     public static LiteralCommandNode<CommandSourceStack> healCommand() {
@@ -83,5 +85,6 @@ public final class StatCommands {
             }
         }
         player.sendMessage(LowdFX.serverMessage(Component.text("Du wurdest geheilt!", NamedTextColor.GREEN)));
+        Utilities.positiveSound(player);
     }
 }

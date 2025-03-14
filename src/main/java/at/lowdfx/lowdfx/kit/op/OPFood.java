@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.kit.op;
 
-import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.KitManager;
 import com.marcpg.libpg.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class OPFood extends JavaPlugin {
     public static final ItemStack ITEM = new ItemBuilder(Material.GOLDEN_CARROT)
             .name(Component.text("OP Essen", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
-            .lore(LowdFX.OP_LORE)
+            .lore(KitManager.OP_LORE)
             .amount(64)
             .build();
 

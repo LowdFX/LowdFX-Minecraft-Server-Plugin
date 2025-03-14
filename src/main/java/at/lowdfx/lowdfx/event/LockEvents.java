@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.managers.LockableManager;
+import at.lowdfx.lowdfx.managers.block.LockableManager;
 import at.lowdfx.lowdfx.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,6 +34,7 @@ public class LockEvents implements Listener {
 
         if (locked.notAllowed(player)) {
             player.sendMessage(LowdFX.serverMessage(Component.text("Der Block ist gesperrt! Du hast keinen Zugriff.", NamedTextColor.RED)));
+            Utilities.negativeSound(player);
             event.setCancelled(true);
             return;
         }
@@ -53,6 +54,7 @@ public class LockEvents implements Listener {
         }
 
         event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Block nicht zerstören, weil er gesperrt ist!", NamedTextColor.RED)));
+        Utilities.negativeSound(event.getPlayer());
         event.setCancelled(true);
     }
 
@@ -60,6 +62,7 @@ public class LockEvents implements Listener {
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         if (!(event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Chest)) return;
         Block connectedChest = Utilities.connectedChest(event.getBlock());
+        if (connectedChest == null) return;
 
         LockableManager.Locked locked = LockableManager.getLocked(connectedChest.getLocation());
         if (locked == null) return;
@@ -71,6 +74,7 @@ public class LockEvents implements Listener {
         } else {
             LockableManager.lock(event.getBlock(), locked);
             event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Die Kiste wurde zu einer großen Kiste erweitert.", NamedTextColor.GREEN)));
+            Utilities.positiveSound(event.getPlayer());
         }
     }
 

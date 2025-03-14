@@ -2,7 +2,6 @@ package at.lowdfx.lowdfx.util;
 
 import at.lowdfx.lowdfx.LowdFX;
 import com.marcpg.libpg.storage.JsonUtils;
-import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permissible;
@@ -67,24 +66,27 @@ public final class Perms {
     }
 
     // Lädt die Berechtigungen aus der permissions.json und registriert sie.
-    public static void loadPermissions() throws IOException {
-        if (LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile().createNewFile()) {
-            Map<String, Object> data = new LinkedHashMap<>();
-            for (Perm perm : Perm.values()) {
-                Map<String, Object> permData = new LinkedHashMap<>();
-                permData.put("description", "Erlaubt die Benutzung von " + perm.commands);
-                permData.put("default", perm.def.name().toLowerCase());
-                data.put(perm.permission, permData);
+    public static void loadPermissions() {
+        try {
+            if (LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile().createNewFile()) {
+                Map<String, Object> data = new LinkedHashMap<>();
+                for (Perm perm : Perm.values()) {
+                    Map<String, Object> permData = new LinkedHashMap<>();
+                    permData.put("description", "Erlaubt die Benutzung von " + perm.commands);
+                    permData.put("default", perm.def.name().toLowerCase());
+                    data.put(perm.permission, permData);
+                }
+                JsonUtils.saveMapSafe(data, LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile());
+                LowdFX.LOG.info("Permission-Konfiguration erstellt.");
             }
-            JsonUtils.saveSafe(data, LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile());
-            LowdFX.LOG.info("Permission-Konfiguration erstellt.");
+        } catch (IOException e) {
+            LowdFX.LOG.error("Konnte Permission-Datei nicht erstellen.");
         }
 
         PluginManager manager = Bukkit.getPluginManager();
-        JsonUtils.loadSafe(LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile(), Map.of()).forEach((s, o) -> {
+        JsonUtils.loadMapSafe(LowdFX.PLUGIN_DIR.resolve("permissions.json").toFile(), Map.of()).forEach((s, o) -> {
             if (!(o instanceof Map<?, ?> map)) return;
-            manager.addPermission(new Permission(
-                    (String) s,
+            manager.addPermission(new Permission(s,
                     (String) map.get("description"),
                     PermissionDefault.valueOf(((String) map.get("default")).toUpperCase())));
         });
@@ -97,10 +99,5 @@ public final class Perms {
     @SuppressWarnings("UnstableApiUsage")
     public static boolean check(@NotNull CommandSourceStack source, @NotNull Perm perm) {
         return check(source.getSender(), perm);
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    public static boolean check(@NotNull CommandContext<CommandSourceStack> context, @NotNull Perm perm) {
-        return check(context.getSource(), perm);
     }
 }

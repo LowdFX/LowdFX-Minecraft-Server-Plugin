@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.managers.ChestShopManager;
+import at.lowdfx.lowdfx.managers.block.ChestShopManager;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.marcpg.libpg.exception.MessagedException;
@@ -47,6 +47,7 @@ public class ChestShopEvents implements Listener {
         try {
             shop.transaction(container, player);
             player.sendMessage(LowdFX.serverMessage(Component.text("Erfolgreich! Du hast " + shop.item().getAmount() + " ").append(Component.translatable(shop.item().translationKey())).append(Component.text(" für " + shop.price() + " Diamanten gekauft.").color(NamedTextColor.GREEN))));
+            Utilities.positiveSound(event.getPlayer());
         } catch (MessagedException e) {
             player.sendMessage(e.message());
         }
@@ -64,6 +65,7 @@ public class ChestShopEvents implements Listener {
         }
 
         event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst diesen Shop nicht zerstören!", NamedTextColor.RED)));
+        Utilities.negativeSound(event.getPlayer());
         event.setCancelled(true);
     }
 
@@ -71,6 +73,7 @@ public class ChestShopEvents implements Listener {
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         if (!(event.getBlock().getBlockData() instanceof Chest)) return;
         Block connectedChest = Utilities.connectedChest(event.getBlock());
+        if (connectedChest == null) return;
 
         ChestShopManager.Shop shop = ChestShopManager.getShop(connectedChest.getLocation());
         if (shop == null) return;
@@ -79,9 +82,11 @@ public class ChestShopEvents implements Listener {
         if (shop.notAllowed(event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst keine große Kiste aus einem Shop, den du nicht besitzt, machen!", NamedTextColor.RED)));
+            Utilities.negativeSound(event.getPlayer());
         } else {
             ChestShopManager.registerShop(event.getBlock(), shop);
             event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Dein Shop wurde zu einer großen Kiste erweitert.", NamedTextColor.GREEN)));
+            Utilities.positiveSound(event.getPlayer());
         }
     }
 
@@ -97,7 +102,12 @@ public class ChestShopEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMove(@NotNull InventoryMoveItemEvent event) {
-        if (ChestShopManager.isShop(event.getSource().getLocation()) || ChestShopManager.isShop(event.getDestination().getLocation()))
+        ChestShopManager.Shop sourceShop = ChestShopManager.getShop(event.getSource().getLocation());
+        if (sourceShop != null)
+            event.setCancelled(true);
+
+        ChestShopManager.Shop destinationShop = ChestShopManager.getShop(event.getDestination().getLocation());
+        if (destinationShop != null)
             event.setCancelled(true);
     }
 

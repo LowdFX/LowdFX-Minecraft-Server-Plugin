@@ -1,1 +1,1 @@
-rootProject.name = "lowdfx"
+rootProject.name = "LowdFX"

@@ -1,9 +1,22 @@
 package at.lowdfx.lowdfx;
 
-import at.lowdfx.lowdfx.command.*;
+import at.lowdfx.lowdfx.command.PlaytimeCommand;
+import at.lowdfx.lowdfx.command.StatCommands;
+import at.lowdfx.lowdfx.command.block.ChestShopCommand;
+import at.lowdfx.lowdfx.command.block.LockCommand;
+import at.lowdfx.lowdfx.command.inventory.InventoryCommands;
+import at.lowdfx.lowdfx.command.inventory.KitCommand;
+import at.lowdfx.lowdfx.command.moderation.MuteCommands;
+import at.lowdfx.lowdfx.command.moderation.VanishCommand;
+import at.lowdfx.lowdfx.command.moderation.WarnCommand;
+import at.lowdfx.lowdfx.command.teleport.*;
+import at.lowdfx.lowdfx.command.util.LowCommand;
+import at.lowdfx.lowdfx.command.util.TimeCommands;
+import at.lowdfx.lowdfx.command.util.UtilityCommands;
 import at.lowdfx.lowdfx.event.*;
-import at.lowdfx.lowdfx.kit.KitManager;
-import at.lowdfx.lowdfx.managers.*;
+import at.lowdfx.lowdfx.managers.HologramManager;
+import at.lowdfx.lowdfx.managers.ManagerManager;
+import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
 import com.marcpg.libpg.MinecraftLibPG;
 import com.marcpg.libpg.util.ServerUtils;
@@ -12,28 +25,21 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import xyz.xenondevs.invui.InvUI;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({ "UnstableApiUsage", "ResultOfMethodCallIgnored" })
 public final class LowdFX extends JavaPlugin {
-    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss");
-    public static final List<Component> OP_LORE = List.of(Component.text("OP Kit", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-    public static final List<Component> STARTER_LORE = List.of(Component.text("Starter Kit", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.ITALIC, false));
+    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
 
     public static Logger LOG;
-    public static FileConfiguration CONFIG;
     public static LowdFX PLUGIN;
     public static Path PLUGIN_DIR;
     public static Path DATA_DIR;
@@ -43,50 +49,22 @@ public final class LowdFX extends JavaPlugin {
         LOG = getSLF4JLogger();
         PLUGIN = this;
         PLUGIN_DIR = getDataPath();
-        DATA_DIR = PLUGIN_DIR.resolve("data");
 
-        try {
-            Files.createDirectories(DATA_DIR);
-        } catch (IOException e) {
-            // Runtime exception, weil das sehr kritisch ist und der rest dann nicht funktioniert.
-            throw new RuntimeException(e);
-        }
+        DATA_DIR = PLUGIN_DIR.resolve("data");
+        DATA_DIR.toFile().mkdirs();
 
         InvUI.getInstance().setPlugin(this);
         MinecraftLibPG.init(this);
+        Configuration.init(this);
 
-        // === Permissions Klasse laden === //
-        try {
-            Perms.loadPermissions();
-        } catch (IOException e) {
-            LOG.warn("Konnte permissions nicht sichern/laden.");
-        }
-
-        // === Config Datei === //
-        saveDefaultConfig();
-        CONFIG = getConfig();
-
-        ConnectionEvents.FIRST_JOIN_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.first-join"), ""));
-        ConnectionEvents.JOIN_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.join"), ""));
-        ConnectionEvents.QUIT_MESSAGE = MiniMessage.miniMessage().deserialize(Objects.requireNonNullElse(CONFIG.getString("connection.quit"), ""));
-
-        // === Data-Dir Erstellen === //
-        if (PLUGIN_DIR.toFile().mkdirs()) {
-            LOG.info("Datenordner erstellt: {}", getDataFolder().getAbsolutePath());
-        }
-
-        ChestShopManager.load();
-        HomeManager.load();
-        KitManager.load();
-        LockableManager.load();
-        PlaytimeManager.load();
-        SpawnManager.load();
-        VanishManager.load();
-        WarpManager.load();
+        Perms.loadPermissions();
+        ManagerManager.load();
+        HologramManager.load();
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
+            registrar.register(ChestShopCommand.command(), "Erstelle oder verwalte einen Kisten-Shop.", List.of("shop"));
             registrar.register(HomeCommand.command(), "Teleportiert dich zu deinem Home.");
             registrar.register(InventoryCommands.anvilCommand(), "Öffnet einen Amboss.", List.of("amboss"));
             registrar.register(InventoryCommands.enderseeCommand(), "Öffnet die Enderchest von einem Spieler.");
@@ -113,28 +91,21 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
-            registrar.register(ChestShopCommand.command(), "Erstelle oder verwalte einen Kisten-Shop.", List.of("shop"));
         });
 
         LOG.info("LowdFX Plugin gestartet!");
+
+        // Save all data every 3 minutes.
+        Bukkit.getScheduler().runTaskTimer(this, ManagerManager::save, 3600, 3600);
     }
 
     @Override
     public void onDisable() {
-        CONFIG = getConfig();
-
-        ChestShopManager.save();
-        HomeManager.save();
-        KitManager.save();
-        LockableManager.save();
-        PlaytimeManager.save();
-        SpawnManager.save();
-        VanishManager.save();
-        WarpManager.save();
+        ManagerManager.save();
     }
 
-    public static @NotNull Component serverMessage(Component message) {
-        return Component.text(Objects.requireNonNullElse(LowdFX.CONFIG.getString("basic.servername"), "???"), NamedTextColor.GOLD, TextDecoration.BOLD)
+    public static @NotNull Component serverMessage(@NotNull Component message) {
+        return Component.text(Configuration.BASIC_SERVER_NAME, NamedTextColor.GOLD, TextDecoration.BOLD)
                 .append(Component.text(" >> ", NamedTextColor.GRAY))
                 .append(message.decoration(TextDecoration.BOLD, false));
     }

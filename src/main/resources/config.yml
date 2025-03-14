@@ -13,7 +13,7 @@
 connection:
 
   # Gesendet, wenn ein Spieler das erste Mal spielt.
-  first-join: "<yellow>Heißt, <gold>{0}<yellow>willkommen, er ist das erste Mal gejoint!"
+  first-join: "<yellow>Heißt, <gold>{0}<yellow> willkommen, er ist das erste Mal gejoint!"
 
   # Gesendet, wenn ein Spieler beitritt.
   join: "<yellow>Guten Tag, <gold>{0}<yellow>!"
@@ -25,13 +25,19 @@ connection:
 basic:
 
   # Steht vor jeder Befehlsnachricht.
-  servername: "HiyarCraft"
+  server-name: "HiyarCraft"
 
   # Maximale Homes pro Spieler.
-  maxhomes: 5
+  max-homes: 5
+
+  # Aktualisierungsintervall der Chests in Ticks.
+  hologram-refresh-interval: 20
 
 ## Einstellungen für das Verwarnungssystem.
-warnsystem:
+warning:
 
-  # Dauer des temporären Bans in Sekunden (Standard: 24 Stunden)
-  tempban-duration: 86400
+  # Dauer des temporären Bans in Minuten. Standard: 1440 (24 Stunden)
+  tempban-duration: 1440
+
+  # Die Dauer einer Warnung in Minuten. Standard: 7200 (5 Tage)
+  expiration: 7200

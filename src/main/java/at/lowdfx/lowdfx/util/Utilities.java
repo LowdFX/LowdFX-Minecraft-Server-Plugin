@@ -1,10 +1,13 @@
 package at.lowdfx.lowdfx.util;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.event.ConnectionEvents;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.ban.BanListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
@@ -16,8 +19,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Properties;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Predicate;
 
 public final class Utilities {
     public static long currentTimeSecs() {
@@ -58,11 +62,43 @@ public final class Utilities {
     }
 
     public static @NotNull Component joinMessage(@NotNull Player player) {
-        return LowdFX.serverMessage((player.hasPlayedBefore() ? ConnectionEvents.JOIN_MESSAGE : ConnectionEvents.FIRST_JOIN_MESSAGE)
-                .replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build()));
+        return LowdFX.serverMessage((player.hasPlayedBefore() ? Configuration.CONNECTION_JOIN : Configuration.CONNECTION_FIRST_JOIN)
+                .replaceText(TextReplacementConfig.builder().match("\\{0\\}").replacement(player.name()).build()));
     }
 
     public static @NotNull Component quitMessage(@NotNull Player player) {
-        return LowdFX.serverMessage(ConnectionEvents.QUIT_MESSAGE.replaceText(TextReplacementConfig.builder().match("{0}").replacement(player.name()).build()));
+        return LowdFX.serverMessage(Configuration.CONNECTION_QUIT.replaceText(TextReplacementConfig.builder().match("\\{0\\}").replacement(player.name()).build()));
+    }
+
+    public static void ban(PlayerProfile target, Component reason, @Nullable Duration duration, String source) {
+        String stringReason = LegacyComponentSerializer.legacySection().serialize(reason);
+        Bukkit.getBanList(BanListType.PROFILE).addBan(target, stringReason, duration, source);
+
+        Player t = Bukkit.getPlayer(Objects.requireNonNull(target.getId()));
+        if (t != null) {
+            Bukkit.getBanList(BanListType.IP).addBan(Objects.requireNonNull(t.getAddress()).getAddress(), stringReason, duration, source);
+            t.kick(reason);
+        }
+    }
+
+    public static void positiveSound(@NotNull Player player) {
+        player.playSound(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+    }
+
+    public static void negativeSound(@NotNull Player player) {
+        player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
+    }
+
+    public static <T> int removeIf(@NotNull List<T> list, Predicate<? super T> filter) {
+        int removed = 0;
+
+        Iterator<T> each = list.iterator();
+        while (each.hasNext()) {
+            if (filter.test(each.next())) {
+                each.remove();
+                removed++;
+            }
+        }
+        return removed;
     }
 }
