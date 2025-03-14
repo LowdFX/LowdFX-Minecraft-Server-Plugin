@@ -1,8 +1,0 @@
-lalu:
-  ==: org.bukkit.Location
-  world: world
-  x: 558.8594244327472
-  y: 112.0
-  z: -3236.7020419240175
-  pitch: 8.550277
-  yaw: 175.3422
