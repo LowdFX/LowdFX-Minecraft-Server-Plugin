@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.event;
 
-import at.lowdfx.lowdfx.kit.KitManager;
+import at.lowdfx.lowdfx.managers.KitManager;
 import at.lowdfx.lowdfx.kit.op.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

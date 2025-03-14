@@ -1,6 +1,6 @@
 package at.lowdfx.lowdfx.event;
 
-import at.lowdfx.lowdfx.kit.KitManager;
+import at.lowdfx.lowdfx.managers.KitManager;
 import at.lowdfx.lowdfx.managers.PlaytimeManager;
 import at.lowdfx.lowdfx.managers.teleport.HomeManager;
 import at.lowdfx.lowdfx.managers.teleport.SpawnManager;
@@ -34,7 +34,7 @@ public final class ConnectionEvents implements Listener {
         HomeManager.add(player.getUniqueId());
 
         // Kits
-        KitManager.load(player.getUniqueId());
+        KitManager.add(player.getUniqueId());
 
         // Spawns
         if (!event.getPlayer().hasPlayedBefore())

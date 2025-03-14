@@ -24,6 +24,8 @@ public class HologramManager {
     private static final Map<Location, List<ArmorStand>> HOLOGRAMS = new HashMap<>();
 
     public static void load() {
+        Bukkit.getScheduler().runTaskTimer(LowdFX.PLUGIN, HologramManager::fixAll, 5, Configuration.BASIC_HOLOGRAM_REFRESH_INTERVAL * 20);
+
         Bukkit.getScheduler().runTaskTimer(LowdFX.PLUGIN, () -> {
             if (HOLOGRAMS.isEmpty()) return;
 
@@ -45,23 +47,20 @@ public class HologramManager {
                     }
                 }
             });
-        }, Configuration.BASIC_HOLOGRAM_REFRESH_INTERVAL, Configuration.BASIC_HOLOGRAM_REFRESH_INTERVAL);
+        }, 10, Configuration.BASIC_HOLOGRAM_REFRESH_INTERVAL);
     }
 
     public static void save() {
         removeAll();
     }
 
-    public static void spawnSafe(Location location, @NotNull List<Component> text) {
+    public static void spawnSafe(Location location) {
         remove(location);
-        add(location, true, text);
+        add(location);
     }
 
-    public static void add(@NotNull Location location, boolean offset, @NotNull List<Component> text) {
-        Location finalLocation = offset ? location.clone().add(0.5, 1.05, 0.5) : location.clone();
-        HOLOGRAMS.put(location, new ArrayList<>(text.stream()
-                .map(t -> finalLocation.getWorld().spawn(finalLocation.add(0, 0.25, 0), ArmorStand.class, armorStandInit(t)))
-                .toList()));
+    public static void add(@NotNull Location location) {
+        HOLOGRAMS.put(location, new ArrayList<>());
     }
 
     public static void remove(Location location) {
@@ -92,7 +91,7 @@ public class HologramManager {
 
     public static void fixAll() {
         HOLOGRAMS.forEach((l, s) -> {
-            l.clone().getNearbyEntitiesByType(ArmorStand.class, 2, 20, 2, e -> e.getPersistentDataContainer().has(KEY)).forEach(Entity::remove);
+            l.clone().getNearbyEntitiesByType(ArmorStand.class, 3, 10, 3, e -> e.getPersistentDataContainer().has(KEY)).forEach(Entity::remove);
             s.clear();
         });
     }

@@ -121,15 +121,11 @@ public final class ChestShopManager {
     public static void load() {
         SHOPS.putAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("shops.json").toFile(), Map.of(), new TypeToken<>() {}));
 
-        LowdFX.LOG.info("Loading 1");
-
         // Holograms:
         HologramManager.removeAll();
         for (ArrayList<Shop> playerShops : SHOPS.values()) {
             playerShops.forEach(s -> spawnHologram(s.location().asLocation()));
         }
-
-        LowdFX.LOG.info("Loading 2");
     }
 
     public static void registerShop(UUID owner, @NotNull Block block, ItemStack item, int price) {
@@ -192,11 +188,7 @@ public final class ChestShopManager {
     // ====================================
 
     public static void spawnHologram(Location location) {
-        HologramManager.spawnSafe(location, List.of(
-                Component.text("???").color(NamedTextColor.YELLOW),
-                Component.text("Stock: 0", NamedTextColor.GREEN),
-                Component.text("Price: 0 Diamonds", NamedTextColor.AQUA)
-        ));
+        HologramManager.spawnSafe(location);
     }
 
     public static @NotNull @Unmodifiable List<Component> hologramText(@NotNull Shop shop) {

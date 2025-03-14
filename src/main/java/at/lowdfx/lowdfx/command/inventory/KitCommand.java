@@ -1,7 +1,7 @@
 package at.lowdfx.lowdfx.command.inventory;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.kit.KitManager;
+import at.lowdfx.lowdfx.managers.KitManager;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

@@ -1,6 +1,7 @@
-package at.lowdfx.lowdfx.kit;
+package at.lowdfx.lowdfx.managers;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.kit.Items;
 import at.lowdfx.lowdfx.kit.op.*;
 import at.lowdfx.lowdfx.kit.starter.*;
 import com.google.common.collect.Lists;
@@ -33,9 +34,9 @@ public final class KitManager {
 
     public static final Map<UUID, Kit> KITS = new HashMap<>();
 
-    public static void load(UUID player) {
-        if (!KITS.containsKey(player))
-            KITS.put(player, new Kit());
+    public static void add(UUID player) {
+        if (KITS.containsKey(player)) return;
+        KITS.put(player, new Kit());
     }
 
     public static void load() {
@@ -94,12 +95,12 @@ public final class KitManager {
 
         public Kit() {
             this(Map.of(                        //   Default slots for kits:
-                    KitSlot.SWORD, 0,           // [X][ ][ ][ ][ ][ ][ ][ ][ ]
-                    KitSlot.AXE, 1,             // [ ][X][ ][ ][ ][ ][ ][ ][ ]
-                    KitSlot.PICKAXE, 2,         // [ ][ ][X][ ][ ][ ][ ][ ][ ]
-                    KitSlot.SHOVEL, 3,          // [ ][ ][ ][X][ ][ ][ ][ ][ ]
-                    KitSlot.EXTRA_FOOD, 7,      // [ ][ ][ ][ ][ ][ ][ ][X][ ]
-                    KitSlot.FOOD, 8             // [ ][ ][ ][ ][ ][ ][ ][ ][X]
+                    KitSlot.SWORD, 1,           // [X][ ][ ][ ][ ][ ][ ][ ][ ]
+                    KitSlot.AXE, 2,             // [ ][X][ ][ ][ ][ ][ ][ ][ ]
+                    KitSlot.PICKAXE, 3,         // [ ][ ][X][ ][ ][ ][ ][ ][ ]
+                    KitSlot.SHOVEL, 4,          // [ ][ ][ ][X][ ][ ][ ][ ][ ]
+                    KitSlot.EXTRA_FOOD, 8,      // [ ][ ][ ][ ][ ][ ][ ][X][ ]
+                    KitSlot.FOOD, 9             // [ ][ ][ ][ ][ ][ ][ ][ ][X]
             ));                                 // [S][A][p][s][ ][ ][ ][F][f]
         }
 
@@ -109,16 +110,30 @@ public final class KitManager {
             return inv;
         }
 
+        public @NotNull Map<KitSlot, Integer> items() {
+            Map<KitSlot, Integer> realItems = new HashMap<>(items);
+            realItems.put(KitSlot.HELMET, 40);
+            realItems.put(KitSlot.CHESTPLATE, 39);
+            realItems.put(KitSlot.LEGGINGS, 38);
+            realItems.put(KitSlot.BOOTS, 37);
+            return realItems;
+        }
+
         public void give(boolean op, @NotNull Player player) {
             PlayerInventory inv = player.getInventory();
 
             List<ItemStack> pendingItems = new ArrayList<>();
-            items.forEach((k, i) -> {
-                ItemStack previous = inv.getItem(i);
-                if (previous != null && !previous.isEmpty()) {
-                    inv.setItem(i, k.item(op));
+            items().forEach((k, i) -> {
+                int realIndex = i == 0 ? 40 : i - 1;
+
+                ItemStack given = k.item(op);
+                if (given == null) return;
+
+                ItemStack previous = inv.getItem(realIndex);
+                if (previous == null || previous.isEmpty()) {
+                    inv.setItem(realIndex, given);
                 } else {
-                    pendingItems.add(k.item(op));
+                    pendingItems.add(given);
                 }
             });
             pendingItems.forEach(inv::addItem);
@@ -174,6 +189,4 @@ public final class KitManager {
             }
         }
     }
-
-    public enum KitType { STARTER, OP }
 }
