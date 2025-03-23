@@ -36,7 +36,8 @@ public final class WarnCommand {
                                     for (PlayerProfile t : targets) {
                                         WarnManager.warn(t.getId(), sender, reason);
                                         sender.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler <b>" + t.getName() + "</b> wurde verwarnt.")));
-                                        sender.sendMessage(LowdFX.serverMessage(Component.text("Aktuelle Punkte: ", NamedTextColor.GREEN).append(Component.text(WarnManager.amount(t.getId()), NamedTextColor.RED, TextDecoration.BOLD))));
+                                        sender.sendMessage(LowdFX.serverMessage(Component.text("Aktuelle Punkte: ", NamedTextColor.GREEN)
+                                                .append(Component.text(WarnManager.amount(t.getId()), NamedTextColor.RED, TextDecoration.BOLD))));
                                     }
                                     return 1;
                                 })
@@ -49,7 +50,8 @@ public final class WarnCommand {
                                 return 1;
                             }
 
-                            player.sendMessage(LowdFX.serverMessage(Component.text("Deine Verwarnungen: ", NamedTextColor.GREEN).append(Component.text(WarnManager.amount(player.getUniqueId()), NamedTextColor.RED, TextDecoration.BOLD))));
+                            player.sendMessage(LowdFX.serverMessage(Component.text("Deine Verwarnungen: ", NamedTextColor.GREEN)
+                                    .append(Component.text(WarnManager.amount(player.getUniqueId()), NamedTextColor.RED, TextDecoration.BOLD))));
                             WarnManager.warnList(player.getUniqueId()).forEach(player::sendMessage);
                             return 1;
                         })
@@ -60,8 +62,45 @@ public final class WarnCommand {
                                     Collection<PlayerProfile> targets = context.getArgument("players", PlayerProfileListResolver.class).resolve(context.getSource());
 
                                     for (PlayerProfile t : targets) {
-                                        sender.sendMessage(LowdFX.serverMessage(Component.text("Verwarnungen von " + t.getName() + ": ", NamedTextColor.GREEN).append(Component.text(WarnManager.amount(t.getId()), NamedTextColor.RED, TextDecoration.BOLD))));
+                                        sender.sendMessage(LowdFX.serverMessage(Component.text("Verwarnungen von " + t.getName() + ": ", NamedTextColor.GREEN)
+                                                .append(Component.text(WarnManager.amount(t.getId()), NamedTextColor.RED, TextDecoration.BOLD))));
                                         WarnManager.warnList(t.getId()).forEach(sender::sendMessage);
+                                    }
+                                    return 1;
+                                })
+                        )
+                )
+                // Neuer Subcommand: /warn remove
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove")
+                        .requires(source -> Perms.check(source, Perms.Perm.WARN_ADMIN))
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerProfileListResolver>argument("players", ArgumentTypes.playerProfiles())
+                                .executes(context -> {
+                                    CommandSender sender = context.getSource().getSender();
+                                    Collection<PlayerProfile> targets = context.getArgument("players", PlayerProfileListResolver.class).resolve(context.getSource());
+                                    for (PlayerProfile t : targets) {
+                                        if (WarnManager.removeLastWarn(t.getId())) {
+                                            sender.sendMessage(LowdFX.serverMessage(Component.text("Die letzte Verwarnung von " + t.getName() + " wurde entfernt.", NamedTextColor.GREEN)));
+                                        } else {
+                                            sender.sendMessage(LowdFX.serverMessage(Component.text(t.getName() + " hat keine Verwarnungen.", NamedTextColor.RED)));
+                                        }
+                                    }
+                                    return 1;
+                                })
+                        )
+                )
+                // Neuer Subcommand: /warn removeall
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("removeall")
+                        .requires(source -> Perms.check(source, Perms.Perm.WARN_ADMIN))
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerProfileListResolver>argument("players", ArgumentTypes.playerProfiles())
+                                .executes(context -> {
+                                    CommandSender sender = context.getSource().getSender();
+                                    Collection<PlayerProfile> targets = context.getArgument("players", PlayerProfileListResolver.class).resolve(context.getSource());
+                                    for (PlayerProfile t : targets) {
+                                        if (WarnManager.removeAllWarns(t.getId())) {
+                                            sender.sendMessage(LowdFX.serverMessage(Component.text("Alle Verwarnungen von " + t.getName() + " wurden entfernt.", NamedTextColor.GREEN)));
+                                        } else {
+                                            sender.sendMessage(LowdFX.serverMessage(Component.text(t.getName() + " hat keine Verwarnungen.", NamedTextColor.RED)));
+                                        }
                                     }
                                     return 1;
                                 })

@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -42,8 +41,11 @@ public final class WarnManager {
         warns.add(new Warn(player, by instanceof Player p ? p.getName() : "Console", reason, System.currentTimeMillis()));
 
         if (warns.size() == 2) {
-            Utilities.ban(Bukkit.getOfflinePlayer(player).getPlayerProfile(), banMessage(player), Duration.ofMillis(Configuration.WARNING_TEMPBAN_DURATION), "Warn System");
-            by.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler wurde für <red>" + Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000) + " <green> temporär gebannt.")));
+            Utilities.ban(Bukkit.getOfflinePlayer(player).getPlayerProfile(), banMessage(player),
+                    Configuration.WARNING_TEMPBAN_DURATION > 0 ? java.time.Duration.ofMillis(Configuration.WARNING_TEMPBAN_DURATION) : null,
+                    "Warn System");
+            by.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize(
+                    "<green>Spieler wurde für <red>" + Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000) + " <green> temporär gebannt.")));
         } else if (warns.size() >= 3) {
             Utilities.ban(Bukkit.getOfflinePlayer(player).getPlayerProfile(), banMessage(player), null, "Warn System");
             by.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler wurde <red>permanent <green> gebannt.")));
@@ -71,7 +73,7 @@ public final class WarnManager {
                     Bei <b>3</b> Verwarnungen hast du einen permanenten Ban!
                     ------------------------------------------------------------------
                     """,
-                Placeholder.unparsed("duration", Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000))))
+                        Placeholder.unparsed("duration", Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000))))
                 .append(warnList(user)).build();
     }
 
@@ -83,10 +85,45 @@ public final class WarnManager {
         for (int i = 0; i < warns.size(); i++) {
             Warn w = warns.get(i);
             text.add(Component.newline()
-                    .append(Component.text("➽ " + (i + 1) + ". Grund: ", NamedTextColor.GRAY).append(Component.text(w.reason(), NamedTextColor.RED)))
-                    .append(Component.text(", von: ", NamedTextColor.GRAY).append(Component.text(w.warner(), NamedTextColor.GOLD)))
-                    .append(Component.text(", am: ", NamedTextColor.GRAY).append(Component.text(LowdFX.TIME_FORMAT.format(LocalDateTime.ofEpochSecond(w.given() / 1000, 0, ZoneOffset.UTC)), NamedTextColor.WHITE))));
+                    .append(Component.text("➽ " + (i + 1) + ". Grund: ", NamedTextColor.GRAY)
+                            .append(Component.text(w.reason(), NamedTextColor.RED)))
+                    .append(Component.text(", von: ", NamedTextColor.GRAY)
+                            .append(Component.text(w.warner(), NamedTextColor.GOLD)))
+                    .append(Component.text(", am: ", NamedTextColor.GRAY)
+                            .append(Component.text(
+                                    LowdFX.TIME_FORMAT.format(LocalDateTime.ofEpochSecond(w.given() / 1000, 0, ZoneOffset.UTC)),
+                                    NamedTextColor.WHITE))));
         }
         return text;
+    }
+
+    // Neue Methode: Entfernt die letzte (aktuellste) Verwarnung
+    public static boolean removeLastWarn(UUID user) {
+        update(user);
+        ArrayList<Warn> warns = WARNS.get(user);
+        if (warns == null || warns.isEmpty()) {
+            return false;
+        }
+        warns.remove(warns.size() - 1);
+        if (warns.isEmpty()) {
+            WARNS.remove(user);
+            // Unban, da keine Verwarnungen mehr vorliegen
+            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
+        } else if (warns.size() < 2) {
+            // Bei weniger als 2 Warnungen den temporären Bann aufheben
+            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
+        }
+        return true;
+    }
+
+    // Neue Methode: Entfernt alle Verwarnungen
+    public static boolean removeAllWarns(UUID user) {
+        if (WARNS.containsKey(user)) {
+            WARNS.remove(user);
+            // Unban bei vollständiger Entfernung
+            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
+            return true;
+        }
+        return false;
     }
 }

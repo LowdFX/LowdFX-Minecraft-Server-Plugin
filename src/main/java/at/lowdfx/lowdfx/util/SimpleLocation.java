@@ -11,16 +11,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record SimpleLocation(String world, Cord cord) {
+public record SimpleLocation(String world, Cord cord, float yaw, float pitch) {
+
     public void teleportSafe(Entity entity) {
         TeleportManager.teleportSafe(entity, asLocation());
     }
 
     public @NotNull Location asLocation() {
-        return CordMinecraftAdapter.toLocation(cord, Objects.requireNonNull(Bukkit.createWorld(WorldCreator.name(world))));
+        Location loc = CordMinecraftAdapter.toLocation(cord, Objects.requireNonNull(Bukkit.createWorld(WorldCreator.name(world))));
+        loc.setYaw(yaw);
+        loc.setPitch(pitch);
+        return loc;
     }
 
     public static @NotNull SimpleLocation ofLocation(@NotNull Location location) {
-        return new SimpleLocation(location.getWorld().getName(), CordMinecraftAdapter.ofLocation(location));
+        return new SimpleLocation(
+                location.getWorld().getName(),
+                CordMinecraftAdapter.ofLocation(location),
+                location.getYaw(),
+                location.getPitch()
+        );
     }
 }

@@ -1,0 +1,19 @@
+### Plugin Name ###
+name: lowdfx
+
+### Build Version ###
+version: '1.1.0'
+
+### Main Class ###
+main: at.lowdfx.lowdfx.LowdFX
+
+### Loader Class (1.20.4+) ###
+loader: at.lowdfx.lowdfx.LowLoader
+
+### PaperAPI Version ###
+api-version: '1.21'
+
+### Autoren ###
+authors:
+  - LowdFX
+  - MarcPG

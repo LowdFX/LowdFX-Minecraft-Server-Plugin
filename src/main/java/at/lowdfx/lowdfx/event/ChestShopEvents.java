@@ -114,12 +114,14 @@ public class ChestShopEvents implements Listener {
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
         for (Block block : event.getBlocks()) {
-            if (!ChestShopManager.isShop(block.getLocation())) {
+            if (ChestShopManager.isShop(block.getLocation())) {  // Nur abbrechen, wenn es ein Shop ist.
                 event.setCancelled(true);
                 return;
             }
         }
     }
+
+
 
     @EventHandler
     public void onPistonRetract(@NotNull BlockPistonRetractEvent event) {
@@ -130,4 +132,6 @@ public class ChestShopEvents implements Listener {
             }
         }
     }
+
+
 }

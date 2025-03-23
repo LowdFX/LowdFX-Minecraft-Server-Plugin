@@ -20,6 +20,10 @@ public class Configuration {
     public static long WARNING_TEMPBAN_DURATION;
     public static long WARNING_EXPIRATION;
 
+    // Neue Felder für den Safe-Teleport
+    public static boolean SAFE_TELEPORT_ENABLED;
+    public static int TELEPORT_DELAY;
+
     public static void init(@NotNull JavaPlugin plugin) {
         plugin.saveDefaultConfig();
         CONFIG = plugin.getConfig();
@@ -32,7 +36,11 @@ public class Configuration {
         BASIC_MAX_HOMES = CONFIG.getInt("basic.max-homes", 5);
         BASIC_HOLOGRAM_REFRESH_INTERVAL = CONFIG.getLong("basic.hologram-refresh-interval", 20);
 
-        WARNING_TEMPBAN_DURATION = CONFIG.getLong("warning.tempban-duration", 1440) * 60000; // Minutes -> Milliseconds
-        WARNING_EXPIRATION = CONFIG.getLong("warning.expiration", 7200) * 60000; // Minutes -> Milliseconds
+        WARNING_TEMPBAN_DURATION = CONFIG.getLong("warning.tempban-duration", 1440) * 60000; // Minuten -> Millisekunden
+        WARNING_EXPIRATION = CONFIG.getLong("warning.expiration", 7200) * 60000; // Minuten -> Millisekunden
+
+        // Neue Einstellungen aus der Config
+        SAFE_TELEPORT_ENABLED = CONFIG.getBoolean("teleport.safe-enabled", true);
+        TELEPORT_DELAY = CONFIG.getInt("teleport.delay", 5);
     }
 }

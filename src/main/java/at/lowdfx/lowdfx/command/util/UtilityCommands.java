@@ -20,6 +20,7 @@ import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class UtilityCommands {
+
     public static LiteralCommandNode<CommandSourceStack> flyCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("fly")
                 .requires(source -> Perms.check(source, Perms.Perm.FLY))
@@ -37,7 +38,7 @@ public final class UtilityCommands {
                             Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                             boolean fly = !player.getAllowFlight();
                             setFly(player, fly);
-                            context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(player.getName() + " kann nun " + (fly ? "" : "nicht mehr") + "fliegen!", NamedTextColor.GREEN)));
+                            context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(player.getName() + " kann nun " + (fly ? "" : "nicht mehr") + " fliegen!", NamedTextColor.GREEN)));
                             return 1;
                         })
                 )
@@ -62,7 +63,8 @@ public final class UtilityCommands {
                 .then(RequiredArgumentBuilder.<CommandSourceStack, GameMode>argument("mode", ArgumentTypes.gameMode())
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {
-                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
+                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(
+                                        Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                                 return 1;
                             }
 
@@ -75,7 +77,8 @@ public final class UtilityCommands {
                                     List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
                                     GameMode mode = context.getArgument("mode", GameMode.class);
                                     players.forEach(p -> setMode(p, mode));
-                                    context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler sind jetzt im " + mode.name().toLowerCase() + " Modus!", NamedTextColor.GREEN)));
+                                    context.getSource().getSender().sendMessage(LowdFX.serverMessage(
+                                            Component.text(players.size() + " Spieler sind jetzt im " + mode.name().toLowerCase() + " Modus!", NamedTextColor.GREEN)));
                                     return 1;
                                 })
                         )
@@ -83,20 +86,26 @@ public final class UtilityCommands {
                 .then(RequiredArgumentBuilder.<CommandSourceStack, Integer>argument("modeNumber", IntegerArgumentType.integer(0, 3))
                         .executes(context -> {
                             if (!(context.getSource().getExecutor() instanceof Player player)) {
-                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
+                                context.getSource().getSender().sendMessage(LowdFX.serverMessage(
+                                        Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED)));
                                 return 1;
                             }
 
-                            GameMode mode = GameMode.values()[context.getArgument("modeNumber", Integer.class)];
+                            int modeNumber = context.getArgument("modeNumber", Integer.class);
+                            GameMode[] modeMapping = { GameMode.SURVIVAL, GameMode.CREATIVE, GameMode.ADVENTURE, GameMode.SPECTATOR };
+                            GameMode mode = modeMapping[modeNumber];
                             setMode(player, mode);
                             return 1;
                         })
                         .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
                                 .executes(context -> {
                                     List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
-                                    GameMode mode = GameMode.values()[context.getArgument("modeNumber", Integer.class)];
+                                    int modeNumber = context.getArgument("modeNumber", Integer.class);
+                                    GameMode[] modeMapping = { GameMode.SURVIVAL, GameMode.CREATIVE, GameMode.ADVENTURE, GameMode.SPECTATOR };
+                                    GameMode mode = modeMapping[modeNumber];
                                     players.forEach(p -> setMode(p, mode));
-                                    context.getSource().getSender().sendMessage(LowdFX.serverMessage(Component.text(players.size() + " Spieler ist/sind jetzt im " + mode.name().toLowerCase() + " Modus!", NamedTextColor.GREEN)));
+                                    context.getSource().getSender().sendMessage(LowdFX.serverMessage(
+                                            Component.text(players.size() + " Spieler sind jetzt im " + mode.name().toLowerCase() + " Modus!", NamedTextColor.GREEN)));
                                     return 1;
                                 })
                         )

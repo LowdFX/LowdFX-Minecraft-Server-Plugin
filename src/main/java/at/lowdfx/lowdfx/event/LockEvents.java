@@ -97,20 +97,24 @@ public class LockEvents implements Listener {
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
         for (Block block : event.getBlocks()) {
-            if (!LockableManager.isLocked(block.getLocation())) {
+            if (LockableManager.isLocked(block.getLocation())) {  // Nur abbrechen, wenn der Block gesperrt ist.
                 event.setCancelled(true);
                 return;
             }
         }
     }
 
+
+
     @EventHandler
     public void onPistonRetract(@NotNull BlockPistonRetractEvent event) {
         for (Block block : event.getBlocks()) {
-            if (!LockableManager.isLocked(block.getLocation())) {
+            if (LockableManager.isLocked(block.getLocation())) {
                 event.setCancelled(true);
                 return;
             }
         }
     }
+
+
 }

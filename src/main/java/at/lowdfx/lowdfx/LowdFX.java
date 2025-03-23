@@ -16,6 +16,7 @@ import at.lowdfx.lowdfx.command.util.UtilityCommands;
 import at.lowdfx.lowdfx.event.*;
 import at.lowdfx.lowdfx.managers.HologramManager;
 import at.lowdfx.lowdfx.managers.ManagerManager;
+import at.lowdfx.lowdfx.managers.teleport.TeleportCancelOnDamageListener;
 import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
 import com.marcpg.libpg.MinecraftLibPG;
@@ -60,6 +61,8 @@ public final class LowdFX extends JavaPlugin {
         Perms.loadPermissions();
         ManagerManager.load();
         HologramManager.load();
+
+        getServer().getPluginManager().registerEvents(new TeleportCancelOnDamageListener(), this);
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
