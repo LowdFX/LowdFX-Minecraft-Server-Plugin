@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public final class LowLoader implements PluginLoader {
     @Override
     public void classloader(@NotNull PluginClasspathBuilder classpathBuilder) {
-        // Downloaded die InvUI library automatisch wenn das plugin lädt, damit PaperMC das re-mappen kann.
+        // Lädt InvUI automatisch beim Start herunter
         MavenLibraryResolver resolver = new MavenLibraryResolver();
         resolver.addRepository(new RemoteRepository.Builder("xenondevs", "default", "https://repo.xenondevs.xyz/releases/").build());
         resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.43"), null));

@@ -7,6 +7,8 @@
 ##                                Configuration                                ##
 #################################################################################
 
+language: "de"
+
 ## Alle Nachrichten, wenn Spieler den Server betreten oder verlassen.
 # Im MiniMessage format: https://docs.advntr.dev/minimessage/index.html.
 # Der Placeholder "{0}" ist der Spielername.

@@ -6,7 +6,6 @@ import io.papermc.paper.ban.BanListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.BanEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -151,4 +150,13 @@ public final class Utilities {
         }
         return removed;
     }
+
+    /**
+     * Lädt die config.yml und alle gecachten Config-Werte neu.
+     */
+    public static void reloadPlugin() {
+        LowdFX.PLUGIN.reloadConfig(); // Bukkit Config
+        Configuration.reload();       // Eigene gecachte Config-Werte
+    }
+
 }

@@ -26,13 +26,13 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import at.lowdfx.metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import xyz.xenondevs.invui.InvUI;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -45,6 +45,7 @@ public final class LowdFX extends JavaPlugin {
     public static LowdFX PLUGIN;
     public static Path PLUGIN_DIR;
     public static Path DATA_DIR;
+
 
 
     @Override
@@ -63,6 +64,11 @@ public final class LowdFX extends JavaPlugin {
         Perms.loadPermissions();
         ManagerManager.load();
         HologramManager.load();
+
+        // bStats starten
+        int pluginId = 25282;
+        Metrics metrics = new Metrics(this, pluginId);
+        metrics.addCustomChart(new Metrics.SimplePie("language", () -> getConfig().getString("language")));
 
         getServer().getPluginManager().registerEvents(new TeleportCancelOnDamageListener(), this);
 
@@ -117,4 +123,6 @@ public final class LowdFX extends JavaPlugin {
                 .append(Component.text(" >> ", NamedTextColor.GRAY))
                 .append(message.decoration(TextDecoration.BOLD, false));
     }
+
+
 }
