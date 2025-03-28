@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.moderation.VanishManager;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import net.kyori.adventure.text.Component;
@@ -19,11 +20,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -58,12 +61,74 @@ public class VanishEvents implements Listener {
         // Für alle online-spieler, falls jemand un-vanished, während der Spieler offline ist.
         for (Player target : Bukkit.getOnlinePlayers()) {
             if (target.hasMetadata("vanished")) {
-                player.hidePlayer(LowdFX.PLUGIN, target);
+                if (!Perms.check(player, Perms.Perm.VANISH)) {
+                    player.hidePlayer(LowdFX.PLUGIN, target);
+                } else {
+                    player.showPlayer(LowdFX.PLUGIN, target);
+                }
             } else {
                 player.showPlayer(LowdFX.PLUGIN, target);
             }
         }
+
     }
+
+    @EventHandler
+    public void onSculkSensorRedstone(BlockRedstoneEvent event) {
+        if (event.getBlock().getType() != Material.SCULK_SENSOR) return;
+
+        for (Player player : event.getBlock().getWorld().getPlayers()) {
+            if (player.hasMetadata("vanished") &&
+                    player.getLocation().distance(event.getBlock().getLocation()) <= 8) {
+                event.setNewCurrent(0); // Signal unterdrücken
+                return;
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPrivateMessage(PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage();
+        Player sender = event.getPlayer();
+
+        // Nur /msg, /tell, /w abfangen (kannst du beliebig erweitern)
+        if (message.toLowerCase().startsWith("/msg ") ||
+                message.toLowerCase().startsWith("/tell ") ||
+                message.toLowerCase().startsWith("/w ")||
+                message.toLowerCase().startsWith("/reply ")) {
+
+            String[] args = message.split(" ");
+            if (args.length < 2) return; // Kein Ziel angegeben
+
+            String targetName = args[1];
+            Player target = Bukkit.getPlayerExact(targetName);
+
+            if (target != null && target.hasMetadata("vanished")) {
+                // Prüfen ob der Sender die VANISH-Permission hat (über dein Enum-System)
+                if (!Perms.check(sender, Perms.Perm.VANISH)) {
+                    sender.sendMessage(Component.text("Es wurde kein Spieler gefunden", NamedTextColor.RED));
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player joined = event.getPlayer();
+
+        // Prüfe, ob der Spieler vanished ist
+        if (joined.hasMetadata("vanished")) {
+            // Sende Nachricht an alle Spieler mit VANISH-Permission
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (Perms.check(online, Perms.Perm.VANISH)) {
+                    online.sendMessage(LowdFX.serverMessage(Component.text("Der Spieler ")
+                            .append(Component.text(joined.getName(), NamedTextColor.YELLOW))
+                            .append(Component.text(" ist vanished gejoint!", NamedTextColor.GOLD))));
+                }
+            }
+        }
+    }
+
 
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
@@ -116,7 +181,26 @@ public class VanishEvents implements Listener {
 
         Block block = event.getClickedBlock();
         if (block == null) return;
+
         BlockData data = block.getBlockData();
+        Material type = block.getType();
+
+        // Nur du siehst das Enderchest-Inventar
+        if (type == Material.ENDER_CHEST) {
+            GameMode oldGameMode = player.getGameMode();
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setVelocity(new Vector(0, 0, 0));
+
+            // Öffne die Enderchest manuell im nächsten Tick
+            Bukkit.getScheduler().runTaskLater(LowdFX.PLUGIN, () -> {
+                player.openInventory(player.getEnderChest());
+                player.setGameMode(oldGameMode);
+                VanishManager.makePlayerInvisible(player);
+            }, 1L);
+            return;
+        }
+
+
 
         ItemStack item = event.getItem();
         if (item != null && event.getHand() != null) {
@@ -140,6 +224,8 @@ public class VanishEvents implements Listener {
         if (block.getState() instanceof Container)
             tempSpectator(player);
     }
+
+
 
     private void tempSpectator(@NotNull Player player) {
         GameMode before = player.getGameMode();

@@ -33,13 +33,18 @@ public class LockEvents implements Listener {
         if (locked == null) return;
 
         if (locked.notAllowed(player)) {
+            // Erlaube Interaktion bei global lock
+            if (locked.isGlobal()) return;
+
             player.sendMessage(LowdFX.serverMessage(Component.text("Der Block ist gesperrt! Du hast keinen Zugriff.", NamedTextColor.RED)));
             Utilities.negativeSound(player);
             event.setCancelled(true);
             return;
         }
 
-        player.sendMessage(LowdFX.serverMessage(Component.text("Du hast den Block geöffnet.", NamedTextColor.GREEN)));
+
+
+        player.sendMessage(LowdFX.serverMessage(Component.text("Du hast einen gesperrten Block geöffnet.", NamedTextColor.GREEN)));
     }
 
     @EventHandler
@@ -50,6 +55,13 @@ public class LockEvents implements Listener {
         if (locked.isOwner(event.getPlayer())) {
             LockableManager.unlock(event.getBlock().getLocation());
             event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du hast den gesperrten Block zerstört.", NamedTextColor.YELLOW)));
+            return;
+        }
+
+        if (locked.isGlobal()) {
+            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist global gesperrt und darf nicht abgebaut werden!", NamedTextColor.RED)));
+            Utilities.negativeSound(event.getPlayer());
+            event.setCancelled(true);
             return;
         }
 

@@ -12,6 +12,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,28 @@ import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class UtilityCommands {
+
+
+    public static LiteralCommandNode<CommandSourceStack> chatClearCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("chat")
+                .requires(source -> Perms.check(source, Perms.Perm.CHAT_CLEAR))
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("clear")
+                        .executes(context -> {
+                            // Sende an jeden Spieler 100 leere Nachrichten, um den Chat "zu leeren"
+                            Bukkit.getOnlinePlayers().forEach(player -> {
+                                for (int i = 0; i < 200; i++) {
+                                    player.sendMessage("");
+                                }
+                            });
+                            // Verwende getSender().sendMessage(...) anstatt sendFeedback(...)
+                            context.getSource().getSender().sendMessage(
+                                    LowdFX.serverMessage(Component.text("Chat wurde geleert.", NamedTextColor.GREEN))
+                            );
+                            return 1;
+                        })
+                )
+                .build();
+    }
 
     public static LiteralCommandNode<CommandSourceStack> flyCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("fly")

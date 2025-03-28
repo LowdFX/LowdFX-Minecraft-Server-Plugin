@@ -88,9 +88,11 @@ public final class VanishCommand {
         if (state) {
             player.setMetadata("vanished", new FixedMetadataValue(LowdFX.PLUGIN, true));
             VanishManager.makePlayerInvisible(player);
+            VanishManager.applyNametag(player);
         } else {
             player.removeMetadata("vanished", LowdFX.PLUGIN);
             VanishManager.makePlayerVisible(player);
+            VanishManager.resetNametag(player);
         }
         player.setSleepingIgnored(state);
         player.setCollidable(!state);

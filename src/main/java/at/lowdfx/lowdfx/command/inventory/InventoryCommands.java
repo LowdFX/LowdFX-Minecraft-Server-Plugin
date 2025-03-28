@@ -74,12 +74,12 @@ public final class InventoryCommands {
                             PlayerInventory inv = target.getInventory();
 
                             Gui gui = Gui.normal().setStructure(
-                                    "# h c l b # # o #", // h = Helmet
-                                    "# # # # # # # # #", // c = Chestplate
-                                    "I I I I I I I I I", // l = Leggings
-                                    "I I I I I I I I I", // b = Boots
-                                    "I I I I I I I I I", // o = Offhand
-                                    "I I I I I I I I I") // I = Inventory
+                                            "# h c l b # # o #", // h = Helmet
+                                            "# # # # # # # # #", // c = Chestplate
+                                            "I I I I I I I I I", // l = Leggings
+                                            "I I I I I I I I I", // b = Boots
+                                            "I I I I I I I I I", // o = Offhand
+                                            "I I I I I I I I I") // I = Inventory
                                     .addIngredient('#', Items.BLACK_BACKGROUND)
                                     .addIngredient('h', new Items.LiveItem(target, PlayerInventory::setHelmet, () -> Objects.requireNonNullElse(inv.getHelmet(), ItemStack.empty()), false))
                                     .addIngredient('c', new Items.LiveItem(target, PlayerInventory::setChestplate, () -> Objects.requireNonNullElse(inv.getChestplate(), ItemStack.empty()), false))

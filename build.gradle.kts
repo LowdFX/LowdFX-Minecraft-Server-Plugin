@@ -17,6 +17,12 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases/")
     maven("https://marcpg.com/repo/")
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
@@ -25,6 +31,8 @@ dependencies {
     implementation("com.marcpg:libpg-paper:1.0.1")
     implementation("com.marcpg:libpg-storage-json:1.0.1")
     implementation("com.marcpg:libpg-storage-yaml:1.0.1")
+    implementation("de.tr7zw:item-nbt-api:2.14.1")
+    implementation(files("lib/craftbukkit-1.21.4-R0.1-SNAPSHOT-remapped-mojang.jar"))
 }
 
 tasks {

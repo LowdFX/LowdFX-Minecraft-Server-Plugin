@@ -23,13 +23,20 @@ public final class LockableManager {
         private final SimpleLocation location;
         public SimpleLocation connected;
         private final ArrayList<UUID> whitelist;
+        private final boolean global;
+        public boolean isWhitelisted(UUID uuid) {
+            return whitelist != null && whitelist.contains(uuid);
+        }
 
-        public Locked(UUID owner, SimpleLocation location, SimpleLocation connected, ArrayList<UUID> whitelist) {
+
+        public Locked(UUID owner, SimpleLocation location, SimpleLocation connected, ArrayList<UUID> whitelist, boolean global) {
             this.owner = owner;
             this.location = location;
             this.connected = connected;
             this.whitelist = whitelist;
+            this.global = global;
         }
+
 
         public void removeWhitelist(UUID player) {
             whitelist.remove(player);
@@ -42,6 +49,10 @@ public final class LockableManager {
 
         public boolean isOwner(@NotNull Player player) {
             return owner.equals(player.getUniqueId()) || Perms.check(player, Perms.Perm.CHEST_SHOP_ADMIN);
+        }
+
+        public boolean isGlobal() {
+            return global;
         }
 
         public boolean notAllowed(@NotNull Player player) {
@@ -75,9 +86,10 @@ public final class LockableManager {
         LOCKED.putAll(JsonUtils.loadSafe(LowdFX.DATA_DIR.resolve("locked.json").toFile(), Map.of(), new TypeToken<>() {}));
     }
 
-    public static void lock(UUID owner, @NotNull Block block) {
-        lock(block, new Locked(owner, SimpleLocation.ofLocation(block.getLocation()), null, new ArrayList<>()));
+    public static void lock(UUID owner, @NotNull Block block, boolean global) {
+        lock(block, new Locked(owner, SimpleLocation.ofLocation(block.getLocation()), null, new ArrayList<>(), global));
     }
+
 
     public static void lock(@NotNull Block block, @NotNull Locked data) {
         ArrayList<Locked> ownerLocked = LOCKED.computeIfAbsent(data.owner(), k -> new ArrayList<>());

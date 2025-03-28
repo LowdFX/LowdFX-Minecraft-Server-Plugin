@@ -87,4 +87,70 @@ public final class MuteCommands {
                 )
                 .build();
     }
+
+    public static LiteralCommandNode<CommandSourceStack> muteAllCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("muteall")
+                .requires(source -> Perms.check(source, Perms.Perm.MUTE))
+                .executes(context -> {
+                    // Standardwerte
+                    CommandSender sender = context.getSource().getSender();
+                    Time defaultTime = new Time(1, Time.Unit.HOURS);
+                    String defaultReason = "Event-Mute";
+
+                    for (Player target : Bukkit.getOnlinePlayers()) {
+                        if (target.equals(sender)) continue;
+                        if (Perms.check(target, Perms.Perm.MUTE)) continue;
+
+                        MuteManager.mute(target.getUniqueId(), sender, defaultReason, defaultTime);
+                    }
+
+                    sender.sendMessage(LowdFX.serverMessage(Component.text("Alle Spieler wurden für " + defaultTime.getPreciselyFormatted() + " gemutet!", NamedTextColor.GREEN)));
+                    return 1;
+                })
+                .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("time", StringArgumentType.word())
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("reason", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    CommandSender sender = context.getSource().getSender();
+                                    String timeArg = context.getArgument("time", String.class);
+                                    String reason = context.getArgument("reason", String.class);
+
+                                    Time parsed = Time.parse(timeArg);
+                                    if (parsed.get() <= 0) {
+                                        sender.sendMessage(LowdFX.serverMessage(Component.text("Ungültige Zeitangabe!", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+
+                                    for (Player target : Bukkit.getOnlinePlayers()) {
+                                        if (target.equals(sender)) continue;
+                                        if (Perms.check(target, Perms.Perm.MUTE)) continue;
+
+                                        MuteManager.mute(target.getUniqueId(), sender, reason, parsed);
+                                    }
+
+                                    sender.sendMessage(LowdFX.serverMessage(Component.text("Alle Spieler wurden für " + parsed.getPreciselyFormatted() + " gemutet mit dem Grund: \"" + reason + "\"", NamedTextColor.GREEN)));
+                                    return 1;
+                                })
+                        )
+                )
+                .build();
+    }
+    public static LiteralCommandNode<CommandSourceStack> unmuteAllCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("unmuteall")
+                .requires(source -> Perms.check(source, Perms.Perm.MUTE))
+                .executes(context -> {
+                    CommandSender sender = context.getSource().getSender();
+
+                    int removed = 0;
+                    for (UUID uuid : new ArrayList<>(MuteManager.MUTES.keySet())) {
+                        MuteManager.unmute(uuid, sender);
+                        removed++;
+                    }
+
+                    sender.sendMessage(LowdFX.serverMessage(Component.text("Alle " + removed + " Stummschaltungen wurden aufgehoben!", NamedTextColor.GREEN)));
+                    return 1;
+                })
+                .build();
+    }
+
+
 }

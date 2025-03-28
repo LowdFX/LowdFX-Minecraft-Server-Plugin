@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import xyz.xenondevs.invui.InvUI;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -44,6 +45,7 @@ public final class LowdFX extends JavaPlugin {
     public static LowdFX PLUGIN;
     public static Path PLUGIN_DIR;
     public static Path DATA_DIR;
+
 
     @Override
     public void onEnable() {
@@ -79,6 +81,8 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(LowCommand.command(), "Generelle features vom Plugin.");
             registrar.register(MuteCommands.muteCommand(), "Schaltet einen Spieler stumm.");
             registrar.register(MuteCommands.unmuteCommand(), "Entfernt den Mute eines Spielers.");
+            registrar.register(MuteCommands.muteAllCommand(), "Schaltet alle Spieler stumm.");
+            registrar.register(MuteCommands.unmuteAllCommand(), "Entfernt den Mute aller Spieler vom muteall Command.");
             registrar.register(PlaytimeCommand.command(), "Zeigt deine Spielzeit auf dem Server.");
             registrar.register(SpawnCommand.command(), "Teleportiert dich zum Spawn.");
             registrar.register(StatCommands.feedCommand(), "Füttert einen Spieler.", List.of("saturate"));
@@ -91,6 +95,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(TpaCommand.command(), "Versendet eine TPA an einen Spieler.");
             registrar.register(UtilityCommands.flyCommand(), "Erlaubt einen Spieler zu fliegen.");
             registrar.register(UtilityCommands.gmCommand(), "Setzt den Spielmodus eines Spielers.");
+            registrar.register(UtilityCommands.chatClearCommand(), "Lösche den Chat.");
             registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");

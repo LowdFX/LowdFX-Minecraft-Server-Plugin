@@ -52,7 +52,8 @@ public final class Perms {
         WARN_ADMIN(         "lowdfx.warn.admin",        "/warn",                OP),
         WARP(               "lowdfx.warp",              "/warp",                TRUE),
         WARP_ADMIN(         "lowdfx.warp.admin",        "/warp (andere)",       OP),
-        WORKBENCH(          "lowdfx.inv.workbench",     "/workbench",           OP);
+        WORKBENCH(          "lowdfx.inv.workbench",     "/workbench",           OP),
+        CHAT_CLEAR(         "lowdfx.chat.clear",        "/chat clear",          OP);
 
         private final String permission;
         private final String commands;

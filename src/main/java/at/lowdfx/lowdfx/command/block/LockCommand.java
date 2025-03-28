@@ -3,6 +3,7 @@ package at.lowdfx.lowdfx.command.block;
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.block.LockableManager;
 import at.lowdfx.lowdfx.util.Perms;
+import at.lowdfx.lowdfx.util.SimpleLocation;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -17,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @SuppressWarnings({ "UnstableApiUsage", "DuplicatedCode" })
@@ -40,11 +42,40 @@ public final class LockCommand {
                         return 1;
                     }
 
-                    LockableManager.lock(player.getUniqueId(), block);
+                    LockableManager.lock(player.getUniqueId(), block, true);
                     player.sendMessage(LowdFX.serverMessage(Component.text("Block wurde gesperrt!", NamedTextColor.GREEN)));
                     Utilities.positiveSound(player);
                     return 1;
                 })
+
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("global")
+                        .executes(context -> {
+                            if (!(context.getSource().getSender() instanceof Player player)) return 1;
+
+                            Block block = player.getTargetBlockExact(5);
+                            if (LockableManager.notLockable(block)) {
+                                player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen Block anvisieren, den man öffnen kann.", NamedTextColor.RED)));
+                                Utilities.negativeSound(player);
+                                return 1;
+                            }
+
+                            if (LockableManager.isLocked(block.getLocation())) {
+                                player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist bereits gesperrt.", NamedTextColor.RED)));
+                                Utilities.negativeSound(player);
+                                return 1;
+                            }
+
+                            LockableManager.Locked locked = new LockableManager.Locked(
+                                    player.getUniqueId(), SimpleLocation.ofLocation(block.getLocation()), null, new ArrayList<>(), true
+                            );
+
+                            LockableManager.lock(block, locked);
+                            player.sendMessage(LowdFX.serverMessage(Component.text("Block wurde global gesperrt – nur Abbau & Lock verboten!", NamedTextColor.GREEN)));
+                            Utilities.positiveSound(player);
+                            return 1;
+                        })
+                )
+
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("unlock")
                         .executes(context -> {
                             if (!(context.getSource().getSender() instanceof Player player)) return 1;
