@@ -8,7 +8,6 @@
 #################################################################################
 
 language: "de"
-
 ## Alle Nachrichten, wenn Spieler den Server betreten oder verlassen.
 # Im MiniMessage format: https://docs.advntr.dev/minimessage/index.html.
 # Der Placeholder "{0}" ist der Spielername.
@@ -48,3 +47,5 @@ warning:
 teleport:
   safe-enabled: true # Safe Teleport und delay ein/aus
   delay: 5   # Sekunden
+  # Cooldown für den /back-Befehl in Sekunden (12 Stunden = 43200 Sekunden)
+  backCooldown: 43200

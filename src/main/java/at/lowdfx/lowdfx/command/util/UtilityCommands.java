@@ -34,7 +34,6 @@ public final class UtilityCommands {
                                     player.sendMessage("");
                                 }
                             });
-                            // Verwende getSender().sendMessage(...) anstatt sendFeedback(...)
                             context.getSource().getSender().sendMessage(
                                     LowdFX.serverMessage(Component.text("Chat wurde geleert.", NamedTextColor.GREEN))
                             );
@@ -43,6 +42,53 @@ public final class UtilityCommands {
                 )
                 .build();
     }
+
+    public static LiteralCommandNode<CommandSourceStack> godCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("god")
+                .requires(source -> Perms.check(source, Perms.Perm.GOD)) // Stelle sicher, dass es auch eine entsprechende Berechtigung gibt.
+                .executes(context -> {
+                    if (!(context.getSource().getExecutor() instanceof Player player)) {
+                        context.getSource().getSender().sendMessage(
+                                LowdFX.serverMessage(Component.text("Fehler! Das kann nur ein Spieler tun!", NamedTextColor.RED))
+                        );
+                        return 1;
+                    }
+                    // Toggle den Godmode des ausführenden Spielers
+                    boolean god = !player.isInvulnerable();
+                    setGod(player, god);
+                    return 1;
+                })
+                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
+                        .executes(context -> {
+                            Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
+                            // Toggle den Godmode des Zielspielers
+                            boolean god = !target.isInvulnerable();
+                            setGod(target, god);
+                            context.getSource().getSender().sendMessage(
+                                    LowdFX.serverMessage(Component.text(target.getName() + " ist nun " + (god ? "im Godmode" : "nicht mehr im Godmode") + "!", NamedTextColor.GREEN))
+                            );
+                            return 1;
+                        })
+                )
+                .build();
+    }
+
+    public static void setGod(@NotNull Player player, boolean god) {
+        // Setzt die Invulnerabilität des Spielers, wodurch er keinen Schaden mehr nimmt, wenn god==true
+        player.setInvulnerable(god);
+        if (god) {
+            player.sendMessage(
+                    LowdFX.serverMessage(Component.text("Du bist nun im Godmode!", NamedTextColor.GREEN))
+            );
+            Utilities.positiveSound(player);
+        } else {
+            player.sendMessage(
+                    LowdFX.serverMessage(Component.text("Du bist nun nicht mehr im Godmode!", NamedTextColor.RED))
+            );
+            Utilities.negativeSound(player);
+        }
+    }
+
 
     public static LiteralCommandNode<CommandSourceStack> flyCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("fly")

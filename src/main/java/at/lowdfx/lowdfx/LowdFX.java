@@ -1,5 +1,6 @@
 package at.lowdfx.lowdfx;
 
+import at.lowdfx.lowdfx.command.EmojiCommands;
 import at.lowdfx.lowdfx.command.PlaytimeCommand;
 import at.lowdfx.lowdfx.command.StatCommands;
 import at.lowdfx.lowdfx.command.block.ChestShopCommand;
@@ -14,10 +15,13 @@ import at.lowdfx.lowdfx.command.util.LowCommand;
 import at.lowdfx.lowdfx.command.util.TimeCommands;
 import at.lowdfx.lowdfx.command.util.UtilityCommands;
 import at.lowdfx.lowdfx.event.*;
+import at.lowdfx.lowdfx.managers.EmojiManager;
 import at.lowdfx.lowdfx.managers.HologramManager;
 import at.lowdfx.lowdfx.managers.ManagerManager;
-import at.lowdfx.lowdfx.managers.teleport.TeleportCancelOnDamageListener;
+import at.lowdfx.lowdfx.listeners.TeleportCancelOnDamageListener;
+import at.lowdfx.lowdfx.managers.teleport.CooldownManager;
 import at.lowdfx.lowdfx.util.Configuration;
+import at.lowdfx.lowdfx.util.FileUpdater;
 import at.lowdfx.lowdfx.util.Perms;
 import com.marcpg.libpg.MinecraftLibPG;
 import com.marcpg.libpg.util.ServerUtils;
@@ -32,6 +36,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import xyz.xenondevs.invui.InvUI;
+import at.lowdfx.lowdfx.listeners.*;
 
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
@@ -50,6 +55,9 @@ public final class LowdFX extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Standardkonfigurationen und Dateien werden gemerged
+        FileUpdater.updateYaml(this, "config.yml");
+        FileUpdater.updateJson(this, "permissions.json");
         LOG = getSLF4JLogger();
         PLUGIN = this;
         PLUGIN_DIR = getDataPath();
@@ -64,6 +72,8 @@ public final class LowdFX extends JavaPlugin {
         Perms.loadPermissions();
         ManagerManager.load();
         HologramManager.load();
+        CooldownManager.init();
+        EmojiManager.init(this);
 
         // bStats starten
         int pluginId = 25282;
@@ -71,6 +81,8 @@ public final class LowdFX extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("language", () -> getConfig().getString("language")));
 
         getServer().getPluginManager().registerEvents(new TeleportCancelOnDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatEmojiTabCompleteListener(), this);
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
@@ -98,13 +110,16 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(TpCommands.backCommand(), "Teleportiert dich zurück an deinen letzten Ort.");
             registrar.register(TpCommands.tpallCommand(), "Teleportiere alle Spieler zu dir.");
             registrar.register(TpCommands.tphereCommand(), "Teleportiere einen oder mehrere Spieler zu dir.");
+            registrar.register(TpCommands.rtpCommand(), "Teleportiere dich an eine zufällige Stelle.");
             registrar.register(TpaCommand.command(), "Versendet eine TPA an einen Spieler.");
             registrar.register(UtilityCommands.flyCommand(), "Erlaubt einen Spieler zu fliegen.");
             registrar.register(UtilityCommands.gmCommand(), "Setzt den Spielmodus eines Spielers.");
+            registrar.register(UtilityCommands.godCommand(), "Versetzt dich in den Godmode.");
             registrar.register(UtilityCommands.chatClearCommand(), "Lösche den Chat.");
             registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
+            registrar.register(EmojiCommands.command(), "Teleportiert dich zu einem Warp.");
         });
 
         LOG.info("LowdFX Plugin gestartet!");

@@ -29,7 +29,7 @@ public final class Perms {
         GAME_MODE(          "lowdfx.gm",                "/gm",                  OP),
         HEAL(               "lowdfx.heal",              "/heal",                OP),
         HOME(               "lowdfx.home",              "/home",                TRUE),
-        HOME_ADMIN(         "lowdfx.home.admin",        "/home (andere)",       OP),
+        HOME_ADMIN(         "lowdfx.home.admin",        "/home <player>",       OP),
         INFO(               "lowdfx.low.info",          "/low info",            OP),
         INVSEE(             "lowdfx.inv.invsee",        "/invsee",              OP),
         LOCK(               "lowdfx.lock",              "/lock",                TRUE),
@@ -38,7 +38,7 @@ public final class Perms {
         OP_KIT(             "lowdfx.kit.op",            "/kit op",              OP),
         KIT_ADMIN(          "lowdfx.kit.admin",         "/kit <kit> <player>",  OP),
         PLAYTIME(           "lowdfx.playtime",          "/playtime",            TRUE),
-        PLAYTIME_ADMIN(     "lowdfx.playtime.admin",    "/playtime (andere)",   OP),
+        PLAYTIME_ADMIN(     "lowdfx.playtime.admin",    "/playtime <player>",   OP),
         SPAWN(              "lowdfx.spawn",             "/spawn",               TRUE),
         SPAWN_ADMIN(        "lowdfx.spawn.admin",       "/spawn (andere)",      OP),
         STARTER_KIT(        "lowdfx.kit.starter",       "/kit starter",         TRUE),
@@ -48,13 +48,18 @@ public final class Perms {
         TPHERE(             "lowdfx.tphere",            "/tphere",              OP),
         TRASH(              "lowdfx.trash",             "/trash",               OP),
         VANISH(             "lowdfx.vanish",            "/vanish",              OP),
-        WARN(               "lowdfx.warn",              "/warn (limitiert)",    TRUE),
+        WARN(               "lowdfx.warn",              "/warn (andere)",       TRUE),
         WARN_ADMIN(         "lowdfx.warn.admin",        "/warn",                OP),
         WARP(               "lowdfx.warp",              "/warp",                TRUE),
         WARP_ADMIN(         "lowdfx.warp.admin",        "/warp (andere)",       OP),
         WORKBENCH(          "lowdfx.inv.workbench",     "/workbench",           OP),
         CHAT_CLEAR(         "lowdfx.chat.clear",        "/chat clear",          OP),
-        RELOAD(             "lowdfx.reload",            "/low reload",          OP);
+        RELOAD(             "lowdfx.reload",            "/low reload",          OP),
+        GOD(                "lowdfx.god",               "/god <player>",        OP),
+        RTP(                "lowdfx.rtp",               "/rtp",                 TRUE),
+        TP_BYPASS(          "lowdfx.tp.bypass",         "Teleport Delay Bypass",OP),
+        BACK_PREMIUM(       "lowdfx.back.premium",      "Back Premium Cooldown",OP),
+        EMOJIS(             "lowdfx.emojis",            "Chat Emojis",          TRUE);
 
         private final String permission;
         private final String commands;

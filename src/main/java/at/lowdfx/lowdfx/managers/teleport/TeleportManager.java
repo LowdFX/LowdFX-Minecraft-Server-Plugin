@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.managers.teleport;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.util.Configuration;
+import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.SimpleLocation;
 import com.google.gson.reflect.TypeToken;
 import com.marcpg.libpg.storage.JsonUtils;
@@ -30,9 +31,9 @@ public final class TeleportManager {
     public static final long EXPIRATION = 300000; // 5 Minuten
 
     public static final Map<UUID, Pair<SimpleLocation, AtomicLong>> BACK_POINTS = new HashMap<>();
-
     // Map für bereits gestartete, verzögerte Teleport-Aufträge
     private static final Map<UUID, BukkitTask> pendingTeleports = new HashMap<>();
+    private static final Map<UUID, SimpleLocation> lastEventPoints = new HashMap<>();
 
     // Diese innere Klasse speichert Informationen zum pending Teleport
     public static class PendingTeleport {
@@ -73,8 +74,11 @@ public final class TeleportManager {
     }
 
     public static void teleportSafe(@NotNull Entity entity, @NotNull Location loc, @NotNull Consumer<Boolean> after) {
-        if (entity instanceof Player p)
+        if (entity instanceof Player p) {
+            // Speichere den aktuellen Standort bevor teleportiert wird
+            setLastEvent(p);
             BACK_POINTS.put(p.getUniqueId(), Pair.of(SimpleLocation.ofLocation(p.getLocation()), new AtomicLong(System.currentTimeMillis())));
+        }
         if (entity.getWorld().equals(loc.getWorld())) {
             entity.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_VEHICLE, TeleportFlag.EntityState.RETAIN_PASSENGERS).thenAccept(after);
         } else { // Bei Cross-World-Teleportation
@@ -99,14 +103,22 @@ public final class TeleportManager {
      * Falls Safe-Teleport deaktiviert ist, wird sofort teleportiert.
      */
     public static void teleportDelayed(Player player, Location loc) {
+        // Überprüfe, ob der Spieler den Admin-Bypass für den Teleport-Delay hat
+        if (Perms.check(player, Perms.Perm.TP_BYPASS)) {
+            teleportSafe(player, loc);
+            return;
+        }
+
+        // Falls Safe-Teleport deaktiviert ist, sofort teleportieren
         if (!Configuration.SAFE_TELEPORT_ENABLED) {
             teleportSafe(player, loc);
             return;
         }
-        int delaySeconds = Configuration.TELEPORT_DELAY; // in Sekunden
+
+        int delaySeconds = Configuration.TELEPORT_DELAY;
         PendingTeleport pending = new PendingTeleport(player, loc, delaySeconds);
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(LowdFX.PLUGIN, () -> {
-            // Überprüfe, ob sich der Spieler bewegt hat (nur Blockkoordinaten)
+            // Prüfe, ob sich der Spieler bewegt hat (nur Blockkoordinaten)
             Location current = player.getLocation();
             if (current.getBlockX() != pending.initialX ||
                     current.getBlockY() != pending.initialY ||
@@ -117,11 +129,9 @@ public final class TeleportManager {
                 cancelPendingTeleport(player);
                 return;
             }
-            // Hier könnte man optional auch prüfen, ob der Spieler Schaden erlitten hat (über einen separaten Listener)
             pending.remainingTicks -= 20;
             int remainingSeconds = pending.remainingTicks / 20;
             if (pending.remainingTicks > 0) {
-                // Countdown anzeigen (z. B. per ActionBar)
                 player.sendActionBar(Component.text("Teleport in " + remainingSeconds + " Sekunden...", NamedTextColor.YELLOW));
             } else {
                 cancelPendingTeleport(player);
@@ -130,6 +140,7 @@ public final class TeleportManager {
         }, 0L, 20L);
         pendingTeleports.put(player.getUniqueId(), task);
     }
+
 
     /**
      * Bricht einen pending Teleport für den angegebenen Spieler ab.
@@ -142,6 +153,20 @@ public final class TeleportManager {
     }
     public static boolean hasPendingTeleport(Player player) {
         return pendingTeleports.containsKey(player.getUniqueId());
+    }
+
+    /**
+     * Speichert den aktuellen Standort des Spielers als letztes Ereignis.
+     */
+    public static void setLastEvent(Player player) {
+        lastEventPoints.put(player.getUniqueId(), SimpleLocation.ofLocation(player.getLocation()));
+    }
+
+    /**
+     * Liefert den zuletzt gespeicherten Punkt (Teleport oder Tod) des Spielers.
+     */
+    public static SimpleLocation getLastEvent(UUID playerId) {
+        return lastEventPoints.get(playerId);
     }
 
 }

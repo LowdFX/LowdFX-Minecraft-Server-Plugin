@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.util;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.managers.EmojiManager;
 import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -29,10 +30,12 @@ public final class LowCommand {
                         .requires(source -> Perms.check(source, Perms.Perm.RELOAD))
                         .executes(context -> {
                             CommandSender sender = context.getSource().getSender();
-                            sender.sendMessage(LowdFX.serverMessage(Component.text("Lade config.yml & Permissions.yml neu...", NamedTextColor.YELLOW)));
+                            sender.sendMessage(LowdFX.serverMessage(Component.text("Lade config.yml & emojis.yml neu...", NamedTextColor.YELLOW)));
                             LowdFX.PLUGIN.reloadConfig();
                             Configuration.reload();
-                            sender.sendMessage(LowdFX.serverMessage(Component.text("Config & Permissions erfolgreich neu geladen.", NamedTextColor.GREEN)));
+                            // Emojis neu laden:
+                            EmojiManager.init(LowdFX.PLUGIN);
+                            sender.sendMessage(LowdFX.serverMessage(Component.text("Config & Emojis erfolgreich neu geladen.", NamedTextColor.GREEN)));
                             return 1;
                         })
                 )

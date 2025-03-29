@@ -1,6 +1,7 @@
-package at.lowdfx.lowdfx.managers.teleport;
+package at.lowdfx.lowdfx.listeners;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.managers.teleport.TeleportManager;
 import at.lowdfx.lowdfx.util.Configuration;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;

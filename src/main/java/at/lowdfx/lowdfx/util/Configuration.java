@@ -23,6 +23,7 @@ public class Configuration {
 
     public static boolean SAFE_TELEPORT_ENABLED;
     public static int TELEPORT_DELAY;
+    public static int BACK_COOLDOWN;
 
     public static void init(@NotNull JavaPlugin plugin) {
         plugin.saveDefaultConfig();
@@ -51,6 +52,7 @@ public class Configuration {
 
         SAFE_TELEPORT_ENABLED = CONFIG.getBoolean("teleport.safe-enabled", true);
         TELEPORT_DELAY = CONFIG.getInt("teleport.delay", 5);
+        BACK_COOLDOWN = CONFIG.getInt("teleport.backCooldown", 43200);
     }
 
     public static FileConfiguration get() {
