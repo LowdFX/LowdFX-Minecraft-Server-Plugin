@@ -29,7 +29,7 @@ public final class EmojiCommands {
     @SuppressWarnings("UnstableApiUsage")
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("emojis")
-                .requires(source -> Perms.check(source, Perms.Perm.EMOJIS)) // Beispiel-Permission
+                .requires(source -> Perms.check(source, Perms.Perm.EMOJIS))
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
 

@@ -28,6 +28,9 @@ basic:
   # Steht vor jeder Befehlsnachricht.
   server-name: "LoudCraft"
 
+  # Custom /help Befehl vom Plugin an/aus
+  customhelp: true
+
   # Maximale Homes pro Spieler.
   max-homes: 5
 

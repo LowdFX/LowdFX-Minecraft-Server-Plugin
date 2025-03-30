@@ -16,6 +16,8 @@ public class Configuration {
 
     public static String BASIC_SERVER_NAME;
     public static int BASIC_MAX_HOMES;
+    public static boolean BASIC_STARTERKIT;
+    public static boolean BASIC_CUSTOM_HELP;
     public static long BASIC_HOLOGRAM_REFRESH_INTERVAL;
 
     public static long WARNING_TEMPBAN_DURATION;
@@ -25,8 +27,7 @@ public class Configuration {
     public static int TELEPORT_DELAY;
     public static int BACK_COOLDOWN;
 
-    // Neuer Eintrag für das Starterkit
-    public static boolean BASIC_STARTERKIT;
+
 
     public static void init(@NotNull JavaPlugin plugin) {
         plugin.saveDefaultConfig();
@@ -48,6 +49,7 @@ public class Configuration {
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
         BASIC_MAX_HOMES = CONFIG.getInt("basic.max-homes", 5);
         BASIC_STARTERKIT = CONFIG.getBoolean("basic.starterkit", true);
+        BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
         BASIC_HOLOGRAM_REFRESH_INTERVAL = CONFIG.getLong("basic.hologram-refresh-interval", 20);
 
         WARNING_TEMPBAN_DURATION = CONFIG.getLong("warning.tempban-duration", 1440) * 60000;

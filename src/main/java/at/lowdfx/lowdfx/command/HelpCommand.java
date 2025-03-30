@@ -2,6 +2,8 @@ package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.command.util.CommandHelp;
+import at.lowdfx.lowdfx.util.Configuration;
+import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -17,6 +19,7 @@ public final class HelpCommand {
     @SuppressWarnings("UnstableApiUsage")
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("help")
+                .requires(source -> Configuration.BASIC_CUSTOM_HELP)
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     sender.sendMessage(LowdFX.serverMessage(CommandHelp.getAllHelp(sender)));

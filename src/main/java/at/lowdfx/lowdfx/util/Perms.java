@@ -62,7 +62,8 @@ public final class Perms {
         EMOJIS(             "lowdfx.emojis",            "Chat Emojis",                          TRUE),
         BAN(                "lowdfx.ban",               "/tempban <player> <time> <reason>",    OP),
         ADMINHELP_RECEIVE(  "lowdfx.adminhelp.receive", "Adminhelp Nachricht empfangen",        OP),
-        ADMINHELP_SEND(     "lowdfx.adminhelp.send",    "Adminhelp Nachricht senden",           TRUE);
+        ADMINHELP_SEND(     "lowdfx.adminhelp.send",    "Adminhelp Nachricht senden",           TRUE),
+        SCALE(              "lowdfx.scale",             "Verkleinere/vergrößere dich.",         OP);
 
         private final String permission;
         private final String commands;

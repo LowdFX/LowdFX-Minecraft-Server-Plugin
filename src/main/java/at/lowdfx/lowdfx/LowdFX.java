@@ -1,9 +1,6 @@
 package at.lowdfx.lowdfx;
 
-import at.lowdfx.lowdfx.command.EmojiCommands;
-import at.lowdfx.lowdfx.command.HelpCommand;
-import at.lowdfx.lowdfx.command.PlaytimeCommand;
-import at.lowdfx.lowdfx.command.StatCommands;
+import at.lowdfx.lowdfx.command.*;
 import at.lowdfx.lowdfx.command.block.ChestShopCommand;
 import at.lowdfx.lowdfx.command.block.LockCommand;
 import at.lowdfx.lowdfx.command.inventory.InventoryCommands;
@@ -14,6 +11,7 @@ import at.lowdfx.lowdfx.command.util.LowCommand;
 import at.lowdfx.lowdfx.command.util.TimeCommands;
 import at.lowdfx.lowdfx.command.util.UtilityCommands;
 import at.lowdfx.lowdfx.event.*;
+import at.lowdfx.lowdfx.managers.DeathMessageManager;
 import at.lowdfx.lowdfx.managers.EmojiManager;
 import at.lowdfx.lowdfx.managers.HologramManager;
 import at.lowdfx.lowdfx.managers.ManagerManager;
@@ -73,6 +71,7 @@ public final class LowdFX extends JavaPlugin {
         HologramManager.load();
         CooldownManager.init();
         EmojiManager.init(this);
+        DeathMessageManager deathMessageManager = new DeathMessageManager(this);
 
         // bStats starten
         int pluginId = 25282;
@@ -82,6 +81,7 @@ public final class LowdFX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportCancelOnDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
         getServer().getPluginManager().registerEvents(new ChatEmojiTabCompleteListener(), this);
+        getServer().getPluginManager().registerEvents(new DeathListener(deathMessageManager), this);
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
@@ -121,7 +121,9 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(EmojiCommands.command(), "Teleportiert dich zu einem Warp.");
             registrar.register(TempbanCommand.command(), "Temporärer Bancommand.");
             registrar.register(AdminHelpCommand.command(), "Admin Help.");
-            registrar.register(HelpCommand.command(), "Help.");
+            registrar.register(ScaleCommand.command(), "Macht dich klein.");
+            registrar.register(HelpCommand.command(), "Custom Help Befehl.");
+
         });
 
         LOG.info("LowdFX Plugin gestartet!");
