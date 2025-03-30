@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.moderation.MuteManager;
 import at.lowdfx.lowdfx.util.Perms;
 import com.marcpg.libpg.data.time.Time;
@@ -11,6 +12,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -23,6 +25,21 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class MuteCommands {
+
+    static {
+        CommandHelp.register("mute",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help mute"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du einen Spieler stumm schalten.<newline></gray>" +
+                                "<yellow>· /mute <player> <time> <reason> <newline></yellow>" +
+                                "<yellow>· /muteall <time> <reason></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.MUTE.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static final List<String> TIME_UNITS = List.of("s", "min", "h", "d", "wk", "mo");
 
     public static LiteralCommandNode<CommandSourceStack> muteCommand() {

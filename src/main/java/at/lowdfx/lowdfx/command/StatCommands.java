@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -11,6 +12,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -22,6 +24,33 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class StatCommands {
+
+    static {
+        CommandHelp.register("feed",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/feed <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du deine Hungerleiste füllen.<newline></gray>" +
+                                "<yellow>· /feed <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.FEED.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("heal",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/heal <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du deine Hungerleiste und Lebensleiste füllen.<newline></gray>" +
+                                "<yellow>· /heal <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.HEAL.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> feedCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("feed")
                 .requires(source -> Perms.check(source, Perms.Perm.FEED))

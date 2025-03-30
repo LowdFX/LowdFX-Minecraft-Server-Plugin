@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.block;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.block.LockableManager;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.SimpleLocation;
@@ -14,6 +15,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.PlayerProfileListResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -23,6 +25,25 @@ import java.util.Collection;
 
 @SuppressWarnings({ "UnstableApiUsage", "DuplicatedCode" })
 public final class LockCommand {
+
+    static {
+        CommandHelp.register("lock",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/lock help"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du öffenbare Blöcke sperren.<newline></gray>" +
+                                "<yellow>· /lock<newline></yellow>" +
+                                "<yellow>· /lock global<newline></yellow>" +
+                                "<yellow>· /lock unlock<newline></yellow>" +
+                                "<yellow>· /lock whitelist add<newline></yellow>" +
+                                "<yellow>· /lock whitelist remove<newline></yellow>" +
+                                "<yellow>· /lock whitelist list</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.LOCK.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("lock")
                 .requires(source -> Perms.check(source, Perms.Perm.LOCK) && source.getExecutor() instanceof Player)

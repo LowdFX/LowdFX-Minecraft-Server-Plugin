@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.inventory;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.kit.Items;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
@@ -13,6 +14,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSele
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +27,71 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class InventoryCommands {
+
+    static {
+        CommandHelp.register("anvil",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/anvil"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du einen Amboss öffnen.<newline></gray>" +
+                                "<yellow>· /anvil</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.ANVIL.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+    static {
+        CommandHelp.register("trash",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/trash"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du einen Mülleimer öffnen.<newline></gray>" +
+                                "<yellow>· /trash</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.TRASH.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("workbench",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/workbench"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du eine Werkbank öffnen.<newline></gray>" +
+                                "<yellow>· /workbench</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.WORKBENCH.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("invsee",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/invsee"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du ein Inventar öffnen.<newline></gray>" +
+                                "<yellow>· /invsee <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.INVSEE.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("endersee",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/endersee"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du ein Inventar öffnen.<newline></gray>" +
+                                "<yellow>· /endersee <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.ENDERSEE.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> anvilCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("anvil")
                 .requires(source -> Perms.check(source, Perms.Perm.ANVIL) && source.getExecutor() instanceof Player)

@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.teleport;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.teleport.TeleportManager;
 import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
@@ -14,6 +15,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,6 +26,59 @@ import java.util.Random;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TpCommands {
+
+    static {
+        CommandHelp.register("tphere",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/tphere <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du einen Spieler zu dir teleportieren.<newline></gray>" +
+                                "<yellow>· /tphere <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.TPHERE.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("tpall",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/tpall"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du alle Spieler zu dir teleportieren.<newline></gray>" +
+                                "<yellow>· /tpall</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.TPALL.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("back",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/back"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich zum letzten Teleportpunkt odr Tod teleportieren.<newline></gray>" +
+                                "<yellow>· /back</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.BACK_PREMIUM.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("rtp",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/rtp"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich an eine zufällige Stelle teleportieren.<newline></gray>" +
+                                "<yellow>· /rtp</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.RTP.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> tphereCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("tphere")
                 .requires(source -> Perms.check(source, Perms.Perm.TPHERE))

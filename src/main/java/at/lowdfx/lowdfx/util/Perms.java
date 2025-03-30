@@ -19,47 +19,50 @@ import static org.bukkit.permissions.PermissionDefault.TRUE;
 
 public final class Perms {
     public enum Perm {
-        ANVIL(              "lowdfx.inv.anvil",         "/anvil",               OP),
-        BACK(               "lowdfx.back",              "/back",                OP),
-        CHEST_SHOP(         "lowdfx.chestshop",         "/shop",                TRUE),
-        CHEST_SHOP_ADMIN(   "lowdfx.chestshop.admin",   "/shop",                OP),
-        ENDERSEE(           "lowdfx.inv.endersee",      "/endersee",            OP),
-        FEED(               "lowdfx.feed",              "/feed",                OP),
-        FLY(                "lowdfx.fly",               "/fly",                 OP),
-        GAME_MODE(          "lowdfx.gm",                "/gm",                  OP),
-        HEAL(               "lowdfx.heal",              "/heal",                OP),
-        HOME(               "lowdfx.home",              "/home",                TRUE),
-        HOME_ADMIN(         "lowdfx.home.admin",        "/home <player>",       OP),
-        INFO(               "lowdfx.low.info",          "/low info",            OP),
-        INVSEE(             "lowdfx.inv.invsee",        "/invsee",              OP),
-        LOCK(               "lowdfx.lock",              "/lock",                TRUE),
-        LOCK_ADMIN(         "lowdfx.lock.admin",        "/lock",                OP),
-        MUTE(               "lowdfx.mute",              "/mute & /unmute",      OP),
-        OP_KIT(             "lowdfx.kit.op",            "/kit op",              OP),
-        KIT_ADMIN(          "lowdfx.kit.admin",         "/kit <kit> <player>",  OP),
-        PLAYTIME(           "lowdfx.playtime",          "/playtime",            TRUE),
-        PLAYTIME_ADMIN(     "lowdfx.playtime.admin",    "/playtime <player>",   OP),
-        SPAWN(              "lowdfx.spawn",             "/spawn",               TRUE),
-        SPAWN_ADMIN(        "lowdfx.spawn.admin",       "/spawn (andere)",      OP),
-        STARTER_KIT(        "lowdfx.kit.starter",       "/kit starter",         TRUE),
-        TIME(               "lowdfx.time",              "/day & /night",        OP),
-        TPA(                "lowdfx.tpa",               "/tpa",                 TRUE),
-        TPALL(              "lowdfx.tpall",             "/tpall",               OP),
-        TPHERE(             "lowdfx.tphere",            "/tphere",              OP),
-        TRASH(              "lowdfx.trash",             "/trash",               OP),
-        VANISH(             "lowdfx.vanish",            "/vanish",              OP),
-        WARN(               "lowdfx.warn",              "/warn (andere)",       TRUE),
-        WARN_ADMIN(         "lowdfx.warn.admin",        "/warn",                OP),
-        WARP(               "lowdfx.warp",              "/warp",                TRUE),
-        WARP_ADMIN(         "lowdfx.warp.admin",        "/warp (andere)",       OP),
-        WORKBENCH(          "lowdfx.inv.workbench",     "/workbench",           OP),
-        CHAT_CLEAR(         "lowdfx.chat.clear",        "/chat clear",          OP),
-        RELOAD(             "lowdfx.reload",            "/low reload",          OP),
-        GOD(                "lowdfx.god",               "/god <player>",        OP),
-        RTP(                "lowdfx.rtp",               "/rtp",                 TRUE),
-        TP_BYPASS(          "lowdfx.tp.bypass",         "Teleport Delay Bypass",OP),
-        BACK_PREMIUM(       "lowdfx.back.premium",      "Back Premium Cooldown",OP),
-        EMOJIS(             "lowdfx.emojis",            "Chat Emojis",          TRUE);
+        ANVIL(              "lowdfx.inv.anvil",         "/anvil",                               OP),
+        BACK(               "lowdfx.back",              "/back",                                OP),
+        CHEST_SHOP(         "lowdfx.chestshop",         "/shop",                                TRUE),
+        CHEST_SHOP_ADMIN(   "lowdfx.chestshop.admin",   "/shop",                                OP),
+        ENDERSEE(           "lowdfx.inv.endersee",      "/endersee",                            OP),
+        FEED(               "lowdfx.feed",              "/feed",                                OP),
+        FLY(                "lowdfx.fly",               "/fly",                                 OP),
+        GAME_MODE(          "lowdfx.gm",                "/gm",                                  OP),
+        HEAL(               "lowdfx.heal",              "/heal",                                OP),
+        HOME(               "lowdfx.home",              "/home",                                TRUE),
+        HOME_ADMIN(         "lowdfx.home.admin",        "/home tp_other <player> & mehr",       OP),
+        INFO(               "lowdfx.low.info",          "/low info",                            OP),
+        INVSEE(             "lowdfx.inv.invsee",        "/invsee",                              OP),
+        LOCK(               "lowdfx.lock",              "/lock",                                TRUE),
+        LOCK_ADMIN(         "lowdfx.lock.admin",        "/lock",                                OP),
+        MUTE(               "lowdfx.mute",              "/mute & /unmute",                      OP),
+        OP_KIT(             "lowdfx.kit.op",            "/kit op",                              OP),
+        KIT_ADMIN(          "lowdfx.kit.admin",         "/kit <kit> <player>",                  OP),
+        PLAYTIME(           "lowdfx.playtime",          "/playtime",                            TRUE),
+        PLAYTIME_ADMIN(     "lowdfx.playtime.admin",    "/playtime <player>",                   OP),
+        SPAWN(              "lowdfx.spawn",             "/spawn",                               TRUE),
+        SPAWN_ADMIN(        "lowdfx.spawn.admin",       "/spawn (andere)",                      OP),
+        STARTER_KIT(        "lowdfx.kit.starter",       "/kit starter",                         TRUE),
+        TIME(               "lowdfx.time",              "/day & /night",                        OP),
+        TPA(                "lowdfx.tpa",               "/tpa",                                 TRUE),
+        TPALL(              "lowdfx.tpall",             "/tpall",                               OP),
+        TPHERE(             "lowdfx.tphere",            "/tphere",                              OP),
+        TRASH(              "lowdfx.trash",             "/trash",                               OP),
+        VANISH(             "lowdfx.vanish",            "/vanish",                              OP),
+        WARN(               "lowdfx.warn",              "/warn (andere)",                       TRUE),
+        WARN_ADMIN(         "lowdfx.warn.admin",        "/warn",                                OP),
+        WARP(               "lowdfx.warp",              "/warp",                                TRUE),
+        WARP_ADMIN(         "lowdfx.warp.admin",        "/warp (andere)",                       OP),
+        WORKBENCH(          "lowdfx.inv.workbench",     "/workbench",                           OP),
+        CHAT_CLEAR(         "lowdfx.chat.clear",        "/chat clear",                          OP),
+        RELOAD(             "lowdfx.reload",            "/low reload",                          OP),
+        GOD(                "lowdfx.god",               "/god <player>",                        OP),
+        RTP(                "lowdfx.rtp",               "/rtp",                                 TRUE),
+        TP_BYPASS(          "lowdfx.tp.bypass",         "Teleport Delay Bypass",                OP),
+        BACK_PREMIUM(       "lowdfx.back.premium",      "Back Premium Cooldown",                OP),
+        EMOJIS(             "lowdfx.emojis",            "Chat Emojis",                          TRUE),
+        BAN(                "lowdfx.ban",               "/tempban <player> <time> <reason>",    OP),
+        ADMINHELP_RECEIVE(  "lowdfx.adminhelp.receive", "Adminhelp Nachricht empfangen",        OP),
+        ADMINHELP_SEND(     "lowdfx.adminhelp.send",    "Adminhelp Nachricht senden",           TRUE);
 
         private final String permission;
         private final String commands;
@@ -70,7 +73,12 @@ public final class Perms {
             this.commands = commands;
             this.def = def;
         }
+
+        public String getPermission() {
+            return permission;
+        }
     }
+
 
     // Lädt die Berechtigungen aus der permissions.json und registriert sie.
     public static void loadPermissions() {

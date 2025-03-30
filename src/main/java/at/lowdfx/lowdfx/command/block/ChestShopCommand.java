@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.block;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.HologramManager;
 import at.lowdfx.lowdfx.managers.block.ChestShopManager;
 import at.lowdfx.lowdfx.util.Perms;
@@ -15,6 +16,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.PlayerProfileListResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.Lidded;
@@ -25,6 +27,27 @@ import java.util.Collection;
 
 @SuppressWarnings({ "UnstableApiUsage", "DuplicatedCode" })
 public final class ChestShopCommand {
+
+    static {
+        CommandHelp.register("shop",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help shop"),
+                // Ausführliche Beschreibung für normale Spieler
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du eine Shop Kiste erstellen/verwalten.<newline>" +
+                                "<yellow>· /shop create <price><newline>" +
+                                "· /shop item<newline>" +
+                                "· /shop whitelist add <player><newline>" +
+                                "· /shop whitelist remove <player><newline>" +
+                                "· /shop whitelist list</yellow>"),
+                // Zusätzlicher Admin-Teil (optional)
+                MiniMessage.miniMessage().deserialize("<yellow>· /shop fix-holograms</yellow>"),
+                // Basis-Permission
+                Perms.Perm.CHEST_SHOP.getPermission(),
+                // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
+                Perms.Perm.CHEST_SHOP_ADMIN.getPermission());
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("chest-shop")
                 .requires(source -> Perms.check(source, Perms.Perm.CHEST_SHOP) && source.getExecutor() instanceof Player)

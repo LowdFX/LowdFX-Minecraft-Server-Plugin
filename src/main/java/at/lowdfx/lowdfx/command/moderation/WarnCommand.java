@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.moderation.WarnManager;
 import at.lowdfx.lowdfx.util.Perms;
 import com.destroystokyo.paper.profile.PlayerProfile;
@@ -22,6 +23,26 @@ import java.util.Collection;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class WarnCommand {
+
+    static {
+        CommandHelp.register("warn",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help warn"),
+                // Ausführliche Beschreibung für normale Spieler
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du deine Verwarnungen einsehen.<newline>" +
+                                "<yellow>· /warn info</yellow>"),
+                // Zusätzlicher Admin-Teil (optional)
+                MiniMessage.miniMessage().deserialize(
+                        "<yellow>· /warn <player> <reason><newline></yellow>" +
+                                "<yellow>· /warn remove <player><newline></yellow>" +
+                                "<yellow>· /warn removeall <player></yellow>"),
+                // Basis-Permission
+                Perms.Perm.WARN.getPermission(),
+                // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
+                Perms.Perm.WARN_ADMIN.getPermission());
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("warn")
                 .requires(source -> Perms.check(source, Perms.Perm.WARN))

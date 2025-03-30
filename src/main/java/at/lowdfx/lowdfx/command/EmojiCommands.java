@@ -1,5 +1,6 @@
 package at.lowdfx.lowdfx.command;
 
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.EmojiManager;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -7,9 +8,23 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 
 public final class EmojiCommands {
+
+    static {
+        CommandHelp.register("emojis",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/emojis"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dir eine Liste aller emojis anzeigen lassen.<newline></gray>" +
+                                "<yellow>· /emojis</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.EMOJIS.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
 
     @SuppressWarnings("UnstableApiUsage")
     public static LiteralCommandNode<CommandSourceStack> command() {

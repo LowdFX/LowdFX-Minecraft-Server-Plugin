@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.teleport;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.teleport.TeleportManager;
 import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
@@ -15,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -27,6 +29,24 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TpaCommand {
+
+    static {
+        CommandHelp.register("tpa",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help tpa"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du eine TP Anfrage an angegebene Spieler senden.<newline></gray>" +
+                                "<yellow>· /tpa <player><newline></yellow>" +
+                                "<yellow>· /tpa here <player><newline></yellow>" +
+                                "<yellow>· /tpa cancel<newline></yellow>" +
+                                "<yellow>· /tpa deny<newline></yellow>" +
+                                "<yellow>· /tpa accept<newline></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.TPA.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
 
     public static final long EXPIRATION_TIME = 120000; // 2 Minuten
     // Für normale /tpa-Anfragen: key = Absender, value = Ziel

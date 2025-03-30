@@ -1,15 +1,14 @@
 package at.lowdfx.lowdfx;
 
 import at.lowdfx.lowdfx.command.EmojiCommands;
+import at.lowdfx.lowdfx.command.HelpCommand;
 import at.lowdfx.lowdfx.command.PlaytimeCommand;
 import at.lowdfx.lowdfx.command.StatCommands;
 import at.lowdfx.lowdfx.command.block.ChestShopCommand;
 import at.lowdfx.lowdfx.command.block.LockCommand;
 import at.lowdfx.lowdfx.command.inventory.InventoryCommands;
 import at.lowdfx.lowdfx.command.inventory.KitCommand;
-import at.lowdfx.lowdfx.command.moderation.MuteCommands;
-import at.lowdfx.lowdfx.command.moderation.VanishCommand;
-import at.lowdfx.lowdfx.command.moderation.WarnCommand;
+import at.lowdfx.lowdfx.command.moderation.*;
 import at.lowdfx.lowdfx.command.teleport.*;
 import at.lowdfx.lowdfx.command.util.LowCommand;
 import at.lowdfx.lowdfx.command.util.TimeCommands;
@@ -120,6 +119,9 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
             registrar.register(EmojiCommands.command(), "Teleportiert dich zu einem Warp.");
+            registrar.register(TempbanCommand.command(), "Temporärer Bancommand.");
+            registrar.register(AdminHelpCommand.command(), "Admin Help.");
+            registrar.register(HelpCommand.command(), "Help.");
         });
 
         LOG.info("LowdFX Plugin gestartet!");

@@ -1,7 +1,9 @@
 package at.lowdfx.lowdfx.command.inventory;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.KitManager;
+import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.Perms;
 import at.lowdfx.lowdfx.util.Utilities;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -12,11 +14,37 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class KitCommand {
+
+    static {
+        // Baue den detaillierten Hilfetext dynamisch auf:
+        String detailedHelp = "<gray>Mit diesem Befehl kannst du Kits verwalten.<newline>";
+        if (Configuration.BASIC_STARTERKIT) {
+            detailedHelp += "<yellow>· /kit starter</yellow><newline>";
+        }
+        detailedHelp += "<yellow>· /kit opkit<newline></yellow>" +
+                "<yellow>· /kit edit</yellow></gray>";
+
+        CommandHelp.register("kit",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/kit"),
+                // Ausführliche Beschreibung
+                MiniMessage.miniMessage().deserialize(detailedHelp),
+                // Zusätzlicher Admin-Bereich (optional)
+                MiniMessage.miniMessage().deserialize("<yellow>Admin-Bereich: /kit opkit, /kit edit</yellow>"),
+                // Basis-Permission
+                Perms.Perm.STARTER_KIT.getPermission(),
+                // Admin-Permission
+                Perms.Perm.KIT_ADMIN.getPermission());
+    }
+
+
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("kit")
                 .requires(source -> source.getExecutor() instanceof Player)
@@ -81,6 +109,7 @@ public final class KitCommand {
                         )
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("edit")
+                        .requires(source -> Perms.check(source, Perms.Perm.KIT_ADMIN))
                         .executes(context -> {
                             if (context.getSource().getExecutor() instanceof Player player)
                                 KitManager.showConfig(player);

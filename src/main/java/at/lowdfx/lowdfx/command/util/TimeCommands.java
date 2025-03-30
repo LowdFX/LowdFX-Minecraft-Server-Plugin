@@ -7,9 +7,25 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TimeCommands {
+
+    static {
+        CommandHelp.register("time",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help time"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesen Befehlen kannst du die Zeit steuern.<newline></gray>" +
+                                "<yellow>· /day</yellow>" +
+                                "<yellow>· /night</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.TIME.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> dayCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("day")
                 .requires(source -> Perms.check(source, Perms.Perm.TIME))

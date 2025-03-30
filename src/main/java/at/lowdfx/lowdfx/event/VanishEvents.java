@@ -95,7 +95,8 @@ public class VanishEvents implements Listener {
         if (message.toLowerCase().startsWith("/msg ") ||
                 message.toLowerCase().startsWith("/tell ") ||
                 message.toLowerCase().startsWith("/w ")||
-                message.toLowerCase().startsWith("/reply ")) {
+                message.toLowerCase().startsWith("/reply ")||
+                message.toLowerCase().startsWith("/adminhelp")) {
 
             String[] args = message.split(" ");
             if (args.length < 2) return; // Kein Ziel angegeben

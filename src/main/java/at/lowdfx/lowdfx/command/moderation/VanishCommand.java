@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.command.util.UtilityCommands;
 import at.lowdfx.lowdfx.managers.moderation.VanishManager;
 import at.lowdfx.lowdfx.util.Perms;
@@ -13,6 +14,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,6 +25,21 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class VanishCommand {
+
+    static {
+        CommandHelp.register("vanish",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help vanish"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich oder einen Spieler in vanish versetzen.<newline></gray>" +
+                                "<yellow>· /vanish</yellow>" +
+                                "<yellow>· /vanish <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.VANISH.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("vanish")
                 .requires(source -> Perms.check(source, Perms.Perm.VANISH))

@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.teleport;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.teleport.SpawnManager;
 import at.lowdfx.lowdfx.managers.teleport.TeleportManager;
 import at.lowdfx.lowdfx.util.Configuration;
@@ -14,12 +15,32 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class SpawnCommand {
+
+    static {
+        CommandHelp.register("spawn",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help spawn"),
+                // Ausführliche Beschreibung für normale Spieler
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du Spawns erstellen/verwalten.<newline>" +
+                                "<yellow>· /spawn tp <name></yellow>"),
+                // Zusätzlicher Admin-Teil (optional)
+                MiniMessage.miniMessage().deserialize(
+                        "<yellow>· /spawn set<newline></yellow>" +
+                                "<yellow>· /spawn remove</yellow>"),
+                // Basis-Permission
+                Perms.Perm.SPAWN.getPermission(),
+                // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
+                Perms.Perm.SPAWN_ADMIN.getPermission());
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("spawn")
                 .requires(source -> source.getExecutor() instanceof Player && Perms.check(source, Perms.Perm.SPAWN))

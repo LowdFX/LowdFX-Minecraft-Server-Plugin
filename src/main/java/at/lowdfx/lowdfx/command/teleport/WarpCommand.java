@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.command.teleport;
 
 import at.lowdfx.lowdfx.LowdFX;
+import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.teleport.WarpManager;
 import at.lowdfx.lowdfx.managers.teleport.TeleportManager;
 import at.lowdfx.lowdfx.util.Configuration;
@@ -14,12 +15,32 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class WarpCommand {
+
+    static {
+        CommandHelp.register("warp",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/warp <name>"),
+                // Ausführliche Beschreibung für normale Spieler
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich an einen angegebenen Warppunkt teleportieren.<newline>" +
+                                "<yellow>· /warp <name>></yellow>"),
+                // Zusätzlicher Admin-Teil (optional)
+                MiniMessage.miniMessage().deserialize(
+                        "<yellow>· /warp set <name><newline></yellow>" +
+                                "<yellow>· /warp remove <name></yellow>"),
+                // Basis-Permission
+                Perms.Perm.WARP.getPermission(),
+                // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
+                Perms.Perm.WARP_ADMIN.getPermission());
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("warp")
                 .requires(source -> Perms.check(source, Perms.Perm.WARP))

@@ -12,6 +12,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -22,6 +23,60 @@ import java.util.List;
 @SuppressWarnings("UnstableApiUsage")
 public final class UtilityCommands {
 
+    static {
+        CommandHelp.register("chat",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/chat clear"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du den Chat löschen.<newline></gray>" +
+                                "<yellow>· /chat clear</yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.CHAT_CLEAR.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("god",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/god <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich oder einen angegebenen Spieler in Godmode versetzen.<newline></gray>" +
+                                "<yellow>· /god<newline></yellow>" +
+                                "<yellow>· /god <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.GOD.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("fly",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/fly <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du dich oder einen angegebenen Spieler in Fly versetzen.<newline></gray>" +
+                                "<yellow>· /fly<newline></yellow>" +
+                                "<yellow>· /fly <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.FLY.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
+
+    static {
+        CommandHelp.register("gm",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/gm <mode> <player>"),
+                // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesem Befehl kannst du von dir oder einem angegebenem Spieler den Spielmodus ändern.<newline></gray>" +
+                                "<yellow>· /gm <mode><newline></yellow>" +
+                                "<yellow>· /gm <mode> <player></yellow>"),
+                null, // Kein zusätzlicher Admin-spezifischer Text
+                Perms.Perm.GAME_MODE.getPermission(),
+                null); // Keine separate Admin-Permission
+    }
 
     public static LiteralCommandNode<CommandSourceStack> chatClearCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("chat")

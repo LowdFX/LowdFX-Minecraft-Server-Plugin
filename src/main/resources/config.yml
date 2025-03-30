@@ -31,6 +31,9 @@ basic:
   # Maximale Homes pro Spieler.
   max-homes: 5
 
+  # Starterkit an/aus.
+  starterkit: true
+
   # Aktualisierungsintervall der Chests in Ticks.
   hologram-refresh-interval: 20
 

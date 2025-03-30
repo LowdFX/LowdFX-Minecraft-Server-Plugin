@@ -14,6 +14,24 @@ import org.bukkit.command.CommandSender;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class LowCommand {
+
+    static {
+        CommandHelp.register("low",
+                // Kurzinfo (wird in der Übersicht angezeigt)
+                MiniMessage.miniMessage().deserialize("/help low"),
+                // Ausführliche Beschreibung für normale Spieler
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>Mit diesen Befehlen kannst du die Plugin Info anzeigen lassen und die config.yml und emojis.yml neu laden.<newline>" +
+                                "<yellow>· /low info</yellow>"),
+                // Zusätzlicher Admin-Teil (optional)
+                MiniMessage.miniMessage().deserialize(
+                        "<yellow>· /low reload<newline></yellow>"),
+                // Basis-Permission
+                Perms.Perm.INFO.getPermission(),
+                // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
+                Perms.Perm.RELOAD.getPermission());
+    }
+
     public static LiteralCommandNode<CommandSourceStack> command() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("low")
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("info")

@@ -25,6 +25,9 @@ public class Configuration {
     public static int TELEPORT_DELAY;
     public static int BACK_COOLDOWN;
 
+    // Neuer Eintrag für das Starterkit
+    public static boolean BASIC_STARTERKIT;
+
     public static void init(@NotNull JavaPlugin plugin) {
         plugin.saveDefaultConfig();
         CONFIG = plugin.getConfig();
@@ -37,7 +40,6 @@ public class Configuration {
         loadValues();
     }
 
-
     private static void loadValues() {
         CONNECTION_FIRST_JOIN = MiniMessage.miniMessage().deserialize(CONFIG.getString("connection.first-join", ""));
         CONNECTION_JOIN = MiniMessage.miniMessage().deserialize(CONFIG.getString("connection.join", ""));
@@ -45,6 +47,7 @@ public class Configuration {
 
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
         BASIC_MAX_HOMES = CONFIG.getInt("basic.max-homes", 5);
+        BASIC_STARTERKIT = CONFIG.getBoolean("basic.starterkit", true);
         BASIC_HOLOGRAM_REFRESH_INTERVAL = CONFIG.getLong("basic.hologram-refresh-interval", 20);
 
         WARNING_TEMPBAN_DURATION = CONFIG.getLong("warning.tempban-duration", 1440) * 60000;
@@ -53,6 +56,8 @@ public class Configuration {
         SAFE_TELEPORT_ENABLED = CONFIG.getBoolean("teleport.safe-enabled", true);
         TELEPORT_DELAY = CONFIG.getInt("teleport.delay", 5);
         BACK_COOLDOWN = CONFIG.getInt("teleport.backCooldown", 43200);
+
+
     }
 
     public static FileConfiguration get() {
