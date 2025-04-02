@@ -49,9 +49,16 @@ warning:
   # Die Dauer einer Warnung in Minuten. Standard: 7200 (5 Tage)
   expiration: 7200
 
-## Einstellungen für das Teleportsystem (TPA, Warp, Spawn.
+## Einstellungen für das Teleportsystem (TPA, Warp, Spawn).
 teleport:
   safe-enabled: true # Safe Teleport und delay ein/aus
   delay: 5   # Sekunden
   # Cooldown für den /back-Befehl in Sekunden (12 Stunden = 43200 Sekunden)
   backCooldown: 43200
+
+## Einstellungen für den Deathlog
+deathlog:
+  global: false         # true = alle Tode werden gespeichert, false = nur Tode aus einer bestimmten Welt
+  world: "world"        # nur Tode aus dieser Welt werden gespeichert, falls global false ist
+  maxEntriesPerPlayer: 3  # maximale Anzahl Tode, die pro Spieler gespeichert werden sollen (für Abfrage)
+

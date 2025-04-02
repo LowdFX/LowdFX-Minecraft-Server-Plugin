@@ -1,5 +1,6 @@
 package at.lowdfx.lowdfx.listeners;
 
+import at.lowdfx.lowdfx.managers.moderation.DeathLogManager;
 import at.lowdfx.lowdfx.managers.DeathMessageManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,6 +44,7 @@ public class DeathListener implements Listener {
                 case CUSTOM -> "custom";
                 default -> "default";
             };
+            DeathLogManager.getInstance().saveDeath(event);
         }
 
         // Die formatierte Nachricht wird direkt vom Manager geliefert.

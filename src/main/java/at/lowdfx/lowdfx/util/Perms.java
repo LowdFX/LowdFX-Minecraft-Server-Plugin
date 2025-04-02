@@ -63,7 +63,8 @@ public final class Perms {
         BAN(                "lowdfx.ban",               "/tempban <player> <time> <reason>",    OP),
         ADMINHELP_RECEIVE(  "lowdfx.adminhelp.receive", "Adminhelp Nachricht empfangen",        OP),
         ADMINHELP_SEND(     "lowdfx.adminhelp.send",    "Adminhelp Nachricht senden",           TRUE),
-        SCALE(              "lowdfx.scale",             "Verkleinere/vergrößere dich.",         OP);
+        SCALE(              "lowdfx.scale",             "Verkleinere/vergrößere dich.",         OP),
+        DEATHLOG(           "lowdfx.deathlog",          "Nutze den Deathlog Befehl",            OP);
 
         private final String permission;
         private final String commands;

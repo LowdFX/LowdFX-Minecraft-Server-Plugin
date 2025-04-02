@@ -27,6 +27,9 @@ public class Configuration {
     public static int TELEPORT_DELAY;
     public static int BACK_COOLDOWN;
 
+    public static boolean DEATHLOG_GLOBAL;
+    public static String DEATHLOG_WORLD;
+    public static int DEATHLOG_MAX_ENTRIES;
 
 
     public static void init(@NotNull JavaPlugin plugin) {
@@ -59,6 +62,9 @@ public class Configuration {
         TELEPORT_DELAY = CONFIG.getInt("teleport.delay", 5);
         BACK_COOLDOWN = CONFIG.getInt("teleport.backCooldown", 43200);
 
+        DEATHLOG_GLOBAL = CONFIG.getBoolean("deathlog.global", false);
+        DEATHLOG_WORLD = CONFIG.getString("deathlog.world", "world");
+        DEATHLOG_MAX_ENTRIES = CONFIG.getInt("deathlog.maxEntriesPerPlayer", 3);
 
     }
 

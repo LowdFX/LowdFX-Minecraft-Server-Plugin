@@ -123,6 +123,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(AdminHelpCommand.command(), "Admin Help.");
             registrar.register(ScaleCommand.command(), "Macht dich klein.");
             registrar.register(HelpCommand.command(), "Custom Help Befehl.");
+            registrar.register(DeathlogCommand.command(), "Deathlog Befehl.");
 
         });
 
