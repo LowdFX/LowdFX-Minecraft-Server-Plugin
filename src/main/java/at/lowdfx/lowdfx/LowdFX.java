@@ -101,7 +101,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(MuteCommands.muteAllCommand(), "Schaltet alle Spieler stumm.");
             registrar.register(MuteCommands.unmuteAllCommand(), "Entfernt den Mute aller Spieler vom muteall Command.");
             registrar.register(PlaytimeCommand.command(), "Zeigt deine Spielzeit auf dem Server.");
-            registrar.register(SpawnCommand.command(), "Teleportiert dich zum Spawn.");
+            registrar.register(SpawnCommand.command(), "Teleportiert dich zum Spawn.", List.of("hub"));
             registrar.register(StatCommands.feedCommand(), "Füttert einen Spieler.", List.of("saturate"));
             registrar.register(StatCommands.healCommand(), "Heilt einen Spieler und löscht alle negativen effekte.", List.of("regen"));
             registrar.register(TimeCommands.dayCommand(), "Stellt die Zeit zu Tag.");
@@ -115,7 +115,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(UtilityCommands.gmCommand(), "Setzt den Spielmodus eines Spielers.");
             registrar.register(UtilityCommands.godCommand(), "Versetzt dich in den Godmode.");
             registrar.register(UtilityCommands.chatClearCommand(), "Lösche den Chat.");
-            registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.");
+            registrar.register(VanishCommand.command(), "Macht dich unsichtbar oder wieder sichtbar.", List.of("v"));
             registrar.register(WarnCommand.command(), "Ermahnt einen Spieler.");
             registrar.register(WarpCommand.command(), "Teleportiert dich zu einem Warp.");
             registrar.register(EmojiCommands.command(), "Teleportiert dich zu einem Warp.");
@@ -124,6 +124,7 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(ScaleCommand.command(), "Macht dich klein.");
             registrar.register(HelpCommand.command(), "Custom Help Befehl.");
             registrar.register(DeathlogCommand.command(), "Deathlog Befehl.");
+            registrar.register(ClearEntitysCommand.command(), "Lösche Entitys. (Monster/Items)");
 
         });
 

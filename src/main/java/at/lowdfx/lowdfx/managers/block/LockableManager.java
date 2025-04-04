@@ -12,6 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Player;
+import org.bukkit.block.BrewingStand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,11 +24,7 @@ public final class LockableManager {
         private final SimpleLocation location;
         public SimpleLocation connected;
         private final ArrayList<UUID> whitelist;
-        private final boolean global;
-        public boolean isWhitelisted(UUID uuid) {
-            return whitelist != null && whitelist.contains(uuid);
-        }
-
+        private boolean global; // nicht mehr final, um änderbar zu sein
 
         public Locked(UUID owner, SimpleLocation location, SimpleLocation connected, ArrayList<UUID> whitelist, boolean global) {
             this.owner = owner;
@@ -37,13 +34,12 @@ public final class LockableManager {
             this.global = global;
         }
 
-
         public void removeWhitelist(UUID player) {
             whitelist.remove(player);
         }
 
         public void addWhitelist(UUID player) {
-            if (player == owner) return;
+            if (player.equals(owner)) return;
             whitelist.add(player);
         }
 
@@ -53,6 +49,11 @@ public final class LockableManager {
 
         public boolean isGlobal() {
             return global;
+        }
+
+        // Neuer Setter für den globalen Status
+        public void setGlobal(boolean global) {
+            this.global = global;
         }
 
         public boolean notAllowed(@NotNull Player player) {
@@ -89,7 +90,6 @@ public final class LockableManager {
     public static void lock(UUID owner, @NotNull Block block, boolean global) {
         lock(block, new Locked(owner, SimpleLocation.ofLocation(block.getLocation()), null, new ArrayList<>(), global));
     }
-
 
     public static void lock(@NotNull Block block, @NotNull Locked data) {
         ArrayList<Locked> ownerLocked = LOCKED.computeIfAbsent(data.owner(), k -> new ArrayList<>());
@@ -131,6 +131,9 @@ public final class LockableManager {
     }
 
     public static boolean notLockable(Block block) {
-        return block == null || !(block.getState() instanceof Container || block.getBlockData() instanceof Openable);
+        if (block == null) return true;
+        // Erlaube explizit Braustände
+        if (block.getState() instanceof BrewingStand) return false;
+        return !(block.getState() instanceof Container || block.getBlockData() instanceof Openable);
     }
 }

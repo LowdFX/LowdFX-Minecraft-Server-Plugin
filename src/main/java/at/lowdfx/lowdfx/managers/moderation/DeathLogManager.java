@@ -1,10 +1,11 @@
 package at.lowdfx.lowdfx.managers.moderation;
 
 import at.lowdfx.lowdfx.LowdFX;
-import at.lowdfx.lowdfx.model.DeathLogEntry;
-import at.lowdfx.lowdfx.model.InventoryDTO;
-import at.lowdfx.lowdfx.model.SimpleItemDTO;
+import at.lowdfx.lowdfx.dto.DeathLogEntry;
+import at.lowdfx.lowdfx.dto.InventoryDTO;
+import at.lowdfx.lowdfx.dto.SimpleItemDTO;
 import at.lowdfx.lowdfx.util.Configuration;
+import at.lowdfx.lowdfx.util.ItemStackSerializer;
 import at.lowdfx.lowdfx.util.OptionalAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,10 +16,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.io.File;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DeathLogManager {
     private static DeathLogManager instance;
@@ -99,29 +97,34 @@ public class DeathLogManager {
         }
     }
 
-    // Serialisiert das Inventar, indem es jeden ItemStack in seine Map-Repräsentation konvertiert.
+    /**
+     * Serialisiert das Inventar, indem für jeden relevanten ItemStack dessen komplette Map (mit Meta-Daten)
+     * erzeugt und über fixItemData angepasst wird.
+     */
     private String serializeInventory(PlayerInventory inv) {
         List<SimpleItemDTO> mainItems = new ArrayList<>();
         ItemStack[] contents = inv.getContents();
-        // Slots 9-35 (Hauptinventar)
+        // Hauptinventar: Slots 9-35
         for (int slot = 9; slot <= 35; slot++) {
             if (slot < contents.length && contents[slot] != null) {
-                mainItems.add(new SimpleItemDTO(contents[slot].serialize()));
+                String serialized = ItemStackSerializer.itemStackToString(contents[slot]);
+                mainItems.add(new SimpleItemDTO(java.util.Map.of("data", serialized)));
             }
         }
-        // Slots 0-8 (Hotbar)
+        // Hotbar: Slots 0-8
         for (int slot = 0; slot <= 8; slot++) {
             if (slot < contents.length && contents[slot] != null) {
-                mainItems.add(new SimpleItemDTO(contents[slot].serialize()));
+                String serialized = ItemStackSerializer.itemStackToString(contents[slot]);
+                mainItems.add(new SimpleItemDTO(java.util.Map.of("data", serialized)));
             }
         }
         List<SimpleItemDTO> armorItems = new ArrayList<>();
         Arrays.stream(inv.getArmorContents())
                 .filter(item -> item != null)
-                .forEach(item -> armorItems.add(new SimpleItemDTO(item.serialize())));
+                .forEach(item -> armorItems.add(new SimpleItemDTO(java.util.Map.of("data", ItemStackSerializer.itemStackToString(item)))));
         SimpleItemDTO offhandDTO;
         if (inv.getItemInOffHand() != null) {
-            offhandDTO = new SimpleItemDTO(inv.getItemInOffHand().serialize());
+            offhandDTO = new SimpleItemDTO(java.util.Map.of("data", ItemStackSerializer.itemStackToString(inv.getItemInOffHand())));
         } else {
             offhandDTO = new SimpleItemDTO(null);
         }
@@ -129,10 +132,44 @@ public class DeathLogManager {
         return gson.toJson(dto);
     }
 
-    // Deserialisiert das Inventar aus dem JSON in ein InventoryDTO.
     public InventoryDTO deserializeInventory(String json) {
         return gson.fromJson(json, InventoryDTO.class);
     }
+
+
+
+    /**
+     * Überprüft und passt die Map an, die aus ItemStack.serialize() stammt,
+     * sodass Meta-Daten wie displayName und lore als einfache Strings vorliegen.
+     */
+    private <K, V> Map<K, V> fixItemData(Map<K, V> data) {
+        if (data.containsKey("meta") && data.get("meta") instanceof Map) {
+            Map<?, ?> meta = (Map<?, ?>) data.get("meta");
+            // Erstelle eine neue, modifizierbare Map
+            Map<String, Object> newMeta = new HashMap<>();
+            for (Map.Entry<?, ?> entry : meta.entrySet()) {
+                if (entry.getKey() instanceof String) {
+                    newMeta.put((String) entry.getKey(), entry.getValue());
+                }
+            }
+            // Falls displayName kein String ist, in einen String umwandeln
+            if (newMeta.containsKey("displayName") && !(newMeta.get("displayName") instanceof String)) {
+                newMeta.put("displayName", newMeta.get("displayName").toString());
+            }
+            // Falls lore als Liste vorliegt, alle Einträge in Strings umwandeln
+            if (newMeta.containsKey("lore") && newMeta.get("lore") instanceof List) {
+                List<?> loreList = (List<?>) newMeta.get("lore");
+                List<String> newLore = new ArrayList<>();
+                for (Object o : loreList) {
+                    newLore.add(o.toString());
+                }
+                newMeta.put("lore", newLore);
+            }
+            data.put((K) "meta", (V) newMeta);
+        }
+        return data;
+    }
+
 
     // Liefert alle Spielernamen aus der Datenbank (für Tabcompletion)
     public List<String> getAllPlayers() {

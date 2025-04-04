@@ -2,10 +2,13 @@ package at.lowdfx.lowdfx.event;
 
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.managers.block.LockableManager;
+import at.lowdfx.lowdfx.util.SimpleLocation;
 import at.lowdfx.lowdfx.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.BrewingStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,12 +23,11 @@ public class LockEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
-        // Prevents duplicates, as the event is called twice for doors and other blocks if cancelled.
+        // Verhindert doppelte Aufrufe bei Türen etc.
         if (lastInteract + 20 > System.currentTimeMillis()) return;
         lastInteract = System.currentTimeMillis();
 
         Player player = event.getPlayer();
-
         Block block = event.getClickedBlock();
         if (LockableManager.notLockable(block)) return;
 
@@ -33,18 +35,12 @@ public class LockEvents implements Listener {
         if (locked == null) return;
 
         if (locked.notAllowed(player)) {
-            // Erlaube Interaktion bei global lock
+            // Bei globalen Locks ist Interaktion erlaubt.
             if (locked.isGlobal()) return;
-
             player.sendMessage(LowdFX.serverMessage(Component.text("Der Block ist gesperrt! Du hast keinen Zugriff.", NamedTextColor.RED)));
             Utilities.negativeSound(player);
             event.setCancelled(true);
-            return;
         }
-
-
-
-        player.sendMessage(LowdFX.serverMessage(Component.text("Du hast einen gesperrten Block geöffnet.", NamedTextColor.GREEN)));
     }
 
     @EventHandler
@@ -70,24 +66,60 @@ public class LockEvents implements Listener {
         event.setCancelled(true);
     }
 
+    // Bestehende Logik für die Erweiterung von Chests (Doppelchest)
     @EventHandler
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
+        // Nur für Kisten (Chest) gilt diese Logik.
         if (!(event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Chest)) return;
+
+        // Ermitteln, ob diese Kiste an eine bereits bestehende Kiste (Double Chest) anschließt.
         Block connectedChest = Utilities.connectedChest(event.getBlock());
         if (connectedChest == null) return;
 
+        // Hole den Lock der bereits gesperrten Kiste.
         LockableManager.Locked locked = LockableManager.getLocked(connectedChest.getLocation());
         if (locked == null) return;
 
-        // Prüfen, ob der Spieler berechtigt ist
+        // Prüfen, ob der Spieler berechtigt ist.
         if (locked.notAllowed(event.getPlayer())) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Du kannst keine große Kiste aus einer Kiste, den du nicht besitzt, machen!", NamedTextColor.RED)));
+            event.getPlayer().sendMessage(
+                    LowdFX.serverMessage(Component.text(
+                            "Du kannst keine große Kiste aus einer Kiste, die du nicht besitzt, machen!",
+                            NamedTextColor.RED))
+            );
         } else {
-            LockableManager.lock(event.getBlock(), locked);
-            event.getPlayer().sendMessage(LowdFX.serverMessage(Component.text("Die Kiste wurde zu einer großen Kiste erweitert.", NamedTextColor.GREEN)));
-            Utilities.positiveSound(event.getPlayer());
+            // Aktualisiere den bestehenden Lock, falls die neue Kiste (die Erweiterung) noch nicht registriert ist.
+            if (!locked.isBlock(SimpleLocation.ofLocation(event.getBlock().getLocation()))) {
+                locked.connected = SimpleLocation.ofLocation(event.getBlock().getLocation());
+                event.getPlayer().sendMessage(
+                        LowdFX.serverMessage(Component.text(
+                                "Die Kiste wurde zu einer großen Kiste erweitert und gesperrt.",
+                                NamedTextColor.GREEN))
+                );
+                Utilities.positiveSound(event.getPlayer());
+            }
         }
+    }
+
+
+    // Neuer Event-Handler: Automatisches Sperren von Openables und Brauständen beim Platzieren.
+    @EventHandler(ignoreCancelled = true)
+    public void onAutoLockPlace(BlockPlaceEvent event) {
+        Block block = event.getBlock();
+        // Überspringe, wenn der Block nicht sperrbar ist.
+        if (LockableManager.notLockable(block)) return;
+        // Für Chests, die sich mit einem bestehenden verbinden, übernimmt die bestehende Logik.
+        if (block.getBlockData() instanceof org.bukkit.block.data.type.Chest) {
+            Block connectedChest = Utilities.connectedChest(block);
+            if (connectedChest != null) return;
+        }
+        // Falls bereits gesperrt, nichts tun.
+        if (LockableManager.isLocked(block.getLocation())) return;
+
+        Player player = event.getPlayer();
+        LockableManager.lock(player.getUniqueId(), block, false);
+        player.sendMessage(LowdFX.serverMessage(Component.text("Block wurde automatisch gesperrt.", NamedTextColor.GREEN)));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -109,14 +141,12 @@ public class LockEvents implements Listener {
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
         for (Block block : event.getBlocks()) {
-            if (LockableManager.isLocked(block.getLocation())) {  // Nur abbrechen, wenn der Block gesperrt ist.
+            if (LockableManager.isLocked(block.getLocation())) {
                 event.setCancelled(true);
                 return;
             }
         }
     }
-
-
 
     @EventHandler
     public void onPistonRetract(@NotNull BlockPistonRetractEvent event) {
@@ -127,6 +157,4 @@ public class LockEvents implements Listener {
             }
         }
     }
-
-
 }

@@ -3,9 +3,10 @@ package at.lowdfx.lowdfx.command.moderation;
 import at.lowdfx.lowdfx.LowdFX;
 import at.lowdfx.lowdfx.command.util.CommandHelp;
 import at.lowdfx.lowdfx.managers.moderation.DeathLogManager;
-import at.lowdfx.lowdfx.model.DeathLogEntry;
-import at.lowdfx.lowdfx.model.InventoryDTO;
-import at.lowdfx.lowdfx.model.SimpleItemDTO;
+import at.lowdfx.lowdfx.dto.DeathLogEntry;
+import at.lowdfx.lowdfx.dto.InventoryDTO;
+import at.lowdfx.lowdfx.dto.SimpleItemDTO;
+import at.lowdfx.lowdfx.util.ItemStackSerializer;
 import at.lowdfx.lowdfx.util.Perms;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -69,7 +70,6 @@ public final class DeathlogCommand {
                             String playerName = context.getArgument("player", String.class);
                             int deathNumber = context.getArgument("deathlognumber", Integer.class);
 
-                            // Prüfe Permission
                             if (!Perms.check(sender, Perms.Perm.DEATHLOG)) {
                                 sender.sendMessage(LowdFX.serverMessage(Component.text("Du hast keine Berechtigung, diesen Befehl zu nutzen.")));
                                 return 0;
@@ -129,7 +129,7 @@ public final class DeathlogCommand {
                                 gui.setItem(i, createGlassPane());
                             }
 
-                            // Zeilen 2-4: Hauptinventar
+                            // Zeilen 2-4: Hauptinventar (Slots 18-44)
                             int slot = 18;
                             for (SimpleItemDTO s : mainInventory) {
                                 if (slot >= 45) break;
@@ -137,7 +137,7 @@ public final class DeathlogCommand {
                                 slot++;
                             }
 
-                            // Zeile 5: Hotbar
+                            // Zeile 5: Hotbar (Slots 45-53)
                             slot = 45;
                             for (SimpleItemDTO s : hotbar) {
                                 if (slot >= 54) break;
@@ -157,13 +157,15 @@ public final class DeathlogCommand {
         return root.build();
     }
 
-    // Erzeugt einen ItemStack aus dem SimpleItemDTO, indem er die gespeicherte Map des ItemStacks deserialisiert.
+    // Erstellt einen ItemStack, indem der gespeicherte String (im Map-Eintrag "data") des ItemStacks deserialisiert wird.
     private static ItemStack createDisplayItem(SimpleItemDTO dto) {
-        if (dto.getItemData() == null) {
+        if (dto.getItemData() == null || !dto.getItemData().containsKey("data")) {
             return new ItemStack(Material.AIR);
         }
-        return org.bukkit.inventory.ItemStack.deserialize(dto.getItemData());
+        String serialized = (String) dto.getItemData().get("data");
+        return ItemStackSerializer.stringToItemStack(serialized);
     }
+
 
     private static ItemStack createGlassPane() {
         ItemStack pane = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);

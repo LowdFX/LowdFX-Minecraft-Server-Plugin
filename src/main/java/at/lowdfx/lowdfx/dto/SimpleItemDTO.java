@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.model;
+package at.lowdfx.lowdfx.dto;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package at.lowdfx.lowdfx.model;
+package at.lowdfx.lowdfx.dto;
 
 public class DeathLogEntry {
     private final String player;

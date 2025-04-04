@@ -30,7 +30,7 @@ public final class WarpCommand {
                 // Ausführliche Beschreibung für normale Spieler
                 MiniMessage.miniMessage().deserialize(
                         "<gray>Mit diesem Befehl kannst du dich an einen angegebenen Warppunkt teleportieren.<newline>" +
-                                "<yellow>· /warp <name>></yellow>"),
+                                "<yellow>· /warp <name></yellow>"),
                 // Zusätzlicher Admin-Teil (optional)
                 MiniMessage.miniMessage().deserialize(
                         "<yellow>· /warp set <name><newline></yellow>" +
