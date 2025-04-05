@@ -90,7 +90,8 @@ public final class FileUpdater {
                 }
             }
         } else {
-            plugin.getLogger().warning("Standard-Ressource für " + fileName + " nicht gefunden.");
+            // Wenn keine Standard-Ressource gefunden wird, wird hier keine Warnung mehr ausgegeben.
+            // plugin.getLogger().warning("Standard-Ressource für " + fileName + " nicht gefunden.");
         }
     }
 

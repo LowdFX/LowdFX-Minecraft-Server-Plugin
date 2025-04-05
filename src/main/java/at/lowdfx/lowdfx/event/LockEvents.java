@@ -133,10 +133,52 @@ public class LockEvents implements Listener {
     }
 
     @EventHandler
-    public void onInventoryMoveItem(@NotNull InventoryMoveItemEvent event) {
-        if (LockableManager.isLocked(event.getSource().getLocation()) || LockableManager.isLocked(event.getDestination().getLocation()))
+    public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+        boolean cancel = false;
+        Object srcHolder = event.getSource().getHolder();
+        Object destHolder = event.getDestination().getHolder();
+        Block srcBlock = null;
+        Block destBlock = null;
+
+        if (srcHolder instanceof org.bukkit.block.BlockState) {
+            srcBlock = ((org.bukkit.block.BlockState) srcHolder).getBlock();
+        }
+        if (destHolder instanceof org.bukkit.block.BlockState) {
+            destBlock = ((org.bukkit.block.BlockState) destHolder).getBlock();
+        }
+
+        // Prüfe, ob es sich um einen Hopper-Transfer handelt:
+        // Fall 1: Hopper -> Container (hopperin)
+        if (srcHolder instanceof org.bukkit.block.Hopper && destBlock != null) {
+            if (LockableManager.isLocked(destBlock.getLocation())) {
+                LockableManager.Locked lock = LockableManager.getLocked(destBlock.getLocation());
+                if (!lock.isHopperInAllowed()) {
+                    cancel = true;
+                }
+            }
+        }
+        // Fall 2: Container -> Hopper (hopperout)
+        else if (destHolder instanceof org.bukkit.block.Hopper && srcBlock != null) {
+            if (LockableManager.isLocked(srcBlock.getLocation())) {
+                LockableManager.Locked lock = LockableManager.getLocked(srcBlock.getLocation());
+                if (!lock.isHopperOutAllowed()) {
+                    cancel = true;
+                }
+            }
+        }
+        // Fallback: Wenn keiner der speziellen Fälle greift, und eines der Inventories gesperrt ist, abbrechen.
+        else {
+            if ((srcBlock != null && LockableManager.isLocked(srcBlock.getLocation())) ||
+                    (destBlock != null && LockableManager.isLocked(destBlock.getLocation()))) {
+                cancel = true;
+            }
+        }
+
+        if (cancel) {
             event.setCancelled(true);
+        }
     }
+
 
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {

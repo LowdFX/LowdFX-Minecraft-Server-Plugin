@@ -1,0 +1,19 @@
+# CommandSigns Configuration
+# Legt fest, welche Command-Schilder aktiviert sind.
+# Setze den Wert auf 'true', um den entsprechenden Schildtyp zu aktivieren,
+# oder auf 'false', um ihn zu deaktivieren.
+
+warp: true
+spawn: true
+trash: true
+playtime: true
+anvil: true
+workbench: true
+kit: true
+feed: true
+heal: true
+day: true
+night: true
+rtp: true
+emojis: true
+help: true

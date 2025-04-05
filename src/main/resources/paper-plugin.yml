@@ -16,3 +16,7 @@ api-version: '1.21'
 ### Autoren ###
 authors:
   - LowdFX
+
+### Softdepends ###
+softdepend:
+  - LuckPerms

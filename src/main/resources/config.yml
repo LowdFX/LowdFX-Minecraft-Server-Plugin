@@ -31,23 +31,29 @@ basic:
   # Custom /help Befehl vom Plugin an/aus
   customhelp: true
 
-  # Maximale Homes pro Spieler.
-  max-homes: 5
-
   # Starterkit an/aus.
   starterkit: true
 
   # Aktualisierungsintervall der Chests in Ticks.
   hologram-refresh-interval: 20
 
+## Einstellungen für das Homesystem.
+home:
+  default-max-homes: 5
+  max-homes:
+    admin: 100
+    moderator: 50
+    supporter: 25
+    vipplus: 20
+    vip: 15
+    legend: 10
+
+
 ## Einstellungen für das Verwarnungssystem.
 warning:
 
   # Dauer des temporären Bans in Minuten. Standard: 1440 (24 Stunden)
   tempban-duration: 1440
-
-  # Die Dauer einer Warnung in Minuten. Standard: 7200 (5 Tage)
-  expiration: 7200
 
 ## Einstellungen für das Teleportsystem (TPA, Warp, Spawn).
 teleport:

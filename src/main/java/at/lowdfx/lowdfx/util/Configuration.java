@@ -7,6 +7,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Configuration {
     public static FileConfiguration CONFIG;
 
@@ -15,13 +18,14 @@ public class Configuration {
     public static Component CONNECTION_QUIT;
 
     public static String BASIC_SERVER_NAME;
-    public static int BASIC_MAX_HOMES;
     public static boolean BASIC_STARTERKIT;
     public static boolean BASIC_CUSTOM_HELP;
     public static long BASIC_HOLOGRAM_REFRESH_INTERVAL;
 
+    public static int DEFAULT_MAX_HOMES;
+    public static Map<String, Integer> HOME_MAXHOMES = new HashMap<>();
+
     public static long WARNING_TEMPBAN_DURATION;
-    public static long WARNING_EXPIRATION;
 
     public static boolean SAFE_TELEPORT_ENABLED;
     public static int TELEPORT_DELAY;
@@ -50,13 +54,19 @@ public class Configuration {
         CONNECTION_QUIT = MiniMessage.miniMessage().deserialize(CONFIG.getString("connection.quit", ""));
 
         BASIC_SERVER_NAME = CONFIG.getString("basic.server-name", "Server");
-        BASIC_MAX_HOMES = CONFIG.getInt("basic.max-homes", 5);
         BASIC_STARTERKIT = CONFIG.getBoolean("basic.starterkit", true);
         BASIC_CUSTOM_HELP = CONFIG.getBoolean("basic.customhelp", true);
         BASIC_HOLOGRAM_REFRESH_INTERVAL = CONFIG.getLong("basic.hologram-refresh-interval", 20);
 
+        DEFAULT_MAX_HOMES = CONFIG.getInt("home.default-max-homes", 5);
+        HOME_MAXHOMES.clear();
+        if (CONFIG.isConfigurationSection("home.max-homes")) {
+            for (String group : CONFIG.getConfigurationSection("home.max-homes").getKeys(false)) {
+                HOME_MAXHOMES.put(group, CONFIG.getInt("home.max-homes." + group, DEFAULT_MAX_HOMES));
+            }
+        }
+
         WARNING_TEMPBAN_DURATION = CONFIG.getLong("warning.tempban-duration", 1440) * 60000;
-        WARNING_EXPIRATION = CONFIG.getLong("warning.expiration", 7200) * 60000;
 
         SAFE_TELEPORT_ENABLED = CONFIG.getBoolean("teleport.safe-enabled", true);
         TELEPORT_DELAY = CONFIG.getInt("teleport.delay", 5);

@@ -24,7 +24,9 @@ public final class LockableManager {
         private final SimpleLocation location;
         public SimpleLocation connected;
         private final ArrayList<UUID> whitelist;
-        private boolean global; // nicht mehr final, um änderbar zu sein
+        private boolean global;
+        private boolean allowHopperIn = false;
+        private boolean allowHopperOut = false;
 
         public Locked(UUID owner, SimpleLocation location, SimpleLocation connected, ArrayList<UUID> whitelist, boolean global) {
             this.owner = owner;
@@ -66,6 +68,23 @@ public final class LockableManager {
 
         public UUID owner() {
             return owner;
+        }
+
+        // Neue Getter und Setter für Hopper-Zugriffe:
+        public boolean isHopperInAllowed() {
+            return allowHopperIn;
+        }
+
+        public void setHopperInAllowed(boolean allowHopperIn) {
+            this.allowHopperIn = allowHopperIn;
+        }
+
+        public boolean isHopperOutAllowed() {
+            return allowHopperOut;
+        }
+
+        public void setHopperOutAllowed(boolean allowHopperOut) {
+            this.allowHopperOut = allowHopperOut;
         }
 
         public SimpleLocation location() {

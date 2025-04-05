@@ -73,6 +73,13 @@ public final class LowdFX extends JavaPlugin {
         EmojiManager.init(this);
         DeathMessageManager deathMessageManager = new DeathMessageManager(this);
 
+       /* Plugin Updater
+       *
+       * String updateUrl = "https://yourwebsite.com/lowdfx/latest.txt";
+       * String downloadLink = "https://yourwebsite.com/lowdfx/download";
+       * getServer().getPluginManager().registerEvents(new UpdaterJoinListener(this, updateUrl, downloadLink), this);
+       **/
+
         // bStats starten
         int pluginId = 25282;
         Metrics metrics = new Metrics(this, pluginId);
@@ -82,6 +89,11 @@ public final class LowdFX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
         getServer().getPluginManager().registerEvents(new ChatEmojiTabCompleteListener(), this);
         getServer().getPluginManager().registerEvents(new DeathListener(deathMessageManager), this);
+        getServer().getPluginManager().registerEvents(new BindItemGiveListener(), this);
+        getServer().getPluginManager().registerEvents(new BindItemListener(), this);
+        getServer().getPluginManager().registerEvents(new CommandSignListener(this), this);
+        getServer().getPluginManager().registerEvents(new CommandSignCreationListener(), this);
+
 
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
@@ -125,6 +137,8 @@ public final class LowdFX extends JavaPlugin {
             registrar.register(HelpCommand.command(), "Custom Help Befehl.");
             registrar.register(DeathlogCommand.command(), "Deathlog Befehl.");
             registrar.register(ClearEntitysCommand.command(), "Lösche Entitys. (Monster/Items)");
+            registrar.register(BindCommand.command(), "Binde einen Befehl auf ein Item.");
+            registrar.register(SudoCommand.command(), "Führe einen Befehl als anderer Spieler aus.");
 
         });
 

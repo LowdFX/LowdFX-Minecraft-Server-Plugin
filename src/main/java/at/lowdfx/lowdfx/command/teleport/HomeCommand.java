@@ -20,11 +20,53 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
 import java.util.UUID;
 
 public final class HomeCommand {
+
+    private static int getMaxHomesForPlayer(Player player) {
+        try {
+            Plugin lpPlugin = Bukkit.getPluginManager().getPlugin("LuckPerms");
+            if (lpPlugin == null) {
+                return Configuration.DEFAULT_MAX_HOMES;
+            }
+            Class<?> lpClass = Class.forName("net.luckperms.api.LuckPerms", false, lpPlugin.getClass().getClassLoader());
+            Object registration = Bukkit.getServicesManager().getRegistration(lpClass);
+            if (registration == null) {
+                return Configuration.DEFAULT_MAX_HOMES;
+            }
+            Object luckPermsInstance = registration.getClass().getMethod("getProvider").invoke(registration);
+            if (luckPermsInstance == null) {
+                return Configuration.DEFAULT_MAX_HOMES;
+            }
+            Object userManager = luckPermsInstance.getClass().getMethod("getUserManager").invoke(luckPermsInstance);
+            Object user = userManager.getClass().getMethod("getUser", UUID.class).invoke(userManager, player.getUniqueId());
+            if (user == null) {
+                Object future = userManager.getClass().getMethod("loadUser", UUID.class).invoke(userManager, player.getUniqueId());
+                if (future instanceof java.util.concurrent.CompletableFuture) {
+                    user = ((java.util.concurrent.CompletableFuture<?>) future).join();
+                }
+            }
+            if (user == null) {
+                return Configuration.DEFAULT_MAX_HOMES;
+            }
+            String primaryGroup = (String) user.getClass().getMethod("getPrimaryGroup").invoke(user);
+            if (primaryGroup == null) {
+                primaryGroup = "";
+            }
+            primaryGroup = primaryGroup.toLowerCase();
+            return Configuration.HOME_MAXHOMES.getOrDefault(primaryGroup, Configuration.DEFAULT_MAX_HOMES);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return Configuration.DEFAULT_MAX_HOMES;
+    }
+
+
+
     static {
         CommandHelp.register("home",
                 // Kurzinfo (Übersicht)
@@ -136,10 +178,7 @@ public final class HomeCommand {
                         .requires(source -> source.getExecutor() instanceof Player)
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
                                 .executes(context -> {
-                                    Object exec = context.getSource().getExecutor();
-                                    if (!(exec instanceof Player player)) {
-                                        return 1;
-                                    }
+                                    Player player = (Player) context.getSource().getExecutor();
                                     String name = context.getArgument("name", String.class);
                                     Location loc = player.getLocation();
                                     Map<String, SimpleLocation> homes = HomeManager.get(player.getUniqueId());
@@ -148,9 +187,10 @@ public final class HomeCommand {
                                         Utilities.negativeSound(player);
                                         return 1;
                                     }
-                                    if (homes.size() >= Configuration.BASIC_MAX_HOMES) {
+                                    int maxHomes = getMaxHomesForPlayer(player);
+                                    if (homes.size() >= maxHomes) {
                                         player.sendMessage(LowdFX.serverMessage(
-                                                Component.text("Die maximale Anzahl von Homes (" + Configuration.BASIC_MAX_HOMES + ") wurde erreicht!", NamedTextColor.RED)));
+                                                Component.text("Die maximale Anzahl von Homes (" + maxHomes + ") wurde erreicht!", NamedTextColor.RED)));
                                         Utilities.negativeSound(player);
                                         return 1;
                                     }

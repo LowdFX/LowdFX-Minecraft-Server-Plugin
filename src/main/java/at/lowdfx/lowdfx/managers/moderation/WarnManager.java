@@ -58,13 +58,9 @@ public final class WarnManager {
     }
 
     public static void update(UUID user) {
-        ArrayList<Warn> warns = WARNS.get(user);
-        if (warns == null) return;
-
-        warns.removeIf(w -> w.given + Configuration.WARNING_EXPIRATION < System.currentTimeMillis());
-
-        if (warns.isEmpty())
-            WARNS.remove(user);
+        // Entferne keine Warnungen mehr, da Verwarnungen dauerhaft sein sollen.
+        // Die folgende Zeile wurde entfernt, um das automatische Verfallen der Verwarnungen zu unterbinden:
+        // warns.removeIf(w -> w.given + Configuration.WARNING_EXPIRATION < System.currentTimeMillis());
     }
 
     public static @NotNull Component banMessage(UUID user) {
@@ -73,8 +69,7 @@ public final class WarnManager {
                     Bei <b>3</b> Verwarnungen hast du einen permanenten Ban!
                     ------------------------------------------------------------------
                     """,
-                        Placeholder.unparsed("duration", Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000))))
-                .append(warnList(user)).build();
+                Placeholder.unparsed("duration", Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000)))).append(warnList(user)).build();
     }
 
     public static @NotNull List<Component> warnList(UUID user) {
@@ -97,7 +92,6 @@ public final class WarnManager {
         return text;
     }
 
-    // Neue Methode: Entfernt die letzte (aktuellste) Verwarnung
     public static boolean removeLastWarn(UUID user) {
         update(user);
         ArrayList<Warn> warns = WARNS.get(user);
@@ -105,22 +99,17 @@ public final class WarnManager {
             return false;
         }
         warns.remove(warns.size() - 1);
-        if (warns.isEmpty()) {
+        if (warns.isEmpty())
             WARNS.remove(user);
-            // Unban, da keine Verwarnungen mehr vorliegen
-            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
-        } else if (warns.size() < 2) {
-            // Bei weniger als 2 Warnungen den temporären Bann aufheben
+        else if (warns.size() < 2) {
             Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
         }
         return true;
     }
 
-    // Neue Methode: Entfernt alle Verwarnungen
     public static boolean removeAllWarns(UUID user) {
         if (WARNS.containsKey(user)) {
             WARNS.remove(user);
-            // Unban bei vollständiger Entfernung
             Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
             return true;
         }

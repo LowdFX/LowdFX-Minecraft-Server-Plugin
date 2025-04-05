@@ -64,9 +64,12 @@ public final class Perms {
         ADMINHELP_RECEIVE(  "lowdfx.adminhelp.receive", "Adminhelp Nachricht empfangen",        OP),
         ADMINHELP_SEND(     "lowdfx.adminhelp.send",    "Adminhelp Nachricht senden",           TRUE),
         SCALE(              "lowdfx.scale",             "Verkleinere/vergrößere dich.",         OP),
-        DEATHLOG(           "lowdfx.deathlog",          "Nutze den Deathlog Befehl",            OP),
-        CLEARMONSTERS(      "lowdfx.clear.monsters",    "Lösche alle feindlichen Kreaturen",    OP),
-        CLEARITEMS(         "lowdfx.clear.items",       "Lösche alle Items vom Boden",          OP);
+        DEATHLOG(           "lowdfx.deathlog",          "Nutze den Deathlog Befehl.",           OP),
+        CLEARMONSTERS(      "lowdfx.clear.monsters",    "Lösche alle feindlichen Kreaturen.",   OP),
+        CLEARITEMS(         "lowdfx.clear.items",       "Lösche alle Items vom Boden.",         OP),
+        BIND(               "lowdfx.bind",              "Binde einen Befehl auf ein Item.",     OP),
+        SUDO(               "lowdfx.sudo",              "Führe einen Befehl als anderer aus.",  OP),
+        COMMANDSIGN(        "lowdfx.commandsign",       "Erstelle ein Commandsign.",  OP);
 
         private final String permission;
         private final String commands;

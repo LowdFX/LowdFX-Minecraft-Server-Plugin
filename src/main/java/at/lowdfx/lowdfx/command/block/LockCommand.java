@@ -106,6 +106,66 @@ public final class LockCommand {
                             }
                         })
                 )
+                // /lock modify hopperout und hopperin
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("modify")
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("hopperin")
+                                .executes(context -> {
+                                    if (!(context.getSource().getSender() instanceof Player player)) return 1;
+                                    Block block = player.getTargetBlockExact(5);
+                                    if (LockableManager.notLockable(block)) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen gültigen Block anvisieren.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    LockableManager.Locked locked = LockableManager.getLocked(block.getLocation());
+                                    if (locked == null) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist nicht gesperrt.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    if (!locked.isOwner(player)) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du bist nicht der Besitzer dieses Locks.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    // Toggle den hopperIn-Status:
+                                    boolean newState = !locked.isHopperInAllowed();
+                                    locked.setHopperInAllowed(newState);
+                                    if (newState) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Hopper (und HopperMinecarts) dürfen nun Items in diese Kiste einlegen.", NamedTextColor.GREEN)));
+                                    } else {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Hopper (und HopperMinecarts) dürfen nun keine Items mehr in diese Kiste einlegen.", NamedTextColor.YELLOW)));
+                                    }
+                                    return 1;
+                                })
+                        )
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("hopperout")
+                                .executes(context -> {
+                                    if (!(context.getSource().getSender() instanceof Player player)) return 1;
+                                    Block block = player.getTargetBlockExact(5);
+                                    if (LockableManager.notLockable(block)) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du musst einen gültigen Block anvisieren.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    LockableManager.Locked locked = LockableManager.getLocked(block.getLocation());
+                                    if (locked == null) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Dieser Block ist nicht gesperrt.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    if (!locked.isOwner(player)) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Du bist nicht der Besitzer dieses Locks.", NamedTextColor.RED)));
+                                        return 1;
+                                    }
+                                    // Toggle den hopperOut-Status:
+                                    boolean newState = !locked.isHopperOutAllowed();
+                                    locked.setHopperOutAllowed(newState);
+                                    if (newState) {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Hopper (und HopperMinecarts) dürfen nun Items aus dieser Kiste entnehmen.", NamedTextColor.GREEN)));
+                                    } else {
+                                        player.sendMessage(LowdFX.serverMessage(Component.text("Hopper (und HopperMinecarts) dürfen nun keine Items mehr aus dieser Kiste entnehmen.", NamedTextColor.YELLOW)));
+                                    }
+                                    return 1;
+                                })
+                        )
+                )
+
                 // /lock unlock
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("unlock")
                         .executes(context -> {
