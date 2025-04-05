@@ -59,7 +59,7 @@ public final class TpCommands {
                 MiniMessage.miniMessage().deserialize("/back"),
                 // Ausführliche Beschreibung (wird bei /help adminhelp angezeigt)
                 MiniMessage.miniMessage().deserialize(
-                        "<gray>Mit diesem Befehl kannst du dich zum letzten Teleportpunkt odr Tod teleportieren.<newline></gray>" +
+                        "<gray>Mit diesem Befehl kannst du dich zum letzten Teleportpunkt oder Tod teleportieren.<newline></gray>" +
                                 "<yellow>· /back</yellow>"),
                 null, // Kein zusätzlicher Admin-spezifischer Text
                 Perms.Perm.BACK_PREMIUM.getPermission(),

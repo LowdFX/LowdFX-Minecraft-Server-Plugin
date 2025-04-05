@@ -14,6 +14,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class ClearEntitysCommand {
@@ -36,7 +37,7 @@ public final class ClearEntitysCommand {
 
     public static LiteralCommandNode<CommandSourceStack> command() {
         LiteralArgumentBuilder<CommandSourceStack> clearBuilder = LiteralArgumentBuilder.literal("clear");
-
+        clearBuilder.requires(source -> Perms.check(source, Perms.Perm.CLEARITEMS) || Perms.check(source, Perms.Perm.CLEARMONSTERS) && source.getExecutor() instanceof Player);
         // Sub-Befehl: /clear monsters - löscht alle feindlichen Kreaturen (Monster)
         clearBuilder.then(LiteralArgumentBuilder.<CommandSourceStack>literal("monsters")
                 .executes(context -> {
