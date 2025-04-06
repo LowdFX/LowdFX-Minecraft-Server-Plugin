@@ -1,6 +1,9 @@
 package at.lowdfx.lowdfx.listeners;
 
 import at.lowdfx.lowdfx.util.Perms;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,7 +14,8 @@ public class CommandSignCreationListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        String line0 = event.getLine(0);
+        Component lineComponent = event.line(0);
+        String line0 = PlainTextComponentSerializer.plainText().serialize(lineComponent);
         if (line0 == null) return;
         line0 = line0.trim();
         // Prüfe, ob die erste Zeile das Format [TYPE] hat
@@ -28,6 +32,6 @@ public class CommandSignCreationListener implements Listener {
         }
 
         // Setze die erste Zeile in Blau
-        event.setLine(0, ChatColor.BLUE + "[" + type + "]");
+        event.line(0, Component.text("[" + type + "]").color(NamedTextColor.BLUE));
     }
 }

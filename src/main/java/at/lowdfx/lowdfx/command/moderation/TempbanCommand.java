@@ -68,7 +68,7 @@ public final class TempbanCommand {
 
                                             for (PlayerProfile t : targets) {
                                                 Component banReason = MiniMessage.miniMessage().deserialize("<red>Temporärer Bann für " + timeArg + " | Grund: " + reasonText);
-                                                Utilities.ban(t, banReason, duration, "Tempban Command");
+                                                Utilities.ban(t.getId(), t.getName(), banReason, duration, "Tempban Command");
                                                 sender.sendMessage(LowdFX.serverMessage(
                                                         MiniMessage.miniMessage().deserialize("<green>Spieler <b>" + t.getName() + "</b> wurde temporär gebannt für " + timeArg + " | Grund: " + reasonText)));
                                             }

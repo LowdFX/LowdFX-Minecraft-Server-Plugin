@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.listeners;
 
 import at.lowdfx.lowdfx.managers.moderation.DeathLogManager;
 import at.lowdfx.lowdfx.managers.DeathMessageManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -47,8 +48,7 @@ public class DeathListener implements Listener {
             DeathLogManager.getInstance().saveDeath(event);
         }
 
-        // Die formatierte Nachricht wird direkt vom Manager geliefert.
-        String finalDeathMessage = messageManager.getFormattedMessage(deathType, player.getName());
-        event.setDeathMessage(finalDeathMessage);
+        Component deathMessage = messageManager.getFormattedMessage(deathType, player.getName());
+        event.deathMessage(deathMessage);
     }
 }

@@ -20,6 +20,7 @@ import at.lowdfx.lowdfx.managers.teleport.CooldownManager;
 import at.lowdfx.lowdfx.util.Configuration;
 import at.lowdfx.lowdfx.util.FileUpdater;
 import at.lowdfx.lowdfx.util.Perms;
+import at.lowdfx.lowdfx.util.UpdaterJoinListener;
 import com.marcpg.libpg.MinecraftLibPG;
 import com.marcpg.libpg.util.ServerUtils;
 import io.papermc.paper.command.brigadier.Commands;
@@ -73,12 +74,11 @@ public final class LowdFX extends JavaPlugin {
         EmojiManager.init(this);
         DeathMessageManager deathMessageManager = new DeathMessageManager(this);
 
-       /* Plugin Updater
-       *
-       * String updateUrl = "https://yourwebsite.com/lowdfx/latest.txt";
-       * String downloadLink = "https://yourwebsite.com/lowdfx/download";
-       * getServer().getPluginManager().registerEvents(new UpdaterJoinListener(this, updateUrl, downloadLink), this);
-       **/
+       // Plugin Updater
+       String updateUrl = "https://raw.githubusercontent.com/LowdFX/LowdFX-Minecraft-Server-Plugin/refs/heads/master/update.txt";
+       String downloadLink = "https://github.com/LowdFX/LowdFX-Minecraft-Server-Plugin/releases";
+       getServer().getPluginManager().registerEvents(new UpdaterJoinListener(this, updateUrl, downloadLink), this);
+
 
         // bStats starten
         int pluginId = 25282;

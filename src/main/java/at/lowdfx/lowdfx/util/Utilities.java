@@ -1,13 +1,16 @@
 package at.lowdfx.lowdfx.util;
 
 import at.lowdfx.lowdfx.LowdFX;
-import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.ban.BanListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.BanEntry;
+import org.bukkit.profile.PlayerProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.ban.IpBanList;
+import org.bukkit.ban.ProfileBanList;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
@@ -20,10 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Predicate;
 
 public final class Utilities {
@@ -78,30 +78,26 @@ public final class Utilities {
      * Für den IP-Ban wird der Grund um einen Marker "[UUID:<SpielerUUID>]" erweitert,
      * sodass man später auch bei Offline-Spielern den IP-Ban anhand dieses Markers aufheben kann.
      */
-    public static void ban(PlayerProfile target, Component reason, @Nullable Duration duration, String source) {
+    @SuppressWarnings("deprecation")
+    public static void ban(UUID uuid, @Nullable String name, Component reason, @Nullable Duration duration, String source) {
         String stringReason = LegacyComponentSerializer.legacySection().serialize(reason);
-        // Umrechnung von Duration zu Date
-        Date expiration = null;
-        if (duration != null) {
-            expiration = new Date(System.currentTimeMillis() + duration.toMillis());
-        }
+        Date expiration = (duration != null) ? new Date(System.currentTimeMillis() + duration.toMillis()) : null;
 
-        String targetName = target.getName();
-        if (targetName == null) {
-            targetName = target.getId().toString();
-        }
-        // Profil-Ban hinzufügen (verwende targetName als Schlüssel)
-        Bukkit.getBanList(BanListType.PROFILE).addBan(targetName, stringReason, expiration, source);
+        ProfileBanList profileBans = (ProfileBanList) Bukkit.getBanList(BanListType.PROFILE);
+        org.bukkit.profile.PlayerProfile profile = Bukkit.createProfile(uuid, name);
+        profileBans.addBan(profile, stringReason, expiration, source);
 
-        Player t = Bukkit.getPlayer(target.getId());
-        if (t != null && t.getAddress() != null) {
-            String ip = t.getAddress().getAddress().getHostAddress();
-            // Den IP-Ban-Grund um einen Marker erweitern, damit er später gefunden werden kann
-            String ipBanReason = stringReason + " [UUID:" + target.getId() + "]";
-            Bukkit.getBanList(BanListType.IP).addBan(ip, ipBanReason, expiration, source);
-            t.kick(reason);
+        var player = Bukkit.getPlayer(uuid);
+        if (player != null && player.getAddress() != null) {
+            String ip = player.getAddress().getAddress().getHostAddress();
+            String ipReason = stringReason + " [UUID:" + uuid + "]";
+            IpBanList ipBans = (IpBanList) Bukkit.getBanList(BanListType.IP);
+            ipBans.addBan(ip, ipReason, expiration, source);
+            player.kick(reason);
         }
     }
+
+
 
 
     /**
@@ -109,26 +105,30 @@ public final class Utilities {
      * Bei den IP-Bans wird die Liste aller IP-Ban-Einträge durchlaufen und
      * es werden alle entfernt, deren Grund den Marker "[UUID:<SpielerUUID>]" enthält.
      */
-    public static void unban(PlayerProfile target) {
-        if (target == null) return;
-        String targetName = target.getName();
-        String targetUUID = target.getId().toString();
-        // Direkt versuchen, den Ban anhand des Spielernamens aufzuheben:
-        if (targetName != null) {
-            Bukkit.getBanList(BanListType.PROFILE).pardon(targetName);
-        }
-        // Zusätzlich versuchen, falls die Ban-Liste den Spieler anhand der UUID speichert:
-        Bukkit.getBanList(BanListType.PROFILE).pardon(targetUUID);
+    @SuppressWarnings("deprecation")
+    public static void unban(UUID uuid) {
+        ProfileBanList profileBans = (ProfileBanList) Bukkit.getBanList(BanListType.PROFILE);
 
-        // IP-Ban aufheben: Durchsuche die IP-Ban-Einträge nach dem Marker "[UUID:<targetUUID>]"
-        String uuidMarker = "[UUID:" + targetUUID + "]";
-        Bukkit.getBanList(BanListType.IP).getBanEntries().forEach(entry -> {
-            String banReason = entry.getReason();
-            if (banReason != null && banReason.contains(uuidMarker)) {
-                Bukkit.getBanList(BanListType.IP).pardon(entry.getTarget());
+        // Baue PlayerProfile (leider notwendig)
+        org.bukkit.profile.PlayerProfile profile = Bukkit.createProfile(uuid);
+
+        if (profileBans.isBanned(profile)) {
+            profileBans.pardon(profile);
+        }
+
+        // IP-Ban mit Marker aufheben
+        String uuidMarker = "[UUID:" + uuid + "]";
+        IpBanList ipBans = (IpBanList) Bukkit.getBanList(BanListType.IP);
+        for (BanEntry entry : ipBans.getBanEntries()) {
+            String reason = entry.getReason();
+            if (reason != null && reason.contains(uuidMarker)) {
+                ipBans.pardon(entry.getTarget());
             }
-        });
+        }
     }
+
+
+
 
 
     public static void positiveSound(@NotNull Player player) {

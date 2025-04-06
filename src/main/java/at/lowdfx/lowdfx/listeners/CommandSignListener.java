@@ -1,10 +1,14 @@
 package at.lowdfx.lowdfx.listeners;
 
 import at.lowdfx.lowdfx.util.Perms;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -67,7 +71,8 @@ public class CommandSignListener implements Listener {
         Sign sign = (Sign) state;
 
         // Entferne Farbcodes aus der ersten Zeile
-        String rawLine = ChatColor.stripColor(sign.getLine(0)).trim();
+        Component line = sign.getSide(Side.FRONT).line(0);
+        String rawLine = PlainTextComponentSerializer.plainText().serialize(line).trim();
         if (!rawLine.startsWith("[") || !rawLine.endsWith("]")) return;
         String type = rawLine.substring(1, rawLine.length() - 1).toLowerCase();
 
@@ -76,19 +81,25 @@ public class CommandSignListener implements Listener {
         String command = "";
         switch (type) {
             case "warp":
-                String warpName = sign.getLine(1).trim();
+                String warpName = PlainTextComponentSerializer.plainText()
+                        .serialize(sign.getSide(Side.FRONT).line(1))
+                        .trim();
                 if (warpName.isEmpty()) return;
                 command = "warp " + warpName;
                 break;
             case "spawn":
-                String spawnName = sign.getLine(1).trim();
+                String spawnName = PlainTextComponentSerializer.plainText()
+                        .serialize(sign.getSide(Side.FRONT).line(1))
+                        .trim();
                 command = spawnName.isEmpty() ? "spawn" : "spawn tp " + spawnName;
                 break;
             case "trash":
                 command = "trash";
                 break;
             case "playtime":
-                String target = sign.getLine(1).trim();
+                String target = PlainTextComponentSerializer.plainText()
+                        .serialize(sign.getSide(Side.FRONT).line(1))
+                        .trim();
                 command = target.isEmpty() ? "playtime" : "playtime " + target;
                 break;
             case "anvil":
@@ -98,7 +109,9 @@ public class CommandSignListener implements Listener {
                 command = "workbench";
                 break;
             case "kit":
-                String kitName = sign.getLine(1).trim();
+                String kitName = PlainTextComponentSerializer.plainText()
+                        .serialize(sign.getSide(Side.FRONT).line(1))
+                        .trim();
                 if (kitName.isEmpty()) return;
                 command = "kit " + kitName;
                 break;
@@ -134,7 +147,8 @@ public class CommandSignListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        String line0 = event.getLine(0);
+        Component line = event.line(0);
+        String line0 = PlainTextComponentSerializer.plainText().serialize(line).trim();
         if (line0 == null) return;
         line0 = line0.trim();
         if (!line0.startsWith("[") || !line0.endsWith("]")) return;
@@ -147,6 +161,6 @@ public class CommandSignListener implements Listener {
             return;
         }
 
-        event.setLine(0, ChatColor.BLUE + "[" + type + "]");
+        event.line(0, Component.text("[" + type + "]").color(NamedTextColor.BLUE));
     }
 }

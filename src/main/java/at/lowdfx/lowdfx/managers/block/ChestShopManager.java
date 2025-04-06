@@ -29,7 +29,7 @@ public final class ChestShopManager {
         private final UUID owner;
         private final SimpleLocation location;
         public SimpleLocation connected;
-        private final byte[] serializedItem;
+        private byte[] serializedItem;
         private final AtomicInteger price;
         private final ArrayList<UUID> whitelist;
 
@@ -43,6 +43,11 @@ public final class ChestShopManager {
             this.whitelist = whitelist;
             LowdFX.LOG.info("Shop (byte[]) 2");
         }
+
+        public void setItem(@NotNull ItemStack item) {
+            this.serializedItem = item.serializeAsBytes();
+        }
+
 
         public @NotNull ItemStack item() {
             return ItemStack.deserializeBytes(serializedItem).clone();

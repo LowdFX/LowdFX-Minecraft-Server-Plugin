@@ -204,10 +204,15 @@ public final class TpCommands {
                     int delaySeconds = Configuration.TELEPORT_DELAY;
                     Bukkit.getScheduler().runTaskLater(LowdFX.PLUGIN, () -> {
                         String coords = "X: " + x + "  Y: " + (y + 1) + "  Z: " + z;
-                        // Konvertiere den Component in einen Legacy-String, da sendTitle Strings erwartet
-                        String title = LegacyComponentSerializer.legacyAmpersand().serialize(Component.text(coords));
-                        String subtitle = LegacyComponentSerializer.legacyAmpersand().serialize(Component.empty());
-                        player.sendTitle(title, subtitle, 10, 60, 10);
+                        player.showTitle(net.kyori.adventure.title.Title.title(
+                                Component.text(coords),
+                                Component.empty(),
+                                net.kyori.adventure.title.Title.Times.times(
+                                        java.time.Duration.ofMillis(500),   // Fade In (10 ticks)
+                                        java.time.Duration.ofMillis(3000),  // Stay (60 ticks)
+                                        java.time.Duration.ofMillis(500)    // Fade Out (10 ticks)
+                                )
+                        ));
                     }, delaySeconds * 20L + 1L);
 
                     return 1;

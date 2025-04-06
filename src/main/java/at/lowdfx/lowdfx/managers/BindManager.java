@@ -3,6 +3,7 @@ package at.lowdfx.lowdfx.managers;
 import at.lowdfx.lowdfx.LowdFX;
 import com.google.gson.reflect.TypeToken;
 import com.marcpg.libpg.storage.JsonUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -67,7 +68,8 @@ public final class BindManager {
         meta.getPersistentDataContainer().set(BIND_KEY, PersistentDataType.STRING, name);
         item.setItemMeta(meta);
         String material = item.getType().name();
-        String displayName = meta.hasDisplayName() ? meta.getDisplayName() : null;
+        Component display = meta.displayName();
+        String displayName = display != null ? net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(display) : null;
         BindingData data = new BindingData(command, world, material, displayName);
         addBinding(name, data);
     }
@@ -96,7 +98,7 @@ public final class BindManager {
         ItemStack item = new ItemStack(type);
         ItemMeta meta = item.getItemMeta();
         if (data != null && data.displayName != null) {
-            meta.setDisplayName(data.displayName);
+            meta.displayName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(data.displayName));
         }
         meta.getPersistentDataContainer().set(BIND_KEY, PersistentDataType.STRING, name);
         item.setItemMeta(meta);

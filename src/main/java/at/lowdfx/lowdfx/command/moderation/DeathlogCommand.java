@@ -109,7 +109,7 @@ public final class DeathlogCommand {
                                 mainInventory = new ArrayList<>();
                             }
 
-                            Inventory gui = Bukkit.createInventory(null, 54, "Deathlog: " + entry.getPlayer());
+                            Inventory gui = Bukkit.createInventory(null, 54, Component.text("Deathlog: " + entry.getPlayer()));
 
                             // Zeile 0: Rüstung & Offhand
                             for (int i = 0; i < 9; i++) {
@@ -170,8 +170,10 @@ public final class DeathlogCommand {
     private static ItemStack createGlassPane() {
         ItemStack pane = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta meta = pane.getItemMeta();
-        meta.setDisplayName(" ");
-        pane.setItemMeta(meta);
+        if (meta != null) {
+            meta.displayName(Component.text(" "));
+            pane.setItemMeta(meta);
+        }
         return pane;
     }
 }

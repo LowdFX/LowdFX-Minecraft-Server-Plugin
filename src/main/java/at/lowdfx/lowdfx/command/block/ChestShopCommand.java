@@ -179,9 +179,9 @@ public final class ChestShopCommand {
                             }
 
                             // noinspection deprecation
-                            shop.item().setType(heldItem.getType());
-                            shop.item().setItemMeta(heldItem.getItemMeta());
-                            shop.item().setAmount(heldItem.getAmount());
+                            ItemStack newItem = new ItemStack(heldItem.getType(), heldItem.getAmount());
+                            newItem.setItemMeta(heldItem.getItemMeta());
+                            shop.setItem(newItem);
                             player.sendMessage(LowdFX.serverMessage(Component.text("Das Item vom Shop wurde zu ", NamedTextColor.GREEN).append(Component.translatable(heldItem.translationKey())).append(Component.text(" gesetzt!"))));
                             Utilities.positiveSound(player);
                             return 1;

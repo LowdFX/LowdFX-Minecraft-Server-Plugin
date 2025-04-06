@@ -2,6 +2,7 @@ package at.lowdfx.lowdfx.managers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -302,14 +303,11 @@ public class DeathMessageManager {
      * @param playerName Der Name des toten Spielers
      * @return Die formatierte Todesnachricht als Legacy-String (mit §-Codes)
      */
-    public String getFormattedMessage(String deathType, String playerName) {
+    public Component getFormattedMessage(String deathType, String playerName) {
         String rawMessage = getRandomMessage(deathType);
-        // Spielername fett und weiß hervorheben
         String formattedPlayerName = "<bold><dark_red>" + playerName + "</dark_red></bold>";
         String messageWithPlayer = rawMessage.replace("<player>", formattedPlayerName);
-        // Prefix hinzufügen und gesamte Nachricht in Rot setzen
         String finalMessage = "<red><bold>[💀] </bold>" + messageWithPlayer + "</red>";
-        var component = MiniMessage.miniMessage().deserialize(finalMessage);
-        return LegacyComponentSerializer.legacySection().serialize(component);
+        return MiniMessage.miniMessage().deserialize(finalMessage);
     }
 }

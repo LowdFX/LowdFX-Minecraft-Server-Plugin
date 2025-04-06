@@ -9,6 +9,8 @@ import at.lowdfx.lowdfx.util.ItemStackSerializer;
 import at.lowdfx.lowdfx.util.OptionalAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -69,8 +71,12 @@ public class DeathLogManager {
             String playerName = event.getEntity().getName();
             String killerName = (event.getEntity().getKiller() != null)
                     ? event.getEntity().getKiller().getName()
-                    : "Unknown";
-            String cause = event.getDeathMessage();
+                    : "Unbekannt";
+            Component deathMsg = event.deathMessage();
+            String cause = (deathMsg != null)
+                    ? PlainTextComponentSerializer.plainText().serialize(deathMsg)
+                    : "Unbekannt";
+
             String weapon = "";
             if (event.getEntity().getKiller() != null) {
                 ItemStack item = event.getEntity().getKiller().getInventory().getItemInMainHand();
@@ -120,7 +126,7 @@ public class DeathLogManager {
         }
         List<SimpleItemDTO> armorItems = new ArrayList<>();
         Arrays.stream(inv.getArmorContents())
-                .filter(item -> item != null)
+                .filter(Objects::nonNull)
                 .forEach(item -> armorItems.add(new SimpleItemDTO(java.util.Map.of("data", ItemStackSerializer.itemStackToString(item)))));
         SimpleItemDTO offhandDTO;
         if (inv.getItemInOffHand() != null) {
@@ -135,41 +141,6 @@ public class DeathLogManager {
     public InventoryDTO deserializeInventory(String json) {
         return gson.fromJson(json, InventoryDTO.class);
     }
-
-
-
-    /**
-     * Überprüft und passt die Map an, die aus ItemStack.serialize() stammt,
-     * sodass Meta-Daten wie displayName und lore als einfache Strings vorliegen.
-     */
-    private <K, V> Map<K, V> fixItemData(Map<K, V> data) {
-        if (data.containsKey("meta") && data.get("meta") instanceof Map) {
-            Map<?, ?> meta = (Map<?, ?>) data.get("meta");
-            // Erstelle eine neue, modifizierbare Map
-            Map<String, Object> newMeta = new HashMap<>();
-            for (Map.Entry<?, ?> entry : meta.entrySet()) {
-                if (entry.getKey() instanceof String) {
-                    newMeta.put((String) entry.getKey(), entry.getValue());
-                }
-            }
-            // Falls displayName kein String ist, in einen String umwandeln
-            if (newMeta.containsKey("displayName") && !(newMeta.get("displayName") instanceof String)) {
-                newMeta.put("displayName", newMeta.get("displayName").toString());
-            }
-            // Falls lore als Liste vorliegt, alle Einträge in Strings umwandeln
-            if (newMeta.containsKey("lore") && newMeta.get("lore") instanceof List) {
-                List<?> loreList = (List<?>) newMeta.get("lore");
-                List<String> newLore = new ArrayList<>();
-                for (Object o : loreList) {
-                    newLore.add(o.toString());
-                }
-                newMeta.put("lore", newLore);
-            }
-            data.put((K) "meta", (V) newMeta);
-        }
-        return data;
-    }
-
 
     // Liefert alle Spielernamen aus der Datenbank (für Tabcompletion)
     public List<String> getAllPlayers() {

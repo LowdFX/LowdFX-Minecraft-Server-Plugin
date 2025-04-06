@@ -40,17 +40,20 @@ public final class WarnManager {
         ArrayList<Warn> warns = WARNS.computeIfAbsent(player, k -> new ArrayList<>());
         warns.add(new Warn(player, by instanceof Player p ? p.getName() : "Console", reason, System.currentTimeMillis()));
 
+        String name = Bukkit.getOfflinePlayer(player).getName();
+
         if (warns.size() == 2) {
-            Utilities.ban(Bukkit.getOfflinePlayer(player).getPlayerProfile(), banMessage(player),
+            Utilities.ban(player, name, banMessage(player),
                     Configuration.WARNING_TEMPBAN_DURATION > 0 ? java.time.Duration.ofMillis(Configuration.WARNING_TEMPBAN_DURATION) : null,
                     "Warn System");
             by.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize(
                     "<green>Spieler wurde für <red>" + Time.preciselyFormat(Configuration.WARNING_TEMPBAN_DURATION / 1000) + " <green> temporär gebannt.")));
         } else if (warns.size() >= 3) {
-            Utilities.ban(Bukkit.getOfflinePlayer(player).getPlayerProfile(), banMessage(player), null, "Warn System");
+            Utilities.ban(player, name, banMessage(player), null, "Warn System");
             by.sendMessage(LowdFX.serverMessage(MiniMessage.miniMessage().deserialize("<green>Spieler wurde <red>permanent <green> gebannt.")));
         }
     }
+
 
     public static int amount(UUID user) {
         ArrayList<Warn> warns = WARNS.get(user);
@@ -102,7 +105,7 @@ public final class WarnManager {
         if (warns.isEmpty())
             WARNS.remove(user);
         else if (warns.size() < 2) {
-            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
+            Utilities.unban(user);
         }
         return true;
     }
@@ -110,7 +113,7 @@ public final class WarnManager {
     public static boolean removeAllWarns(UUID user) {
         if (WARNS.containsKey(user)) {
             WARNS.remove(user);
-            Utilities.unban(Bukkit.getOfflinePlayer(user).getPlayerProfile());
+            Utilities.unban(user);
             return true;
         }
         return false;

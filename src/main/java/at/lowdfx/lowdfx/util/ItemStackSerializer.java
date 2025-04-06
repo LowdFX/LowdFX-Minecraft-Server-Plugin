@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Registry;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -170,17 +171,20 @@ public class ItemStackSerializer {
      * Versucht, anhand eines Enchantment-Schlüssel-Strings den Enchantment zu ermitteln.
      * Nutzt NamespacedKey.fromString() und als Fallback Enchantment.getByName().
      */
+    @Deprecated
     private static Enchantment parseEnchantment(String keyStr) {
         NamespacedKey key = NamespacedKey.fromString(keyStr);
         if (key == null) {
-            // Fallback: entferne "minecraft:" falls vorhanden
             keyStr = keyStr.replace("minecraft:", "");
             key = NamespacedKey.minecraft(keyStr);
         }
+
         Enchantment ench = Enchantment.getByKey(key);
+
         if (ench == null) {
-            ench = Enchantment.getByName(keyStr.toUpperCase());
+            ench = Enchantment.getByName(keyStr.toUpperCase()); // Optionaler Fallback (Legacy)
         }
+
         return ench;
     }
 }

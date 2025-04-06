@@ -1,5 +1,6 @@
 package at.lowdfx.lowdfx.util;
 
+import io.papermc.paper.plugin.configuration.PluginMeta;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 public class UpdaterJoinListener implements Listener {
@@ -37,7 +39,7 @@ public class UpdaterJoinListener implements Listener {
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                URL url = new URL(updateUrl);
+                URL url = URI.create(updateUrl).toURL();
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);
@@ -45,12 +47,12 @@ public class UpdaterJoinListener implements Listener {
                 String latestVersion = reader.readLine().trim();
                 reader.close();
 
-                String currentVersion = plugin.getDescription().getVersion();
+                String currentVersion = plugin.getPluginMeta().getVersion();
                 if (!currentVersion.equals(latestVersion)) {
                     // Neue Version verfügbar, Nachricht im Hauptthread senden
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
-                        player.sendMessage("§e[LowdFX Updater] Es gibt ein Update: Version " + latestVersion +
-                                " ist verfügbar! Download: " + downloadLink);
+                        player.sendMessage("§6§l[LowdFX] §eEs gibt ein Update: §6§lVersion " + latestVersion +
+                                " §eist verfügbar! §e§lDownload: §9" + downloadLink);
                     });
                 }
             } catch (Exception e) {

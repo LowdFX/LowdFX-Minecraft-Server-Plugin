@@ -1,6 +1,7 @@
 package at.lowdfx.lowdfx.managers;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -45,6 +46,11 @@ public final class EmojiManager {
                 EMOJIS.put(key, component);
             }
         }
+    }
+    public static String getEmojiMiniMessage(String code) {
+        Component emoji = getEmojiSymbol(code);
+        if (emoji == null) return null;
+        return MiniMessage.miniMessage().serialize(emoji);
     }
 
     /**

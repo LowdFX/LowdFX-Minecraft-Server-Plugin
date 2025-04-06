@@ -1,7 +1,9 @@
 package at.lowdfx.lowdfx.listeners;
 
 import at.lowdfx.lowdfx.managers.EmojiManager;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +11,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 
 public class ChatEmojiTabCompleteListener implements Listener {
-
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onChatTabComplete(PlayerChatTabCompleteEvent event) {
         // Das zuletzt eingegebene Token (z. B. ":sm")
@@ -31,22 +33,19 @@ public class ChatEmojiTabCompleteListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        String message = event.getMessage();
-        // Verwende den Serializer, der § als Farbcode ausgibt
-        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
-        // Ersetze :code: durch das passende Symbol
+    public void onPlayerChat(AsyncChatEvent event) {
+        String rawMessage = MiniMessage.miniMessage().serialize(event.message());
+
         for (String code : EmojiManager.getEmojiCodes()) {
-            String find = ":" + code + ":";
-            if (message.contains(find)) {
-                Component symbolComponent = EmojiManager.getEmojiSymbol(code);
-                if (symbolComponent != null) {
-                    // Dies liefert einen String mit §-Farbmarkierungen, z. B. "§6❤"
-                    String symbol = serializer.serialize(symbolComponent);
-                    message = message.replace(find, symbol);
-                }
+            String placeholder = ":" + code + ":";
+            String miniEmoji = EmojiManager.getEmojiMiniMessage(code);
+            if (miniEmoji != null) {
+                rawMessage = rawMessage.replace(placeholder, miniEmoji);
             }
         }
-        event.setMessage(message);
+
+        Component updated = MiniMessage.miniMessage().deserialize(rawMessage);
+        event.message(updated);
     }
+
 }
