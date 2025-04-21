@@ -76,7 +76,7 @@ public final class LowdFX extends JavaPlugin {
 
        // Plugin Updater
        String updateUrl = "https://raw.githubusercontent.com/LowdFX/LowdFX-Minecraft-Server-Plugin/refs/heads/master/update.txt";
-       String downloadLink = "https://github.com/LowdFX/LowdFX-Minecraft-Server-Plugin/releases";
+       String downloadLink = "https://www.spigotmc.org/resources/lowdfx.123832/";
        getServer().getPluginManager().registerEvents(new UpdaterJoinListener(this, updateUrl, downloadLink), this);
 
 
