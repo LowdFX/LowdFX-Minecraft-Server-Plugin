@@ -21,8 +21,8 @@ public final class Perms {
     public enum Perm {
         ANVIL(              "lowdfx.inv.anvil",         "/anvil",                               OP),
         BACK(               "lowdfx.back",              "/back",                                OP),
-        CHEST_SHOP(         "lowdfx.chestshop",         "/shop",                                TRUE),
-        CHEST_SHOP_ADMIN(   "lowdfx.chestshop.admin",   "/shop",                                OP),
+        CHEST_SHOP(         "lowdfx.chestshop",         "/sh",                                  TRUE),
+        CHEST_SHOP_ADMIN(   "lowdfx.chestshop.admin",   "/sh",                                  OP),
         ENDERSEE(           "lowdfx.inv.endersee",      "/endersee",                            OP),
         FEED(               "lowdfx.feed",              "/feed",                                OP),
         FLY(                "lowdfx.fly",               "/fly",                                 OP),

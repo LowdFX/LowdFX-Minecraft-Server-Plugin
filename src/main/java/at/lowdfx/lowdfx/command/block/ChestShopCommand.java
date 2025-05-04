@@ -29,19 +29,19 @@ import java.util.Collection;
 public final class ChestShopCommand {
 
     static {
-        CommandHelp.register("shop",
+        CommandHelp.register("sh",
                 // Kurzinfo (wird in der Übersicht angezeigt)
-                MiniMessage.miniMessage().deserialize("/help shop"),
+                MiniMessage.miniMessage().deserialize("/help sh"),
                 // Ausführliche Beschreibung für normale Spieler
                 MiniMessage.miniMessage().deserialize(
                         "<gray>Mit diesem Befehl kannst du eine Shop Kiste erstellen/verwalten.<newline>" +
-                                "<yellow>· /shop create <price><newline>" +
-                                "· /shop item<newline>" +
-                                "· /shop whitelist add <player><newline>" +
-                                "· /shop whitelist remove <player><newline>" +
-                                "· /shop whitelist list</yellow>"),
+                                "<yellow>· /sh create <price><newline>" +
+                                "· /sh item<newline>" +
+                                "· /sh whitelist add <player><newline>" +
+                                "· /sh whitelist remove <player><newline>" +
+                                "· /sh whitelist list</yellow>"),
                 // Zusätzlicher Admin-Teil (optional)
-                MiniMessage.miniMessage().deserialize("<yellow>· /shop fix-holograms</yellow>"),
+                MiniMessage.miniMessage().deserialize("<yellow>· /sh fix-holograms</yellow>"),
                 // Basis-Permission
                 Perms.Perm.CHEST_SHOP.getPermission(),
                 // Admin-Permission (hier wird der Admin-Text nur angezeigt, wenn der Spieler diese besitzt)
@@ -49,7 +49,7 @@ public final class ChestShopCommand {
     }
 
     public static LiteralCommandNode<CommandSourceStack> command() {
-        return LiteralArgumentBuilder.<CommandSourceStack>literal("chest-shop")
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("sh")
                 .requires(source -> Perms.check(source, Perms.Perm.CHEST_SHOP) && source.getExecutor() instanceof Player)
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("create")
                         .then(RequiredArgumentBuilder.<CommandSourceStack, Integer>argument("price", IntegerArgumentType.integer(1))

@@ -98,7 +98,7 @@ public final class LowdFX extends JavaPlugin {
         ServerUtils.registerEvents(new ConnectionEvents(), new KitEvents(), new ChestShopEvents(), new LockEvents(), new VanishEvents(), new MuteEvents());
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
-            registrar.register(ChestShopCommand.command(), "Erstelle oder verwalte einen Kisten-Shop.", List.of("shop"));
+            registrar.register(ChestShopCommand.command(), "Erstelle oder verwalte einen Kisten-Shop.");
             registrar.register(HomeCommand.command(), "Teleportiert dich zu deinem Home.");
             registrar.register(InventoryCommands.anvilCommand(), "Öffnet einen Amboss.", List.of("amboss"));
             registrar.register(InventoryCommands.enderseeCommand(), "Öffnet die Enderchest von einem Spieler.");
